@@ -1,0 +1,24 @@
+{
+  "profiles": {
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    },
+    "generate": {
+      "commandName": "Project",
+      "commandLineArgs": "generate --dir \"D:\\Workspace\\Projects\\Ivet\\Ivet\\bin\\Debug\\net6.0\" --output \"D:\\Workspace\\Projects\\Ivet\\Migrations\""
+    },
+    "upgrade": {
+      "commandName": "Project",
+      "commandLineArgs": "upgrade --input \"D:\\Workspace\\Projects\\Ivet\\Migrations\""
+    },
+    "list": {
+      "commandName": "Project",
+      "commandLineArgs": "list --input \"D:\\Workspace\\Projects\\Ivet\\Migrations\""
+    },
+    "test": {
+      "commandName": "Project",
+      "commandLineArgs": "test"
+    }
+  }
+}
