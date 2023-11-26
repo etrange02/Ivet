@@ -129,5 +129,209 @@ namespace Ivet.Tests.Services.Converters
             Assert.Empty(result.CompositeIndexes);
             Assert.Empty(result.IndexBindings);
         }
+
+        [Fact]
+        public void ConvertTest_NoProperties()
+        {
+            // Arrange
+            var schema = new Schema
+            {
+                Edges = { typeof(EdgeSample) },
+                Vertices = { typeof(VertexSample) }
+            };
+
+            // Act
+            var result = LibraryToSchemaConverter.Convert(schema);
+
+            //Assert
+            Assert.NotNull(result);
+            Assert.Single(result.Vertices);
+            Assert.Single(result.Edges);
+            Assert.Single(result.Connections);
+            Assert.Empty(result.Properties);
+            Assert.Empty(result.EdgePropertyBindings);
+            Assert.Empty(result.VertexPropertyBindings);
+            Assert.Empty(result.MixedIndexes);
+            Assert.Empty(result.CompositeIndexes);
+            Assert.Empty(result.IndexBindings);
+        }
+
+        [Theory]
+        [InlineData(typeof(PropertyVertex), "MyProperty", "String.class", Cardinality.SINGLE)]
+        [InlineData(typeof(NamedPropertyVertex), "My property", "String.class", Cardinality.SINGLE)]
+        [InlineData(typeof(CardinalityPropertyVertex), "MyProperty", "String.class", Cardinality.LIST)]
+        public void ConvertTest_VertexProperty(Type vertexType, string propertyName, string propertyType, Cardinality cardinality)
+        {
+            // Arrange
+            var schema = new Schema
+            {
+                Vertices = { vertexType }
+            };
+
+            // Act
+            var result = LibraryToSchemaConverter.Convert(schema);
+
+            //Assert
+            Assert.NotNull(result);
+            Assert.NotEmpty(result.Vertices);
+            Assert.Empty(result.Edges);
+            Assert.Empty(result.Connections);
+            Assert.Single(result.Properties);
+            Assert.Equal(propertyName, result.Properties[0].Name);
+            Assert.Equal(propertyType, result.Properties[0].DataType);
+            Assert.Equal(cardinality, result.Properties[0].Cardinality);
+            Assert.NotNull(result.Properties[0].PropertyInfo);
+            Assert.Empty(result.EdgePropertyBindings);
+            Assert.NotEmpty(result.VertexPropertyBindings);
+            Assert.Empty(result.MixedIndexes);
+            Assert.Empty(result.CompositeIndexes);
+            Assert.Empty(result.IndexBindings);
+        }
+
+        [Fact]
+        public void ConvertTest_EdgeProperty()
+        {
+            // Arrange
+            var schema = new Schema
+            {
+                Edges = { typeof(PropertyEdge) }
+            };
+
+            // Act
+            var result = LibraryToSchemaConverter.Convert(schema);
+
+            //Assert
+            Assert.NotNull(result);
+            Assert.Empty(result.Vertices);
+            Assert.NotEmpty(result.Edges);
+            Assert.NotEmpty(result.Connections);
+            Assert.Single(result.Properties);
+            Assert.Equal("MyProperty", result.Properties[0].Name);
+            Assert.Equal("String.class", result.Properties[0].DataType);
+            Assert.Equal(Cardinality.SINGLE, result.Properties[0].Cardinality);
+            Assert.NotNull(result.Properties[0].PropertyInfo);
+            Assert.NotEmpty(result.EdgePropertyBindings);
+            Assert.Empty(result.VertexPropertyBindings);
+            Assert.Empty(result.MixedIndexes);
+            Assert.Empty(result.CompositeIndexes);
+            Assert.Empty(result.IndexBindings);
+        }
+
+        [Fact]
+        public void ConvertTest_PropertiesWithSameName()
+        {
+            // Arrange
+            var schema = new Schema
+            {
+                Edges = { typeof(PropertyEdge) },
+                Vertices = { typeof(PropertyVertex) }
+            };
+
+            // Act
+            var result = LibraryToSchemaConverter.Convert(schema);
+
+            //Assert
+            Assert.NotNull(result);
+            Assert.NotEmpty(result.Vertices);
+            Assert.NotEmpty(result.Edges);
+            Assert.NotEmpty(result.Connections);
+            Assert.Single(result.Properties);
+            Assert.Equal("MyProperty", result.Properties[0].Name);
+            Assert.Equal("String.class", result.Properties[0].DataType);
+            Assert.Equal(Cardinality.SINGLE, result.Properties[0].Cardinality);
+            Assert.NotNull(result.Properties[0].PropertyInfo);
+            Assert.NotEmpty(result.EdgePropertyBindings);
+            Assert.NotEmpty(result.VertexPropertyBindings);
+            Assert.Empty(result.MixedIndexes);
+            Assert.Empty(result.CompositeIndexes);
+            Assert.Empty(result.IndexBindings);
+        }
+
+        [Theory]
+        [InlineData(typeof(PropertyEdge), "PropertyEdge", "MyProperty")]
+        public void ConvertTest_EdgePropertyBinding(Type edgeType, string entity, string property)
+        {
+            // Arrange
+            var schema = new Schema
+            {
+                Edges = { edgeType }
+            };
+
+            // Act
+            var result = LibraryToSchemaConverter.Convert(schema);
+
+            //Assert
+            Assert.NotNull(result);
+            Assert.Empty(result.Vertices);
+            Assert.NotEmpty(result.Edges);
+            Assert.NotEmpty(result.Connections);
+            Assert.NotEmpty(result.Properties);
+            Assert.Single(result.EdgePropertyBindings);
+            Assert.Equal(entity, result.EdgePropertyBindings[0].Entity);
+            Assert.Equal(property, result.EdgePropertyBindings[0].Name);
+            Assert.Empty(result.VertexPropertyBindings);
+            Assert.Empty(result.MixedIndexes);
+            Assert.Empty(result.CompositeIndexes);
+            Assert.Empty(result.IndexBindings);
+        }
+
+        [Theory]
+        [InlineData(typeof(PropertyVertex), "PropertyVertex", "MyProperty")]
+        public void ConvertTest_VertexPropertyBinding(Type vertexType, string entity, string property)
+        {
+            // Arrange
+            var schema = new Schema
+            {
+                Vertices = { vertexType }
+            };
+
+            // Act
+            var result = LibraryToSchemaConverter.Convert(schema);
+
+            //Assert
+            Assert.NotNull(result);
+            Assert.NotEmpty(result.Vertices);
+            Assert.Empty(result.Edges);
+            Assert.Empty(result.Connections);
+            Assert.NotEmpty(result.Properties);
+            Assert.Empty(result.EdgePropertyBindings);
+            Assert.Single(result.VertexPropertyBindings);
+            Assert.Equal(entity, result.VertexPropertyBindings[0].Entity);
+            Assert.Equal(property, result.VertexPropertyBindings[0].Name);
+            Assert.Empty(result.MixedIndexes);
+            Assert.Empty(result.CompositeIndexes);
+            Assert.Empty(result.IndexBindings);
+        }
+
+        [Fact]
+        public void ConvertTest_PropertyBindingsWithSameName()
+        {
+            // Arrange
+            var schema = new Schema
+            {
+                Edges = { typeof(PropertyEdge) },
+                Vertices = { typeof(PropertyVertex) }
+            };
+
+            // Act
+            var result = LibraryToSchemaConverter.Convert(schema);
+
+            //Assert
+            Assert.NotNull(result);
+            Assert.NotEmpty(result.Vertices);
+            Assert.NotEmpty(result.Edges);
+            Assert.NotEmpty(result.Connections);
+            Assert.NotEmpty(result.Properties);
+            Assert.NotNull(result.Properties[0].PropertyInfo);
+            Assert.Single(result.EdgePropertyBindings);
+            Assert.Equal("PropertyEdge", result.EdgePropertyBindings[0].Entity);
+            Assert.Equal("MyProperty", result.EdgePropertyBindings[0].Name);
+            Assert.Single(result.VertexPropertyBindings);
+            Assert.Equal("PropertyVertex", result.VertexPropertyBindings[0].Entity);
+            Assert.Equal("MyProperty", result.VertexPropertyBindings[0].Name);
+            Assert.Empty(result.MixedIndexes);
+            Assert.Empty(result.CompositeIndexes);
+            Assert.Empty(result.IndexBindings);
+        }
     }
 }
