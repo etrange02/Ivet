@@ -14,7 +14,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ivet.Tests", "Ivet.Tests\Iv
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ivet.TestModel1", "Ivet.TestModel\Ivet.TestModel1.csproj", "{FCA62E58-B686-4500-94AF-B925D40ADCBA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ivet.TestFramework", "Ivet.TestFramework\Ivet.TestFramework.csproj", "{9122500F-6168-4C76-AC8A-C715B2B4A769}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ivet.TestFramework", "Ivet.TestFramework\Ivet.TestFramework.csproj", "{9122500F-6168-4C76-AC8A-C715B2B4A769}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "Éléments de solution", "{8BC0EC70-7236-42CA-8DE4-C40A46D13F1F}"
+	ProjectSection(SolutionItems) = preProject
+		Readme.md = Readme.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

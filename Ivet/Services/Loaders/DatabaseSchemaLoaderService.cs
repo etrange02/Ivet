@@ -4,9 +4,9 @@ namespace Ivet.Services.Loaders
 {
     public class DatabaseSchemaLoaderService
     {
-        private readonly DatabaseService _databaseService;
+        private readonly IDatabaseService _databaseService;
 
-        public DatabaseSchemaLoaderService(DatabaseService databaseService)
+        public DatabaseSchemaLoaderService(IDatabaseService databaseService)
         {
             _databaseService = databaseService;
         }
@@ -17,7 +17,8 @@ namespace Ivet.Services.Loaders
             var edgeSchema = _databaseService.GetEdgeSchema();
             var propertyKeySchema = _databaseService.GetPropertyKeysSchema();
             var connectionSchema = _databaseService.GetConnectionSchema();
-            var propertyBindingSchema = _databaseService.GetPropertyBindingsSchema();
+            var vertexPropertyBindingSchema = _databaseService.GetVertexPropertyBindingsSchema();
+            var edgePropertyBindingSchema = _databaseService.GetEdgesPropertyBindingsSchema();
             var indices = _databaseService.GetIndexSchema();
             var indexBindings = _databaseService.GetIndexBindingSchema();
 
@@ -28,7 +29,8 @@ namespace Ivet.Services.Loaders
             schema.Edges.AddRange(parser.GetEdges(edgeSchema));
             schema.PropertyKeys.AddRange(parser.GetPropertyKeys(propertyKeySchema));
             schema.Connections.AddRange(parser.GetConnections(connectionSchema));
-            schema.PropertyBindings.AddRange(parser.GetPropertyBindings(propertyBindingSchema));
+            schema.VertexPropertyBindings.AddRange(parser.GetPropertyBindings(vertexPropertyBindingSchema));
+            schema.EdgesPropertyBindings.AddRange(parser.GetPropertyBindings(edgePropertyBindingSchema));
             schema.Indices.AddRange(parser.GetIndices(indices));
             schema.IndexBindings.AddRange(parser.GetIndexBindings(indexBindings));
 

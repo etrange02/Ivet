@@ -1,5 +1,4 @@
 ﻿using CommandLine;
-using System.Reflection;
 
 namespace Ivet.Verbs.Model
 {
@@ -15,7 +14,7 @@ namespace Ivet.Verbs.Model
         [Option("dir", HelpText = "Directory where to find dlls", Required = true)]
         public string Directory { get; set; } = string.Empty;
 
-        [Option("output", HelpText = "Directory where to find dlls", Required = true)]
+        [Option("output", HelpText = "Directory where to put migration file", Required = true)]
         public string OutputDirectory { get; set; } = string.Empty;
     }
 }

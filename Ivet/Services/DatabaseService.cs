@@ -5,7 +5,7 @@ using static ExRam.Gremlinq.Core.GremlinQuerySource;
 
 namespace Ivet.Services
 {
-    public class DatabaseService : IDisposable
+    public class DatabaseService : IDisposable, IDatabaseService
     {
         private GremlinClient? _client;
         private bool disposedValue;
@@ -79,7 +79,7 @@ namespace Ivet.Services
 
         public string GetConnectionSchema()
         {
-            var res =  _client.SubmitAsync<string>(
+            var res = _client.SubmitAsync<string>(
                "mgmt = graph.openManagement(); " +
                $"result = \"|Edge|Ingoing|Outgoing|\\n\" ;" +
                 "edges = mgmt.getRelationTypes(EdgeLabel.class);" +
@@ -93,7 +93,23 @@ namespace Ivet.Services
             return res;
         }
 
-        public string GetPropertyBindingsSchema()
+        public string GetVertexPropertyBindingsSchema()
+        {
+            var res = _client.SubmitAsync<string>(
+               "mgmt = graph.openManagement(); " +
+               $"result = \"|Name|Entity|\\n\" ;" +
+                "vertices = mgmt.getVertexLabels();" +
+                "for (vertexLabel in vertices) {" +
+                    " vertexLabel.mappedProperties().each() { property -> " +
+                        $" result += '|' << property.name() << '|' << vertexLabel.name() << '|\\n';" +
+                    "};" +
+                "};" +
+                "return result;"
+                ).Result.Single();
+            return res;
+        }
+
+        public string GetEdgesPropertyBindingsSchema()
         {
             var res = _client.SubmitAsync<string>(
                "mgmt = graph.openManagement(); " +
@@ -102,12 +118,6 @@ namespace Ivet.Services
                 "for (edgeLabel in edges) {" +
                     " edgeLabel.mappedProperties().each() { property -> " +
                         $" result += '|' << property.name() << '|' << edgeLabel.name() << '|\\n';" +
-                    "};" +
-                "};" +
-                "vertices = mgmt.getVertexLabels();" +
-                "for (vertexLabel in vertices) {" +
-                    " vertexLabel.mappedProperties().each() { property -> " +
-                        $" result += '|' << property.name() << '|' << vertexLabel.name() << '|\\n';" +
                     "};" +
                 "};" +
                 "return result;"
@@ -148,7 +158,7 @@ namespace Ivet.Services
                             "for (parameter in parameters) {" +
                                 $" result += '|' << index.name() << '|' << property.name() << '|' << parameter.value() << '|\\n';" +
                             "};" +
-                        "};" + 
+                        "};" +
                     "};" +
                 "};" +
                 "return result;"

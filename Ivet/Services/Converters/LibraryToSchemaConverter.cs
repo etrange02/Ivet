@@ -17,6 +17,7 @@ namespace Ivet.Services.Converters
             result.Properties.AddRange(GetProperties(schema));
             result.Connections.AddRange(GetConnections(result));
             result.VertexPropertyBindings.AddRange(GetVertexPropertyBindings(result));
+            result.EdgePropertyBindings.AddRange(GetEdgePropertyBindings(result));
             result.CompositeIndexes.AddRange(GetCompositeIndices(result));
             result.MixedIndexes.AddRange(GetMixedIndices(schema));
             result.IndexBindings.AddRange(GetIndexBindings(result));
@@ -24,7 +25,7 @@ namespace Ivet.Services.Converters
             return result;
         }
 
-        public static IEnumerable<MetaVertex> GetVertices(Schema schema)
+        private static IEnumerable<MetaVertex> GetVertices(Schema schema)
         {
             return schema.Vertices.ConvertAll(x =>
             {
@@ -40,7 +41,7 @@ namespace Ivet.Services.Converters
             }).DistinctBy(x => x.Name);
         }
 
-        public static IEnumerable<MetaEdge> GetEdges(Schema schema)
+        private static IEnumerable<MetaEdge> GetEdges(Schema schema)
         {
             return schema.Edges.ConvertAll(x =>
             {
@@ -77,7 +78,7 @@ namespace Ivet.Services.Converters
             }));
         }
 
-        public static IEnumerable<MetaPropertyKey> GetProperties(Schema schema)
+        private static IEnumerable<MetaPropertyKey> GetProperties(Schema schema)
         {
             return schema.Vertices.Concat(schema.Edges).SelectMany(x =>
             {
@@ -97,7 +98,7 @@ namespace Ivet.Services.Converters
             }).DistinctBy(x => x.Name);
         }
 
-        public static IEnumerable<MetaConnection> GetConnections(MetaSchema metaSchema)
+        private static IEnumerable<MetaConnection> GetConnections(MetaSchema metaSchema)
         {
             return metaSchema.Edges.Select(x =>
             {
@@ -113,12 +114,12 @@ namespace Ivet.Services.Converters
             });
         }
 
-        public static IEnumerable<MetaPropertyBinding> GetVertexPropertyBindings(MetaSchema metaSchema)
+        private static IEnumerable<MetaPropertyBinding> GetVertexPropertyBindings(MetaSchema metaSchema)
         {
             return GetPropertyBindings(metaSchema.Vertices);
         }
 
-        public static IEnumerable<MetaPropertyBinding> GetEdgePropertyBindings(MetaSchema metaSchema)
+        private static IEnumerable<MetaPropertyBinding> GetEdgePropertyBindings(MetaSchema metaSchema)
         {
             return GetPropertyBindings(metaSchema.Edges);
         }
@@ -141,7 +142,7 @@ namespace Ivet.Services.Converters
             });
         }
 
-        public static IEnumerable<MetaCompositeIndex> GetCompositeIndices(MetaSchema schema)
+        private static IEnumerable<MetaCompositeIndex> GetCompositeIndices(MetaSchema schema)
         {
             return GetAllCompositeIndices<CompositeIndexAttribute>(schema.Vertices, ConvertCompositeAttribute)
                 .Concat(GetAllCompositeIndices<PrimaryKeyAttribute>(schema.Vertices, ConvertPrimaryAttribute))
@@ -186,7 +187,7 @@ namespace Ivet.Services.Converters
             });
         }
 
-        public static IEnumerable<MetaMixedIndex> GetMixedIndices(Schema schema)
+        private static IEnumerable<MetaMixedIndex> GetMixedIndices(Schema schema)
         {
             return schema.Vertices.Concat(schema.Edges).SelectMany(x =>
             {
@@ -209,7 +210,7 @@ namespace Ivet.Services.Converters
             }).DistinctBy(x => x.Name);
         }
 
-        public static IEnumerable<MetaIndexBinding> GetIndexBindings(MetaSchema schema)
+        private static IEnumerable<MetaIndexBinding> GetIndexBindings(MetaSchema schema)
         {
             return GetAllIndexBindings<CompositeIndexAttribute>(schema.Vertices, ConvertCompositeBinding)
                 .Concat(GetAllIndexBindings<PrimaryKeyAttribute>(schema.Vertices, ConvertPrimaryBinding))

@@ -34,12 +34,12 @@ namespace Ivet.Services.Converters
                 Ingoing = x.Ingoing,
                 Outgoing = x.Outgoing
             }));
-            result.VertexPropertyBindings.AddRange(schema.PropertyBindings.ConvertAll(x => new MetaPropertyBinding
+            result.VertexPropertyBindings.AddRange(schema.VertexPropertyBindings.ConvertAll(x => new MetaPropertyBinding
             {
                 Name = x.Name,
                 Entity = x.Entity
             }));
-            result.EdgePropertyBindings.AddRange(schema.PropertyBindings.ConvertAll(x => new MetaPropertyBinding
+            result.EdgePropertyBindings.AddRange(schema.EdgesPropertyBindings.ConvertAll(x => new MetaPropertyBinding
             {
                 Name = x.Name,
                 Entity = x.Entity
@@ -48,14 +48,12 @@ namespace Ivet.Services.Converters
             {
                 Name = x.Name,
                 IsUnique = x.IsUnique,
-                Kind = x.IndexedElement,
                 IndexedElement = x.IndexedElement,
             }));
             result.MixedIndexes.AddRange(schema.Indices.Where(x => !x.IsCompositeIndex).Select(x => new MetaMixedIndex
             {
                 Name = x.Name,
                 BackendIndex = x.BackendIndex,
-                Kind = x.IndexedElement,
                 IndexedElement = x.IndexedElement,
             }));
             result.IndexBindings.AddRange(schema.IndexBindings.ConvertAll(x => new MetaIndexBinding
