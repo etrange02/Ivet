@@ -396,3 +396,16 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/conf
+/Migrations
+/Migrations2
+/Ivet.Model/Old
+/20230830_Docker_Kubernetes.txt
+/Cassandra 3.11.txt
+/Dockerfile.bak
+/JanusGraphManagement_1.txt
+/JanusGraphManagement_2.txt
+/Readme.txt
+/Sage.txt
+/server_start_inmemory.bat
+/server_start_solr.bat

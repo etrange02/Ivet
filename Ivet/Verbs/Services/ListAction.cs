@@ -23,7 +23,7 @@ namespace Ivet.Verbs.Services
             var allMigrations = migrations.ConvertAll(x =>
             {
                 var y = appliedMigrations.FirstOrDefault(migr => migr.MigrationName == x.Name);
-                return new { Name = x.Name, Description = x.Migration?.Description, Date = y?.MigrationDate };
+                return new { x.Name, x.Migration?.Description, Date = y?.MigrationDate };
             }).OrderBy(x => x.Name).ToList();
 
             var table = new ConsoleTable("Name", "Description", "Date");

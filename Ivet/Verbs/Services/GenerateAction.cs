@@ -1,7 +1,5 @@
 ﻿using Ivet.Model;
-using Ivet.Model.Meta;
 using Ivet.Services;
-using Ivet.Services.Comparers;
 using Ivet.Services.Converters;
 using Ivet.Services.Loaders;
 using Ivet.Verbs.Model;
@@ -25,16 +23,8 @@ namespace Ivet.Verbs.Services
             var librarySchema = librarySchemaLoader.Load(options.Directory);
             metaSchema.Target = LibraryToSchemaConverter.Convert(librarySchema);
 
-            metaSchema.Difference = new MetaSchema();
-            metaSchema.Difference.Vertices.AddRange(metaSchema.Target.Vertices.ExceptBy(metaSchema.Source.Vertices.Select(x => x.Name), x => x.Name));
-            metaSchema.Difference.Edges.AddRange(metaSchema.Target.Edges.ExceptBy(metaSchema.Source.Edges.Select(x => x.Name), x => x.Name));
-            metaSchema.Difference.Properties.AddRange(metaSchema.Target.Properties.ExceptBy(metaSchema.Source.Properties.Select(x => x.Name), x => x.Name));
-            metaSchema.Difference.Connections.AddRange(metaSchema.Target.Connections.Except(metaSchema.Source.Connections, new ConnectionComparer()));
-            metaSchema.Difference.VertexPropertyBindings.AddRange(metaSchema.Target.VertexPropertyBindings.Except(metaSchema.Source.VertexPropertyBindings, new PropertyBindingComparer()));
-            metaSchema.Difference.EdgePropertyBindings.AddRange(metaSchema.Target.EdgePropertyBindings.Except(metaSchema.Source.EdgePropertyBindings, new PropertyBindingComparer()));
-            metaSchema.Difference.CompositeIndexes.AddRange(metaSchema.Target.CompositeIndexes.Except(metaSchema.Source.CompositeIndexes, new CompositeIndexComparer()));
-            metaSchema.Difference.MixedIndexes.AddRange(metaSchema.Target.MixedIndexes.Except(metaSchema.Source.MixedIndexes, new MixedIndexComparer()));
-            metaSchema.Difference.IndexBindings.AddRange(metaSchema.Target.IndexBindings.Except(metaSchema.Source.IndexBindings, new IndexBindingComparer()));
+            var deltaSchemaMaker = new DeltaSchemaMakerService();
+            metaSchema.Difference = deltaSchemaMaker.Difference(metaSchema.Source, metaSchema.Target);
 
             var builder = new MigrationBuilder();
             builder.MetaSchema = metaSchema.Difference;
