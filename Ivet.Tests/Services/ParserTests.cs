@@ -17,7 +17,7 @@ namespace Ivet.Tests.Services
             var label = _randomGenerator.RandomString();
             var isPartitionned = _randomGenerator.RandomBool();
             var isStatic = _randomGenerator.RandomBool();
-            var content = $"Vertex Label Name  | Partitioned | Static  |\r\n----\r\n{label}    | {isPartitionned}       | {isStatic}   |";
+            var content = $"Vertex Label Name  | Partitioned | Static  |{ Environment.NewLine }----{ Environment.NewLine }{label}    | {isPartitionned}       | {isStatic}   |";
 
             // Act
             var result = sut.GetVertices(content);
@@ -39,7 +39,7 @@ namespace Ivet.Tests.Services
             var isDirected = _randomGenerator.RandomBool();
             var isUnidirected = _randomGenerator.RandomBool();
             var multiplicity = _randomGenerator.RandomEnum<Multiplicity>();
-            var content = $"Edge Label Name  | Directed    | Unidirected | Multiplicity   |\r\n------\r\n{label}  | {isDirected} | {isUnidirected} | {multiplicity}  |";
+            var content = $"Edge Label Name  | Directed    | Unidirected | Multiplicity   |{ Environment.NewLine }------{ Environment.NewLine }{label}  | {isDirected} | {isUnidirected} | {multiplicity}  |";
 
             // Act
             var result = sut.GetEdges(content);
@@ -61,7 +61,7 @@ namespace Ivet.Tests.Services
             var label = _randomGenerator.RandomString();
             var cardinality = _randomGenerator.RandomEnum<Cardinality>();
             var dataType = _randomGenerator.RandomString();
-            var content = $"Property Key Name | Cardinality | Data Type  |\r\n---\r\n{label}  | {cardinality}  | {dataType}  |";
+            var content = $"Property Key Name | Cardinality | Data Type  |{ Environment.NewLine }---{ Environment.NewLine }{label}  | {cardinality}  | {dataType}  |";
 
             // Act
             var result = sut.GetPropertyKeys(content);

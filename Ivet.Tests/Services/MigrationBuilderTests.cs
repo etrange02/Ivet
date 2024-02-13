@@ -45,7 +45,7 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Single(result);
-            Assert.Equal($"// Vertices\r\nmgmt.makeVertexLabel('{name}').make();\r\n// Edges\r\n\r\n// Properties\r\n\r\n// Vertex property bindings\r\n\r\n// Edge property bindings\r\n\r\n// Connections\r\n\r\n", result[0]);
+            Assert.Equal($"// Vertices{ Environment.NewLine }mgmt.makeVertexLabel('{name}').make();{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0]);
         }
 
         [Fact]
@@ -67,7 +67,7 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Single(result);
-            Assert.Equal($"// Vertices\r\nmgmt.makeVertexLabel('{name}').partition().make();\r\n// Edges\r\n\r\n// Properties\r\n\r\n// Vertex property bindings\r\n\r\n// Edge property bindings\r\n\r\n// Connections\r\n\r\n", result[0]);
+            Assert.Equal($"// Vertices{ Environment.NewLine }mgmt.makeVertexLabel('{name}').partition().make();{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0]);
         }
 
         [Fact]
@@ -87,7 +87,7 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Single(result);
-            Assert.Equal($"// Vertices\r\nmgmt.makeVertexLabel('{name}').setStatic().make();\r\n// Edges\r\n\r\n// Properties\r\n\r\n// Vertex property bindings\r\n\r\n// Edge property bindings\r\n\r\n// Connections\r\n\r\n", result[0]);
+            Assert.Equal($"// Vertices{ Environment.NewLine }mgmt.makeVertexLabel('{name}').setStatic().make();{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0]);
         }
 
         [Fact]
@@ -108,7 +108,7 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Single(result);
-            Assert.Equal($"// Vertices\r\nmgmt.makeVertexLabel('{name}').partition().setStatic().make();\r\n// Edges\r\n\r\n// Properties\r\n\r\n// Vertex property bindings\r\n\r\n// Edge property bindings\r\n\r\n// Connections\r\n\r\n", result[0]);
+            Assert.Equal($"// Vertices{ Environment.NewLine }mgmt.makeVertexLabel('{name}').partition().setStatic().make();{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0]);
         }
 
         [Fact]
@@ -129,7 +129,7 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Single(result);
-            Assert.Equal($"// Vertices\r\n\r\n// Edges\r\nmgmt.makeEdgeLabel('{ name }').multiplicity({ multiplicity.ToJavaString() }).make();\r\n// Properties\r\n\r\n// Vertex property bindings\r\n\r\n// Edge property bindings\r\n\r\n// Connections\r\n\r\n", result[0]);
+            Assert.Equal($"// Vertices{ Environment.NewLine }{ Environment.NewLine }// Edges{ Environment.NewLine }mgmt.makeEdgeLabel('{ name }').multiplicity({ multiplicity.ToJavaString() }).make();{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0]);
         }
 
         [Fact]
@@ -152,7 +152,7 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Single(result);
-            Assert.Equal($"// Vertices\r\n\r\n// Edges\r\n\r\n// Properties\r\nmgmt.makePropertyKey('{ name }').dataType({ dataType }).cardinality({ cardinality.ToJavaString() }).make();\r\n// Vertex property bindings\r\n\r\n// Edge property bindings\r\n\r\n// Connections\r\n\r\n", result[0]);
+            Assert.Equal($"// Vertices{ Environment.NewLine }{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }mgmt.makePropertyKey('{ name }').dataType({ dataType }).cardinality({ cardinality.ToJavaString() }).make();{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0]);
         }
 
         [Fact]
@@ -173,7 +173,7 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Single(result);
-            Assert.Equal($"// Vertices\r\n\r\n// Edges\r\n\r\n// Properties\r\n\r\n// Vertex property bindings\r\nvertex = mgmt.getVertexLabel('{ entity }');prop = mgmt.getPropertyKey('{ name }');mgmt.addProperties(vertex, prop);\r\n// Edge property bindings\r\n\r\n// Connections\r\n\r\n", result[0]);
+            Assert.Equal($"// Vertices{ Environment.NewLine }{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }vertex = mgmt.getVertexLabel('{ entity }');prop = mgmt.getPropertyKey('{ name }');mgmt.addProperties(vertex, prop);{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0]);
         }
 
         [Fact]
@@ -194,7 +194,7 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Single(result);
-            Assert.Equal($"// Vertices\r\n\r\n// Edges\r\n\r\n// Properties\r\n\r\n// Vertex property bindings\r\n\r\n// Edge property bindings\r\nedge = mgmt.getEdgeLabel('{ entity }');prop = mgmt.getPropertyKey('{ name }');mgmt.addProperties(edge, prop);\r\n// Connections\r\n\r\n", result[0]);
+            Assert.Equal($"// Vertices{ Environment.NewLine }{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }edge = mgmt.getEdgeLabel('{ entity }');prop = mgmt.getPropertyKey('{ name }');mgmt.addProperties(edge, prop);{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0]);
         }
 
         [Fact]
@@ -217,7 +217,7 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Single(result);
-            Assert.Equal($"// Vertices\r\n\r\n// Edges\r\n\r\n// Properties\r\n\r\n// Vertex property bindings\r\n\r\n// Edge property bindings\r\n\r\n// Connections\r\ninput = mgmt.getVertexLabel('{ ingoing }');output = mgmt.getVertexLabel('{ outgoing }');edge = mgmt.getEdgeLabel('{ edge }');mgmt.addConnection(edge, output, input);\r\n", result[0]);
+            Assert.Equal($"// Vertices{ Environment.NewLine }{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }input = mgmt.getVertexLabel('{ ingoing }');output = mgmt.getVertexLabel('{ outgoing }');edge = mgmt.getEdgeLabel('{ edge }');mgmt.addConnection(edge, output, input);{ Environment.NewLine }", result[0]);
         }
     }
 }
