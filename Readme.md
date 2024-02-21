@@ -29,4 +29,13 @@ Available commands
 
 Docker image
 =======
-https://hub.docker.com/r/dlecoconnier/ivet
+Docker image is available there:
+- https://hub.docker.com/r/dlecoconnier/ivet
+- https://github.com/etrange02/Ivet/pkgs/container/ivet
+
+To use Docker image, run the following command replacing `MyDir` with your local dierctory
+
+```
+docker run -v MyDir:/app/Migrations -e ip=localhost ivet
+```
+See upgrade command to add your own parameters.
