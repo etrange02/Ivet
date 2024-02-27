@@ -39,3 +39,16 @@ To use Docker image, run the following command replacing `MyDir` with your local
 docker run -v MyDir:/app/Migrations -e ip=localhost ivet
 ```
 See upgrade command to add your own parameters.
+
+Dotnet Tool
+=======
+You can install Ivet as a dotnet tool
+```
+dotnet tool install --global Ivet
+```
+All versions are available on https://www.nuget.org/packages/Ivet
+
+After the package is installed you can use it like
+```
+Ivet list --input "C:\MigrationFiles"
+```
