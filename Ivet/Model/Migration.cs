@@ -1,7 +1,7 @@
 ﻿namespace Ivet.Model
 {
     [Vertex]
-    public class Migration : Vertex
+    public class Migration : AbstractVertex
     {
         [PropertyKey]
         [PrimaryKey]
