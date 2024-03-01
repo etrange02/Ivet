@@ -52,3 +52,62 @@ After the package is installed you can use it like
 ```
 Ivet list --input "C:\MigrationFiles"
 ```
+
+How to tag code?
+=======
+Add `Ivet.Model` to your project. You are now ready to tag your code.
+All names and possibilities are listed in Janusgraph documentation at https://docs.janusgraph.org/schema/.
+
+Tag a Vertex:
+```
+[Vertex]
+public class MyVertex
+{
+    [PropertyKey]
+    [PrimaryKey()]
+    public string Id { get; set; }
+
+    [PropertyKey(Name="NewName", Cardinality=Cardinality = Cardinality.SINGLE)]
+    public string ANamedProperty { get; set; }
+
+    [EdgeProperty]
+    public List<Vertex3> AListProperty { get; private set; } = new List<Vertex3>();
+
+    [EdgeProperty]
+    public Vertex3[] AnArrayProperty { get; private set; } = Array.Empty<Vertex3>(); 
+}
+```
+
+
+You can also specify a different name or a cardinality (details at https://docs.janusgraph.org/schema/#property-key-cardinality):
+```
+[PropertyKey(Name="NewName", Cardinality=Cardinality = Cardinality.SINGLE)]
+public string ANamedProperty { get; set; }
+```
+
+
+Tag an Edge:
+```
+[Edge(typeof(MyVertex1), typeof(MyVertex2))]
+public class EdgeWithProperties
+{
+    [PropertyKey]
+    public int AProperty { get; set; }
+}
+```
+
+
+You can also tag a property to be used with an index (https://docs.janusgraph.org/schema/index-management/index-performance/):
+```
+[Vertex]
+public class MyVertex
+{
+    [PropertyKey]
+    [CompositeIndex("unicity_index", IsUnique = true)] // Set unicity of the data
+    public string ACompositeIndexProperty { get; set; }
+
+    [PropertyKey]
+    [MixedIndex("vertex2_mixed", Backend = "search", Mapping = MappingType.TEXTSTRING)]
+    public string SearchProperty { get; set; }
+}
+```
