@@ -36,7 +36,7 @@ namespace Ivet.Tests.Services.Converters
         public void ConvertTest_Vertex()
         {
             // Arrange
-            var entity = new Vertex { Name = _random.RandomString(), Partitioned = _random.RandomBool(), Static = _random.RandomBool() };
+            var entity = new Model.Database.Vertex { Name = _random.RandomString(), Partitioned = _random.RandomBool(), Static = _random.RandomBool() };
             var schema = new Schema
             {
                 Vertices = { entity }
@@ -65,7 +65,7 @@ namespace Ivet.Tests.Services.Converters
         public void ConvertTest_Edge()
         {
             // Arrange
-            var entity = new Edge { Name = _random.RandomString(), Directed = _random.RandomBool(), Multiplicity = _random.RandomEnum<Multiplicity>(), Unidirected = _random.RandomBool() };
+            var entity = new Model.Database.Edge { Name = _random.RandomString(), Directed = _random.RandomBool(), Multiplicity = _random.RandomEnum<Multiplicity>(), Unidirected = _random.RandomBool() };
             var schema = new Schema
             {
                 Edges = { entity }

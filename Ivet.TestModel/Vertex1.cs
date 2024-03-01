@@ -10,9 +10,9 @@ namespace Ivet.TestModel
         public string Id { get; set; }
 
         [EdgeProperty]
-        public List<Vertex3> vertex3s { get; private set; } = new List<Vertex3>();
+        public List<Vertex3> Vertex3s { get; private set; } = new List<Vertex3>();
 
         [EdgeProperty]
-        public Vertex3[] array_vertex3s { get; private set; }
+        public Vertex3[] ArrayVertex3s { get; private set; } = Array.Empty<Vertex3>(); 
     }
 }

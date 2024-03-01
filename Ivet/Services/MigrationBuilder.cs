@@ -6,7 +6,7 @@ namespace Ivet.Services
 {
     public class MigrationBuilder
     {
-        public MetaSchema MetaSchema { get; set; }
+        public MetaSchema? MetaSchema { get; set; }
 
         private readonly string skeleton = "graph.tx().rollback();" + Environment.NewLine +
             "mgmt = graph.openManagement();" + Environment.NewLine +

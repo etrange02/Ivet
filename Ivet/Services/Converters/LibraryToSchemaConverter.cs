@@ -48,7 +48,7 @@ namespace Ivet.Services.Converters
                 var attribute = x.GetCustomAttribute<EdgeAttribute>();
                 return new MetaEdge
                 {
-                    Name = attribute.Name ?? x.Name,
+                    Name = attribute?.Name ?? x.Name,
                     Multiplicity = attribute.Multiplicity,
                     Type = x,
                     Attribute = attribute,
