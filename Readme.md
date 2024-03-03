@@ -67,7 +67,7 @@ public class MyVertex
     [PrimaryKey()]
     public string Id { get; set; }
 
-    [PropertyKey(Name="NewName", Cardinality=Cardinality = Cardinality.SINGLE)]
+    [PropertyKey(Name="NewName", Cardinality=Cardinality.SINGLE)]
     public string ANamedProperty { get; set; }
 
     [EdgeProperty]
@@ -81,7 +81,7 @@ public class MyVertex
 
 You can also specify a different name or a cardinality (details at https://docs.janusgraph.org/schema/#property-key-cardinality):
 ```
-[PropertyKey(Name="NewName", Cardinality=Cardinality = Cardinality.SINGLE)]
+[PropertyKey(Name="NewName", Cardinality=Cardinality.SINGLE)]
 public string ANamedProperty { get; set; }
 ```
 
