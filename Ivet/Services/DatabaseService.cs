@@ -1,4 +1,5 @@
 ﻿using ExRam.Gremlinq.Core;
+using ExRam.Gremlinq.Core.Models;
 using ExRam.Gremlinq.Providers.Core;
 using ExRam.Gremlinq.Providers.JanusGraph;
 using ExRam.Gremlinq.Support.NewtonsoftJson;
@@ -22,8 +23,14 @@ namespace Ivet.Services
             var uri = new Uri($"ws://{ipAddress}:{port}");
 
             GremlinqClient = g.UseJanusGraph<AbstractVertex, AbstractEdge>(configurator => configurator
-                                .At(uri)
-                                .UseNewtonsoftJson());
+                                    .At(uri)
+                                    .UseNewtonsoftJson()
+                                ).ConfigureEnvironment(e => e
+                                    .UseModel(GraphModel.FromBaseTypes<AbstractVertex, AbstractEdge>()
+                                        .AddAssemblies(typeof(Migration).Assembly)
+                                    )
+                                    .UseNewtonsoftJson()
+                                );
         }
 
         protected virtual void Dispose(bool disposing)
