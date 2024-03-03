@@ -14,7 +14,7 @@ namespace Ivet.Tests.Services.Comparers
         {
             // Arrange
             var sut = new MixedIndexComparer();
-            var name = _randomGenerator.RandomString();
+            var name = RandomGenerator.RandomString();
             var a = new MetaMixedIndex { Name = name };
             var b = new MetaMixedIndex { Name = name };
 
@@ -30,8 +30,8 @@ namespace Ivet.Tests.Services.Comparers
         {
             // Arrange
             var sut = new MixedIndexComparer();
-            var a = new MetaMixedIndex { Name = _randomGenerator.RandomString() };
-            var b = new MetaMixedIndex { Name = _randomGenerator.RandomString() };
+            var a = new MetaMixedIndex { Name = RandomGenerator.RandomString() };
+            var b = new MetaMixedIndex { Name = RandomGenerator.RandomString() };
 
             // Act
             var result = sut.Equals(a, b);

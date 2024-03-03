@@ -10,7 +10,7 @@
     },
     "upgrade": {
       "commandName": "Project",
-      "commandLineArgs": "upgrade --input \"D:\\Workspace\\Projects\\Ivet\\Migrations\\Migration_202403010119_000.json\""
+      "commandLineArgs": "upgrade --input \"D:\\Workspace\\Projects\\Ivet\\Migrations\""
     },
     "list": {
       "commandName": "Project",

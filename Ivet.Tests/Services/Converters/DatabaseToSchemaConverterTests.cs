@@ -36,7 +36,7 @@ namespace Ivet.Tests.Services.Converters
         public void ConvertTest_Vertex()
         {
             // Arrange
-            var entity = new Model.Database.Vertex { Name = _random.RandomString(), Partitioned = _random.RandomBool(), Static = _random.RandomBool() };
+            var entity = new Model.Database.Vertex { Name = RandomGenerator.RandomString(), Partitioned = RandomGenerator.RandomBool(), Static = RandomGenerator.RandomBool() };
             var schema = new Schema
             {
                 Vertices = { entity }
@@ -65,7 +65,7 @@ namespace Ivet.Tests.Services.Converters
         public void ConvertTest_Edge()
         {
             // Arrange
-            var entity = new Model.Database.Edge { Name = _random.RandomString(), Directed = _random.RandomBool(), Multiplicity = _random.RandomEnum<Multiplicity>(), Unidirected = _random.RandomBool() };
+            var entity = new Model.Database.Edge { Name = RandomGenerator.RandomString(), Directed = RandomGenerator.RandomBool(), Multiplicity = RandomGenerator.RandomEnum<Multiplicity>(), Unidirected = RandomGenerator.RandomBool() };
             var schema = new Schema
             {
                 Edges = { entity }
@@ -93,7 +93,7 @@ namespace Ivet.Tests.Services.Converters
         public void ConvertTest_Connection()
         {
             // Arrange
-            var entity = new Connection { Edge = _random.RandomString(), Ingoing = _random.RandomString(), Outgoing = _random.RandomString() };
+            var entity = new Connection { Edge = RandomGenerator.RandomString(), Ingoing = RandomGenerator.RandomString(), Outgoing = RandomGenerator.RandomString() };
             var schema = new Schema
             {
                 Connections = { entity }
@@ -122,7 +122,7 @@ namespace Ivet.Tests.Services.Converters
         public void ConvertTest_PropertyKey()
         {
             // Arrange
-            var entity = new PropertyKey { Name = _random.RandomString(), DataType = _random.RandomString(), Cardinality = _random.RandomEnum<Cardinality>() };
+            var entity = new PropertyKey { Name = RandomGenerator.RandomString(), DataType = RandomGenerator.RandomString(), Cardinality = RandomGenerator.RandomEnum<Cardinality>() };
             var schema = new Schema
             {
                 PropertyKeys = { entity }
@@ -151,7 +151,7 @@ namespace Ivet.Tests.Services.Converters
         public void ConvertTest_EdgePropertyKeyBinding()
         {
             // Arrange
-            var entity = new PropertyBinding { Name = _random.RandomString(), Entity = _random.RandomString() };
+            var entity = new PropertyBinding { Name = RandomGenerator.RandomString(), Entity = RandomGenerator.RandomString() };
             var schema = new Schema
             {
                 EdgesPropertyBindings = { entity }
@@ -179,7 +179,7 @@ namespace Ivet.Tests.Services.Converters
         public void ConvertTest_VertexPropertyKeyBinding()
         {
             // Arrange
-            var entity = new PropertyBinding { Name = _random.RandomString(), Entity = _random.RandomString() };
+            var entity = new PropertyBinding { Name = RandomGenerator.RandomString(), Entity = RandomGenerator.RandomString() };
             var schema = new Schema
             {
                 VertexPropertyBindings = { entity }
@@ -207,7 +207,7 @@ namespace Ivet.Tests.Services.Converters
         public void ConvertTest_MixedIndices()
         {
             // Arrange
-            var entity = new Model.Database.Index { Name = _random.RandomString(), BackendIndex = _random.RandomString(), IndexedElement = _random.RandomString(), IsUnique = _random.RandomBool(), IsCompositeIndex = false, IsMixedIndex = true };
+            var entity = new Model.Database.Index { Name = RandomGenerator.RandomString(), BackendIndex = RandomGenerator.RandomString(), IndexedElement = RandomGenerator.RandomString(), IsUnique = RandomGenerator.RandomBool(), IsCompositeIndex = false, IsMixedIndex = true };
             var schema = new Schema
             {
                 Indices = { entity }
@@ -237,7 +237,7 @@ namespace Ivet.Tests.Services.Converters
         public void ConvertTest_CompositeIndices()
         {
             // Arrange
-            var entity = new Model.Database.Index { Name = _random.RandomString(), BackendIndex = _random.RandomString(), IndexedElement = _random.RandomString(), IsUnique = _random.RandomBool(), IsCompositeIndex = true, IsMixedIndex = false };
+            var entity = new Model.Database.Index { Name = RandomGenerator.RandomString(), BackendIndex = RandomGenerator.RandomString(), IndexedElement = RandomGenerator.RandomString(), IsUnique = RandomGenerator.RandomBool(), IsCompositeIndex = true, IsMixedIndex = false };
             var schema = new Schema
             {
                 Indices = { entity }
@@ -267,7 +267,7 @@ namespace Ivet.Tests.Services.Converters
         public void ConvertTest_IndexBindings()
         {
             // Arrange
-            var entity = new IndexBinding { IndexName = _random.RandomString(), Parameter = _random.RandomString(), PropertyName = _random.RandomString() };
+            var entity = new IndexBinding { IndexName = RandomGenerator.RandomString(), Parameter = RandomGenerator.RandomString(), PropertyName = RandomGenerator.RandomString() };
             var schema = new Schema
             {
                 IndexBindings = { entity }

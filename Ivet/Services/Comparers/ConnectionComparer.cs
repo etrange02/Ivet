@@ -17,7 +17,7 @@ namespace Ivet.Services.Comparers
 
         public int GetHashCode([DisallowNull] MetaConnection obj)
         {
-            return obj.Edge.GetHashCode();
+            return obj.Edge?.GetHashCode() ?? throw new NullReferenceException();
         }
     }
 }

@@ -14,9 +14,9 @@ namespace Ivet.Tests.Services
         {
             // Arrange
             var sut = new Parser();
-            var label = _randomGenerator.RandomString();
-            var isPartitionned = _randomGenerator.RandomBool();
-            var isStatic = _randomGenerator.RandomBool();
+            var label = RandomGenerator.RandomString();
+            var isPartitionned = RandomGenerator.RandomBool();
+            var isStatic = RandomGenerator.RandomBool();
             var content = $"Vertex Label Name  | Partitioned | Static  |{ Environment.NewLine }----{ Environment.NewLine }{label}    | {isPartitionned}       | {isStatic}   |";
 
             // Act
@@ -35,10 +35,10 @@ namespace Ivet.Tests.Services
         {
             // Arrange
             var sut = new Parser();
-            var label = _randomGenerator.RandomString();
-            var isDirected = _randomGenerator.RandomBool();
-            var isUnidirected = _randomGenerator.RandomBool();
-            var multiplicity = _randomGenerator.RandomEnum<Multiplicity>();
+            var label = RandomGenerator.RandomString();
+            var isDirected = RandomGenerator.RandomBool();
+            var isUnidirected = RandomGenerator.RandomBool();
+            var multiplicity = RandomGenerator.RandomEnum<Multiplicity>();
             var content = $"Edge Label Name  | Directed    | Unidirected | Multiplicity   |{ Environment.NewLine }------{ Environment.NewLine }{label}  | {isDirected} | {isUnidirected} | {multiplicity}  |";
 
             // Act
@@ -58,9 +58,9 @@ namespace Ivet.Tests.Services
         {
             // Arrange
             var sut = new Parser();
-            var label = _randomGenerator.RandomString();
-            var cardinality = _randomGenerator.RandomEnum<Cardinality>();
-            var dataType = _randomGenerator.RandomString();
+            var label = RandomGenerator.RandomString();
+            var cardinality = RandomGenerator.RandomEnum<Cardinality>();
+            var dataType = RandomGenerator.RandomString();
             var content = $"Property Key Name | Cardinality | Data Type  |{ Environment.NewLine }---{ Environment.NewLine }{label}  | {cardinality}  | {dataType}  |";
 
             // Act
@@ -79,9 +79,9 @@ namespace Ivet.Tests.Services
         {
             // Arrange
             var sut = new Parser();
-            var edge = _randomGenerator.RandomString();
-            var ingoing = _randomGenerator.RandomString();
-            var outgoing = _randomGenerator.RandomString();
+            var edge = RandomGenerator.RandomString();
+            var ingoing = RandomGenerator.RandomString();
+            var outgoing = RandomGenerator.RandomString();
             var content = $"|Edge|Ingoing|Outgoing|\n|{edge}  | {ingoing}  | {outgoing}  |";
 
             // Act
@@ -100,8 +100,8 @@ namespace Ivet.Tests.Services
         {
             // Arrange
             var sut = new Parser();
-            var name = _randomGenerator.RandomString();
-            var entity = _randomGenerator.RandomString();
+            var name = RandomGenerator.RandomString();
+            var entity = RandomGenerator.RandomString();
             var content = $"|Name|Entity|\n|{name}  | {entity}  |";
 
             // Act
@@ -119,12 +119,12 @@ namespace Ivet.Tests.Services
         {
             // Arrange
             var sut = new Parser();
-            var name = _randomGenerator.RandomString();
-            var isUnique = _randomGenerator.RandomBool();
-            var isMixedIndex = _randomGenerator.RandomBool();
-            var isCompositeIndex = _randomGenerator.RandomBool();
-            var backendIndex = _randomGenerator.RandomString();
-            var indexedElement = _randomGenerator.RandomString();
+            var name = RandomGenerator.RandomString();
+            var isUnique = RandomGenerator.RandomBool();
+            var isMixedIndex = RandomGenerator.RandomBool();
+            var isCompositeIndex = RandomGenerator.RandomBool();
+            var backendIndex = RandomGenerator.RandomString();
+            var indexedElement = RandomGenerator.RandomString();
             var content = $"|Name|IsUnique|IsMixedIndex|IsCompositeIndex|BackendIndex|IndexedElement|\n|{name}|{isUnique}|{isMixedIndex}|{isCompositeIndex}|{backendIndex}|{indexedElement}|";
 
             // Act
@@ -146,9 +146,9 @@ namespace Ivet.Tests.Services
         {
             // Arrange
             var sut = new Parser();
-            var indexName = _randomGenerator.RandomString();
-            var propertyName = _randomGenerator.RandomString();
-            var parameter = _randomGenerator.RandomString();
+            var indexName = RandomGenerator.RandomString();
+            var propertyName = RandomGenerator.RandomString();
+            var parameter = RandomGenerator.RandomString();
             var content = $"|IndexName|PropertyName|Parameter|\n|{indexName}|{propertyName}|{parameter}|";
 
             // Act

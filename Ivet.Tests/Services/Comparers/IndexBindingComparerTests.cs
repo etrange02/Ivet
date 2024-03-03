@@ -14,8 +14,8 @@ namespace Ivet.Tests.Services.Comparers
         {
             // Arrange
             var sut = new IndexBindingComparer();
-            var indexName = _randomGenerator.RandomString();
-            var propertyName = _randomGenerator.RandomString();
+            var indexName = RandomGenerator.RandomString();
+            var propertyName = RandomGenerator.RandomString();
             var a = new MetaIndexBinding { IndexName = indexName, PropertyName = propertyName };
             var b = new MetaIndexBinding { IndexName = indexName, PropertyName = propertyName };
 
@@ -31,9 +31,9 @@ namespace Ivet.Tests.Services.Comparers
         {
             // Arrange
             var sut = new IndexBindingComparer();
-            var indexName = _randomGenerator.RandomString();
-            var a = new MetaIndexBinding { IndexName = indexName, PropertyName = _randomGenerator.RandomString() };
-            var b = new MetaIndexBinding { IndexName = indexName, PropertyName = _randomGenerator.RandomString() };
+            var indexName = RandomGenerator.RandomString();
+            var a = new MetaIndexBinding { IndexName = indexName, PropertyName = RandomGenerator.RandomString() };
+            var b = new MetaIndexBinding { IndexName = indexName, PropertyName = RandomGenerator.RandomString() };
 
             // Act
             var result = sut.Equals(a, b);
@@ -47,9 +47,9 @@ namespace Ivet.Tests.Services.Comparers
         {
             // Arrange
             var sut = new IndexBindingComparer();
-            var indexName = _randomGenerator.RandomString();
-            var a = new MetaIndexBinding { IndexName = indexName, PropertyName = _randomGenerator.RandomString() };
-            var b = new MetaIndexBinding { IndexName = indexName, PropertyName = _randomGenerator.RandomString() };
+            var indexName = RandomGenerator.RandomString();
+            var a = new MetaIndexBinding { IndexName = indexName, PropertyName = RandomGenerator.RandomString() };
+            var b = new MetaIndexBinding { IndexName = indexName, PropertyName = RandomGenerator.RandomString() };
 
             // Act
             var result = sut.Equals(a, b);

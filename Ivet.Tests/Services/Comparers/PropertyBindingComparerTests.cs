@@ -14,8 +14,8 @@ namespace Ivet.Tests.Services.Comparers
         {
             // Arrange
             var sut = new PropertyBindingComparer();
-            var entity = _randomGenerator.RandomString();
-            var name = _randomGenerator.RandomString();
+            var entity = RandomGenerator.RandomString();
+            var name = RandomGenerator.RandomString();
             var a = new MetaPropertyBinding { Entity = entity, Name = name };
             var b = new MetaPropertyBinding { Entity = entity, Name = name };
 
@@ -31,9 +31,9 @@ namespace Ivet.Tests.Services.Comparers
         {
             // Arrange
             var sut = new PropertyBindingComparer();
-            var name = _randomGenerator.RandomString();
-            var a = new MetaPropertyBinding { Entity = _randomGenerator.RandomString(), Name = name };
-            var b = new MetaPropertyBinding { Entity = _randomGenerator.RandomString(), Name = name };
+            var name = RandomGenerator.RandomString();
+            var a = new MetaPropertyBinding { Entity = RandomGenerator.RandomString(), Name = name };
+            var b = new MetaPropertyBinding { Entity = RandomGenerator.RandomString(), Name = name };
 
             // Act
             var result = sut.Equals(a, b);
@@ -47,9 +47,9 @@ namespace Ivet.Tests.Services.Comparers
         {
             // Arrange
             var sut = new PropertyBindingComparer();
-            var entity = _randomGenerator.RandomString();
-            var a = new MetaPropertyBinding { Entity = entity, Name = _randomGenerator.RandomString() };
-            var b = new MetaPropertyBinding { Entity = entity, Name = _randomGenerator.RandomString() };
+            var entity = RandomGenerator.RandomString();
+            var a = new MetaPropertyBinding { Entity = entity, Name = RandomGenerator.RandomString() };
+            var b = new MetaPropertyBinding { Entity = entity, Name = RandomGenerator.RandomString() };
 
             // Act
             var result = sut.Equals(a, b);

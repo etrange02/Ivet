@@ -29,10 +29,10 @@ namespace Ivet.Services.Converters
         {
             return schema.Vertices.ConvertAll(x =>
             {
-                var attribute = x.GetCustomAttribute<VertexAttribute>();
+                var attribute = x.GetCustomAttribute<VertexAttribute>() ?? throw new AttributeNotFoundException($"Attribute not found on { x.FullName }");
                 return new MetaVertex
                 {
-                    Name = attribute?.Name ?? x.Name,
+                    Name = attribute.Name ?? x.Name,
                     Partitioned = attribute.Partitioned,
                     Static = attribute.Static,
                     Type = x,
@@ -45,10 +45,10 @@ namespace Ivet.Services.Converters
         {
             return schema.Edges.ConvertAll(x =>
             {
-                var attribute = x.GetCustomAttribute<EdgeAttribute>();
+                var attribute = x.GetCustomAttribute<EdgeAttribute>() ?? throw new AttributeNotFoundException($"Attribute not found on {x.FullName}");
                 return new MetaEdge
                 {
-                    Name = attribute?.Name ?? x.Name,
+                    Name = attribute.Name ?? x.Name,
                     Multiplicity = attribute.Multiplicity,
                     Type = x,
                     Attribute = attribute,
@@ -63,7 +63,7 @@ namespace Ivet.Services.Converters
 
                 return properties.Select(y =>
                 {
-                    var attribute = y.GetCustomAttribute<EdgePropertyAttribute>();
+                    var attribute = y.GetCustomAttribute<EdgePropertyAttribute>() ?? throw new AttributeNotFoundException($"Attribute not found on {x.FullName}");
                     var type = y.PropertyType.IsGenericType ? y.PropertyType.GenericTypeArguments[0] : y.PropertyType.GetElementType();
                     return new MetaEdge
                     {
@@ -86,10 +86,10 @@ namespace Ivet.Services.Converters
 
                 return properties.Select(y =>
                 {
-                    var attribute = y.GetCustomAttribute<PropertyKeyAttribute>();
+                    var attribute = y.GetCustomAttribute<PropertyKeyAttribute>() ?? throw new AttributeNotFoundException($"Attribute not found on {x.FullName}");
                     return new MetaPropertyKey
                     {
-                        Name = attribute?.Name ?? y.Name,
+                        Name = attribute.Name ?? y.Name,
                         Cardinality = attribute.Cardinality,
                         DataType = y.ToJavaType(),
                         PropertyInfo = y,
@@ -153,7 +153,7 @@ namespace Ivet.Services.Converters
 
         private static MetaCompositeIndex ConvertCompositeAttribute(AbstractMetaItem graphItem, PropertyInfo property)
         {
-            var compositeKeyAttribute = property.GetCustomAttribute<CompositeIndexAttribute>();
+            var compositeKeyAttribute = property.GetCustomAttribute<CompositeIndexAttribute>() ?? throw new AttributeNotFoundException($"Attribute not found on {property.Name}");
 
             return new MetaCompositeIndex
             {
@@ -166,7 +166,7 @@ namespace Ivet.Services.Converters
 
         private static MetaCompositeIndex ConvertPrimaryAttribute(AbstractMetaItem graphItem, PropertyInfo property)
         {
-            var graphItemAttribute = graphItem.Type.GetCustomAttribute<AbstractGraphItemAttribute>();
+            var graphItemAttribute = graphItem.Type.GetCustomAttribute<AbstractGraphItemAttribute>() ?? throw new AttributeNotFoundException($"Attribute not found on {graphItem.Type.FullName}");
 
             return new MetaCompositeIndex
             {
@@ -197,7 +197,7 @@ namespace Ivet.Services.Converters
 
                 return properties.Select(y =>
                 {
-                    var mixedKeyAttribute = y.GetCustomAttribute<MixedIndexAttribute>();
+                    var mixedKeyAttribute = y.GetCustomAttribute<MixedIndexAttribute>() ?? throw new AttributeNotFoundException($"Attribute not found on {x.FullName}");
 
                     return new MetaMixedIndex
                     {
@@ -235,7 +235,7 @@ namespace Ivet.Services.Converters
 
         private static MetaIndexBinding ConvertCompositeBinding(AbstractMetaItem graphItem, PropertyInfo property)
         {
-            var compositeKeyAttribute = property.GetCustomAttribute<CompositeIndexAttribute>();
+            var compositeKeyAttribute = property.GetCustomAttribute<CompositeIndexAttribute>() ?? throw new AttributeNotFoundException($"Attribute not found on {property.Name}");
 
             return new MetaIndexBinding
             {
@@ -246,7 +246,7 @@ namespace Ivet.Services.Converters
 
         private static MetaIndexBinding ConvertPrimaryBinding(AbstractMetaItem graphItem, PropertyInfo property)
         {
-            var graphItemAttribute = graphItem.Type.GetCustomAttribute<AbstractGraphItemAttribute>();
+            var graphItemAttribute = graphItem.Type.GetCustomAttribute<AbstractGraphItemAttribute>() ?? throw new AttributeNotFoundException($"Attribute not found on {graphItem.Type.FullName}");
 
             return new MetaIndexBinding
             {
@@ -257,7 +257,7 @@ namespace Ivet.Services.Converters
 
         private static MetaIndexBinding ConvertMixedBinding(AbstractMetaItem graphItem, PropertyInfo property)
         {
-            var mixedKeyAttribute = property.GetCustomAttribute<MixedIndexAttribute>();
+            var mixedKeyAttribute = property.GetCustomAttribute<MixedIndexAttribute>() ?? throw new AttributeNotFoundException($"Attribute not found on {property.Name}");
 
             return new MetaIndexBinding
             {

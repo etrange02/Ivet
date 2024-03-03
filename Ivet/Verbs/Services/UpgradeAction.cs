@@ -23,7 +23,9 @@ namespace Ivet.Verbs.Services
 
             using var database = new DatabaseService(options.IpAddress, options.Port);
 
-            var appliedMigrations = database.GremlinqClient.V<Migration>().ToArrayAsync().Result.ToList();
+            var appliedMigrations = database.GremlinqClient.V<Migration>()
+                .ToArrayAsync().Result
+                .ToList();
 
             var migrationsToApply = files
                 .ConvertAll(x => new { Fullname = x, Name = Path.GetFileNameWithoutExtension(x) })
@@ -34,18 +36,14 @@ namespace Ivet.Verbs.Services
             migrationsToApply.ForEach(x =>
             {
                 Console.WriteLine($"Loading file {x}");
-                var migrationFile = JsonSerializer.Deserialize<MigrationFile>(File.ReadAllText(x));
-                if (migrationFile == null)
-                {
-                    throw new FormatException($"File {x} has bad format");
-                }
-
-                _ = database.Execute(migrationFile.Content);
-                var migrationDB = database.GremlinqClient.AddV(new Migration
+                var migrationFile = JsonSerializer.Deserialize<MigrationFile>(File.ReadAllText(x)) ?? throw new FormatException($"File {x} has bad format");
+                var res = database.Execute(migrationFile.Content);
+                var migration = new Migration
                 {
                     MigrationName = Path.GetFileNameWithoutExtension(x),
                     MigrationDate = DateTime.Now,
-                }).FirstAsync().Result;
+                };
+                var migrationDB = database.GremlinqClient.AddV(migration).FirstAsync().Result;
 
             });
         }
