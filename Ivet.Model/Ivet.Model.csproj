@@ -12,13 +12,8 @@
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/etrange02/Ivet</RepositoryUrl>
     <Description>Ivet's attributes. Tag your code with these classes then use Ivet to generate and update your Janusgraph schema</Description>
+    <PackageLicenseExpression>CECILL-B</PackageLicenseExpression>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Old\**" />
-    <EmbeddedResource Remove="Old\**" />
-    <None Remove="Old\**" />
-  </ItemGroup>
 
   <ItemGroup>
     <None Include="..\Readme.md">
