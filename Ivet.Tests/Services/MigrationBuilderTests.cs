@@ -34,7 +34,7 @@ namespace Ivet.Tests.Services
         {
             // Arrange
             var sut = new MigrationBuilder { MetaSchema = new MetaSchema() };
-            var name = _randomGenerator.RandomString();
+            var name = RandomGenerator.RandomString();
             sut.MetaSchema.Vertices.Add(new MetaVertex
             {
                 Name = name
@@ -53,9 +53,9 @@ namespace Ivet.Tests.Services
         {
             // Arrange
             var sut = new MigrationBuilder { MetaSchema = new MetaSchema() };
-            var name = _randomGenerator.RandomString();
-            var partitioned = _randomGenerator.RandomBool();
-            var staticValue = _randomGenerator.RandomBool();
+            var name = RandomGenerator.RandomString();
+            var partitioned = RandomGenerator.RandomBool();
+            var staticValue = RandomGenerator.RandomBool();
             sut.MetaSchema.Vertices.Add(new MetaVertex
             {
                 Name = name,
@@ -75,7 +75,7 @@ namespace Ivet.Tests.Services
         {
             // Arrange
             var sut = new MigrationBuilder { MetaSchema = new MetaSchema() };
-            var name = _randomGenerator.RandomString();
+            var name = RandomGenerator.RandomString();
             sut.MetaSchema.Vertices.Add(new MetaVertex
             {
                 Name = name,
@@ -95,7 +95,7 @@ namespace Ivet.Tests.Services
         {
             // Arrange
             var sut = new MigrationBuilder { MetaSchema = new MetaSchema() };
-            var name = _randomGenerator.RandomString();
+            var name = RandomGenerator.RandomString();
             sut.MetaSchema.Vertices.Add(new MetaVertex
             {
                 Name = name,
@@ -116,8 +116,8 @@ namespace Ivet.Tests.Services
         {
             // Arrange
             var sut = new MigrationBuilder { MetaSchema = new MetaSchema() };
-            var name = _randomGenerator.RandomString();
-            var multiplicity = _randomGenerator.RandomEnum<Multiplicity>();
+            var name = RandomGenerator.RandomString();
+            var multiplicity = RandomGenerator.RandomEnum<Multiplicity>();
             sut.MetaSchema.Edges.Add(new MetaEdge
             {
                 Name = name,
@@ -137,9 +137,9 @@ namespace Ivet.Tests.Services
         {
             // Arrange
             var sut = new MigrationBuilder { MetaSchema = new MetaSchema() };
-            var name = _randomGenerator.RandomString();
-            var cardinality = _randomGenerator.RandomEnum<Cardinality>();
-            var dataType = _randomGenerator.RandomString();
+            var name = RandomGenerator.RandomString();
+            var cardinality = RandomGenerator.RandomEnum<Cardinality>();
+            var dataType = RandomGenerator.RandomString();
             sut.MetaSchema.Properties.Add(new MetaPropertyKey
             {
                 Name = name,
@@ -160,8 +160,8 @@ namespace Ivet.Tests.Services
         {
             // Arrange
             var sut = new MigrationBuilder { MetaSchema = new MetaSchema() };
-            var name = _randomGenerator.RandomString();
-            var entity = _randomGenerator.RandomString();
+            var name = RandomGenerator.RandomString();
+            var entity = RandomGenerator.RandomString();
             sut.MetaSchema.VertexPropertyBindings.Add(new MetaPropertyBinding
             {
                 Name = name,
@@ -181,8 +181,8 @@ namespace Ivet.Tests.Services
         {
             // Arrange
             var sut = new MigrationBuilder { MetaSchema = new MetaSchema() };
-            var name = _randomGenerator.RandomString();
-            var entity = _randomGenerator.RandomString();
+            var name = RandomGenerator.RandomString();
+            var entity = RandomGenerator.RandomString();
             sut.MetaSchema.EdgePropertyBindings.Add(new MetaPropertyBinding
             {
                 Name = name,
@@ -202,9 +202,9 @@ namespace Ivet.Tests.Services
         {
             // Arrange
             var sut = new MigrationBuilder { MetaSchema = new MetaSchema() };
-            var edge = _randomGenerator.RandomString();
-            var ingoing = _randomGenerator.RandomString();
-            var outgoing = _randomGenerator.RandomString();
+            var edge = RandomGenerator.RandomString();
+            var ingoing = RandomGenerator.RandomString();
+            var outgoing = RandomGenerator.RandomString();
             sut.MetaSchema.Connections.Add(new MetaConnection
             {
                 Edge = edge,

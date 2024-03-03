@@ -10,6 +10,8 @@ namespace Ivet.Services.Loaders
         {
             var schema = new Schema();
 
+            schema.Vertices.Add(typeof(Migration));
+
             var files = Directory.EnumerateFiles(path, "*.dll").ToList();
             files.ForEach(x =>
             {

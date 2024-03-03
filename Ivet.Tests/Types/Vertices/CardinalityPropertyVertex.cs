@@ -6,6 +6,6 @@ namespace Ivet.Tests.Types.Vertices
     public class CardinalityPropertyVertex
     {
         [PropertyKey(Cardinality = Cardinality.LIST)]
-        public string MyProperty { get; set; }
+        public string MyProperty { get; set; } = string.Empty;
     }
 }

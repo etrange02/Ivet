@@ -6,6 +6,6 @@ namespace Ivet.Tests.Types.Vertices
     public class NamedPropertyVertex
     {
         [PropertyKey(Name = "My property")]
-        public string MyProperty { get; set; }
+        public string MyProperty { get; set; } = string.Empty;
     }
 }

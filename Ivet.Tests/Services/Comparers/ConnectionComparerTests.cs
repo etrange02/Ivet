@@ -14,9 +14,9 @@ namespace Ivet.Tests.Services.Comparers
         {
             // Arrange
             var sut = new ConnectionComparer();
-            var edge = _randomGenerator.RandomString();
-            var ingoing = _randomGenerator.RandomString();
-            var outgoing = _randomGenerator.RandomString();
+            var edge = RandomGenerator.RandomString();
+            var ingoing = RandomGenerator.RandomString();
+            var outgoing = RandomGenerator.RandomString();
             var a = new MetaConnection { Edge = edge, Ingoing = ingoing, Outgoing = outgoing };
             var b = new MetaConnection { Edge = edge, Ingoing = ingoing, Outgoing = outgoing };
 
@@ -32,10 +32,10 @@ namespace Ivet.Tests.Services.Comparers
         {
             // Arrange
             var sut = new ConnectionComparer();
-            var ingoing = _randomGenerator.RandomString();
-            var outgoing = _randomGenerator.RandomString();
-            var a = new MetaConnection { Edge = _randomGenerator.RandomString(), Ingoing = ingoing, Outgoing = outgoing };
-            var b = new MetaConnection { Edge = _randomGenerator.RandomString(), Ingoing = ingoing, Outgoing = outgoing };
+            var ingoing = RandomGenerator.RandomString();
+            var outgoing = RandomGenerator.RandomString();
+            var a = new MetaConnection { Edge = RandomGenerator.RandomString(), Ingoing = ingoing, Outgoing = outgoing };
+            var b = new MetaConnection { Edge = RandomGenerator.RandomString(), Ingoing = ingoing, Outgoing = outgoing };
 
             // Act
             var result = sut.Equals(a, b);
@@ -49,10 +49,10 @@ namespace Ivet.Tests.Services.Comparers
         {
             // Arrange
             var sut = new ConnectionComparer();
-            var edge = _randomGenerator.RandomString();
-            var outgoing = _randomGenerator.RandomString();
-            var a = new MetaConnection { Edge = edge, Ingoing = _randomGenerator.RandomString(), Outgoing = outgoing };
-            var b = new MetaConnection { Edge = edge, Ingoing = _randomGenerator.RandomString(), Outgoing = outgoing };
+            var edge = RandomGenerator.RandomString();
+            var outgoing = RandomGenerator.RandomString();
+            var a = new MetaConnection { Edge = edge, Ingoing = RandomGenerator.RandomString(), Outgoing = outgoing };
+            var b = new MetaConnection { Edge = edge, Ingoing = RandomGenerator.RandomString(), Outgoing = outgoing };
 
             // Act
             var result = sut.Equals(a, b);
@@ -66,10 +66,10 @@ namespace Ivet.Tests.Services.Comparers
         {
             // Arrange
             var sut = new ConnectionComparer();
-            var edge = _randomGenerator.RandomString();
-            var ingoing = _randomGenerator.RandomString();
-            var a = new MetaConnection { Edge = edge, Ingoing = ingoing, Outgoing = _randomGenerator.RandomString() };
-            var b = new MetaConnection { Edge = edge, Ingoing = ingoing, Outgoing = _randomGenerator.RandomString() };
+            var edge = RandomGenerator.RandomString();
+            var ingoing = RandomGenerator.RandomString();
+            var a = new MetaConnection { Edge = edge, Ingoing = ingoing, Outgoing = RandomGenerator.RandomString() };
+            var b = new MetaConnection { Edge = edge, Ingoing = ingoing, Outgoing = RandomGenerator.RandomString() };
 
             // Act
             var result = sut.Equals(a, b);

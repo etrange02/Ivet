@@ -15,7 +15,7 @@ namespace Ivet.Tests.Services
             // Arrange
             var sut = new DeltaSchemaMakerService();
             var schemaSource = new MetaSchema();
-            schemaSource.Vertices.Add(new MetaVertex { Name = _randomGenerator.RandomString() });
+            schemaSource.Vertices.Add(new MetaVertex { Name = RandomGenerator.RandomString() });
             var schemaTarget = new MetaSchema();
 
             // Act
@@ -42,7 +42,7 @@ namespace Ivet.Tests.Services
             var schemaSource = new MetaSchema();
             var schemaTarget = new MetaSchema();
             schemaTarget.Vertices.Add(new MetaVertex { 
-                Name = _randomGenerator.RandomString()              
+                Name = RandomGenerator.RandomString()              
             });
 
             // Act
@@ -69,7 +69,7 @@ namespace Ivet.Tests.Services
             var sut = new DeltaSchemaMakerService();
             var schemaSource = new MetaSchema();
             var schemaTarget = new MetaSchema();
-            var metaVertex = new MetaVertex { Name = _randomGenerator.RandomString() };
+            var metaVertex = new MetaVertex { Name = RandomGenerator.RandomString() };
             schemaTarget.Vertices.Add(metaVertex);
             schemaSource.Vertices.Add(metaVertex);
 
@@ -96,7 +96,7 @@ namespace Ivet.Tests.Services
             // Arrange
             var sut = new DeltaSchemaMakerService();
             var schemaSource = new MetaSchema();
-            schemaSource.Edges.Add(new MetaEdge { Name = _randomGenerator.RandomString() });
+            schemaSource.Edges.Add(new MetaEdge { Name = RandomGenerator.RandomString() });
             var schemaTarget = new MetaSchema();
 
             // Act
@@ -124,7 +124,7 @@ namespace Ivet.Tests.Services
             var schemaTarget = new MetaSchema();
             schemaTarget.Edges.Add(new MetaEdge
             {
-                Name = _randomGenerator.RandomString()
+                Name = RandomGenerator.RandomString()
             });
 
             // Act
@@ -151,7 +151,7 @@ namespace Ivet.Tests.Services
             var sut = new DeltaSchemaMakerService();
             var schemaSource = new MetaSchema();
             var schemaTarget = new MetaSchema();
-            var metaEdge = new MetaEdge { Name = _randomGenerator.RandomString() };
+            var metaEdge = new MetaEdge { Name = RandomGenerator.RandomString() };
             schemaTarget.Edges.Add(metaEdge);
             schemaSource.Edges.Add(metaEdge);
 
@@ -177,7 +177,7 @@ namespace Ivet.Tests.Services
             // Arrange
             var sut = new DeltaSchemaMakerService();
             var schemaSource = new MetaSchema();
-            schemaSource.Properties.Add(new MetaPropertyKey { Name = _randomGenerator.RandomString() });
+            schemaSource.Properties.Add(new MetaPropertyKey { Name = RandomGenerator.RandomString() });
             var schemaTarget = new MetaSchema();
 
             // Act
@@ -205,7 +205,7 @@ namespace Ivet.Tests.Services
             var schemaTarget = new MetaSchema();
             schemaTarget.Properties.Add(new MetaPropertyKey
             {
-                Name = _randomGenerator.RandomString()
+                Name = RandomGenerator.RandomString()
             });
 
             // Act
@@ -232,7 +232,7 @@ namespace Ivet.Tests.Services
             var sut = new DeltaSchemaMakerService();
             var schemaSource = new MetaSchema();
             var schemaTarget = new MetaSchema();
-            var metaPropertyKey = new MetaPropertyKey { Name = _randomGenerator.RandomString() };
+            var metaPropertyKey = new MetaPropertyKey { Name = RandomGenerator.RandomString() };
             schemaTarget.Properties.Add(metaPropertyKey);
             schemaSource.Properties.Add(metaPropertyKey);
 
@@ -259,9 +259,9 @@ namespace Ivet.Tests.Services
             var sut = new DeltaSchemaMakerService();
             var schemaSource = new MetaSchema();
             schemaSource.Connections.Add(new MetaConnection { 
-                Edge = _randomGenerator.RandomString(),
-                Ingoing = _randomGenerator.RandomString(),
-                Outgoing = _randomGenerator.RandomString()
+                Edge = RandomGenerator.RandomString(),
+                Ingoing = RandomGenerator.RandomString(),
+                Outgoing = RandomGenerator.RandomString()
             });
             var schemaTarget = new MetaSchema();
 
@@ -290,9 +290,9 @@ namespace Ivet.Tests.Services
             var schemaTarget = new MetaSchema();
             schemaTarget.Connections.Add(new MetaConnection
             {
-                Edge = _randomGenerator.RandomString(),
-                Ingoing = _randomGenerator.RandomString(),
-                Outgoing = _randomGenerator.RandomString()
+                Edge = RandomGenerator.RandomString(),
+                Ingoing = RandomGenerator.RandomString(),
+                Outgoing = RandomGenerator.RandomString()
             });
 
             // Act
@@ -321,9 +321,9 @@ namespace Ivet.Tests.Services
             var schemaTarget = new MetaSchema();
             var metaConnection = new MetaConnection
             {
-                Edge = _randomGenerator.RandomString(),
-                Ingoing = _randomGenerator.RandomString(),
-                Outgoing = _randomGenerator.RandomString()
+                Edge = RandomGenerator.RandomString(),
+                Ingoing = RandomGenerator.RandomString(),
+                Outgoing = RandomGenerator.RandomString()
             };
             schemaTarget.Connections.Add(metaConnection);
             schemaSource.Connections.Add(metaConnection);
@@ -352,8 +352,8 @@ namespace Ivet.Tests.Services
             var schemaSource = new MetaSchema();
             schemaSource.VertexPropertyBindings.Add(new MetaPropertyBinding
             {
-                Entity = _randomGenerator.RandomString(),
-                Name = _randomGenerator.RandomString(),
+                Entity = RandomGenerator.RandomString(),
+                Name = RandomGenerator.RandomString(),
             });
             var schemaTarget = new MetaSchema();
 
@@ -382,8 +382,8 @@ namespace Ivet.Tests.Services
             var schemaTarget = new MetaSchema();
             schemaTarget.VertexPropertyBindings.Add(new MetaPropertyBinding
             {
-                Entity = _randomGenerator.RandomString(),
-                Name = _randomGenerator.RandomString(),
+                Entity = RandomGenerator.RandomString(),
+                Name = RandomGenerator.RandomString(),
             });
 
             // Act
@@ -412,8 +412,8 @@ namespace Ivet.Tests.Services
             var schemaTarget = new MetaSchema();
             var metaPropertyBinding = new MetaPropertyBinding
             {
-                Entity = _randomGenerator.RandomString(),
-                Name = _randomGenerator.RandomString(),
+                Entity = RandomGenerator.RandomString(),
+                Name = RandomGenerator.RandomString(),
             };
             schemaTarget.VertexPropertyBindings.Add(metaPropertyBinding);
             schemaSource.VertexPropertyBindings.Add(metaPropertyBinding);
@@ -442,8 +442,8 @@ namespace Ivet.Tests.Services
             var schemaSource = new MetaSchema();
             schemaSource.EdgePropertyBindings.Add(new MetaPropertyBinding
             {
-                Entity = _randomGenerator.RandomString(),
-                Name = _randomGenerator.RandomString(),
+                Entity = RandomGenerator.RandomString(),
+                Name = RandomGenerator.RandomString(),
             });
             var schemaTarget = new MetaSchema();
 
@@ -472,8 +472,8 @@ namespace Ivet.Tests.Services
             var schemaTarget = new MetaSchema();
             schemaTarget.EdgePropertyBindings.Add(new MetaPropertyBinding
             {
-                Entity = _randomGenerator.RandomString(),
-                Name = _randomGenerator.RandomString(),
+                Entity = RandomGenerator.RandomString(),
+                Name = RandomGenerator.RandomString(),
             });
 
             // Act
@@ -502,8 +502,8 @@ namespace Ivet.Tests.Services
             var schemaTarget = new MetaSchema();
             var metaPropertyBinding = new MetaPropertyBinding
             {
-                Entity = _randomGenerator.RandomString(),
-                Name = _randomGenerator.RandomString(),
+                Entity = RandomGenerator.RandomString(),
+                Name = RandomGenerator.RandomString(),
             };
             schemaTarget.EdgePropertyBindings.Add(metaPropertyBinding);
             schemaSource.EdgePropertyBindings.Add(metaPropertyBinding);
@@ -532,7 +532,7 @@ namespace Ivet.Tests.Services
             var schemaSource = new MetaSchema();
             schemaSource.CompositeIndexes.Add(new MetaCompositeIndex
             {
-                Name = _randomGenerator.RandomString(),
+                Name = RandomGenerator.RandomString(),
             });
             var schemaTarget = new MetaSchema();
 
@@ -561,7 +561,7 @@ namespace Ivet.Tests.Services
             var schemaTarget = new MetaSchema();
             schemaTarget.CompositeIndexes.Add(new MetaCompositeIndex
             {
-                Name = _randomGenerator.RandomString(),
+                Name = RandomGenerator.RandomString(),
             });
 
             // Act
@@ -590,7 +590,7 @@ namespace Ivet.Tests.Services
             var schemaTarget = new MetaSchema();
             var metaCompositeIndex = new MetaCompositeIndex
             {
-                Name = _randomGenerator.RandomString(),
+                Name = RandomGenerator.RandomString(),
             };
             schemaTarget.CompositeIndexes.Add(metaCompositeIndex);
             schemaSource.CompositeIndexes.Add(metaCompositeIndex);
@@ -619,7 +619,7 @@ namespace Ivet.Tests.Services
             var schemaSource = new MetaSchema();
             schemaSource.MixedIndexes.Add(new MetaMixedIndex
             {
-                Name = _randomGenerator.RandomString(),
+                Name = RandomGenerator.RandomString(),
             });
             var schemaTarget = new MetaSchema();
 
@@ -648,7 +648,7 @@ namespace Ivet.Tests.Services
             var schemaTarget = new MetaSchema();
             schemaTarget.MixedIndexes.Add(new MetaMixedIndex
             {
-                Name = _randomGenerator.RandomString(),
+                Name = RandomGenerator.RandomString(),
             });
 
             // Act
@@ -677,7 +677,7 @@ namespace Ivet.Tests.Services
             var schemaTarget = new MetaSchema();
             var metaMixedIndex = new MetaMixedIndex
             {
-                Name = _randomGenerator.RandomString(),
+                Name = RandomGenerator.RandomString(),
             };
             schemaTarget.MixedIndexes.Add(metaMixedIndex);
             schemaSource.MixedIndexes.Add(metaMixedIndex);
@@ -706,8 +706,8 @@ namespace Ivet.Tests.Services
             var schemaSource = new MetaSchema();
             schemaSource.IndexBindings.Add(new MetaIndexBinding
             {
-                IndexName = _randomGenerator.RandomString(),
-                PropertyName = _randomGenerator.RandomString(),
+                IndexName = RandomGenerator.RandomString(),
+                PropertyName = RandomGenerator.RandomString(),
             });
             var schemaTarget = new MetaSchema();
 
@@ -736,8 +736,8 @@ namespace Ivet.Tests.Services
             var schemaTarget = new MetaSchema();
             schemaTarget.IndexBindings.Add(new MetaIndexBinding
             {
-                IndexName = _randomGenerator.RandomString(),
-                PropertyName = _randomGenerator.RandomString(),
+                IndexName = RandomGenerator.RandomString(),
+                PropertyName = RandomGenerator.RandomString(),
             });
 
             // Act
@@ -766,8 +766,8 @@ namespace Ivet.Tests.Services
             var schemaTarget = new MetaSchema();
             var metaIndexBinding = new MetaIndexBinding
             {
-                IndexName = _randomGenerator.RandomString(),
-                PropertyName = _randomGenerator.RandomString(),
+                IndexName = RandomGenerator.RandomString(),
+                PropertyName = RandomGenerator.RandomString(),
             };
             schemaTarget.IndexBindings.Add(metaIndexBinding);
             schemaSource.IndexBindings.Add(metaIndexBinding);

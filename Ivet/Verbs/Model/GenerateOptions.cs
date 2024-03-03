@@ -6,7 +6,7 @@ namespace Ivet.Verbs.Model
     public class GenerateOptions
     {
         [Option("ip", HelpText = "Server IP", Default = "localhost")]
-        public string IpAddress { get; set; }
+        public string IpAddress { get; set; } = string.Empty;
 
         [Option("port", HelpText = "Server Port", Default = 8182)]
         public int Port { get; set; }

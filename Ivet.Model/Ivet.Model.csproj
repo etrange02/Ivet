@@ -4,6 +4,22 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Authors>david.lecoconnier</Authors>
+    <Version>1.1.0</Version>
+    <Title>Ivet.Model</Title>
+    <PackageProjectUrl>https://github.com/etrange02/Ivet</PackageProjectUrl>
+    <PackageReadmeFile>Readme.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/etrange02/Ivet</RepositoryUrl>
+    <Description>Ivet's attributes. Tag your code with these classes then use Ivet to generate and update your Janusgraph schema</Description>
+    <PackageLicenseExpression>CECILL-B</PackageLicenseExpression>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\Readme.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>

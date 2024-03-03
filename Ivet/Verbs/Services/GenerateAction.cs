@@ -26,8 +26,10 @@ namespace Ivet.Verbs.Services
             var deltaSchemaMaker = new DeltaSchemaMakerService();
             metaSchema.Difference = deltaSchemaMaker.Difference(metaSchema.Source, metaSchema.Target);
 
-            var builder = new MigrationBuilder();
-            builder.MetaSchema = metaSchema.Difference;
+            var builder = new MigrationBuilder
+            {
+                MetaSchema = metaSchema.Difference
+            };
 
             var migrations = builder.BuildFileContent();
 
@@ -36,7 +38,7 @@ namespace Ivet.Verbs.Services
             foreach (var (migration, i) in migrations.Select((v, i) => (v, i)))
             {
                 var fileName = Path.Combine(options.OutputDirectory, $"Migration_{DateTime.Now:yyyyMMddHHmm}_{i:D3}.json");
-                File.WriteAllText(fileName, JsonSerializer.Serialize(migration, new JsonSerializerOptions { WriteIndented = true }));
+                File.WriteAllText(fileName, JsonSerializer.Serialize(migration, new JsonSerializerOptions { WriteIndented = true,  }));
             }
         }
     }

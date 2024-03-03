@@ -6,7 +6,7 @@ namespace Ivet.Services
 {
     public class MigrationBuilder
     {
-        public MetaSchema MetaSchema { get; set; }
+        public MetaSchema? MetaSchema { get; set; }
 
         private readonly string skeleton = "graph.tx().rollback();" + Environment.NewLine +
             "mgmt = graph.openManagement();" + Environment.NewLine +
@@ -32,6 +32,7 @@ namespace Ivet.Services
 
         private string BuildMain()
         {
+            if (MetaSchema == null) return string.Empty;
             if (!MetaSchema.Vertices.Any() && !MetaSchema.Edges.Any() && !MetaSchema.Properties.Any() && !MetaSchema.VertexPropertyBindings.Any() && !MetaSchema.EdgePropertyBindings.Any() && !MetaSchema.Connections.Any()) return string.Empty;
             
             var content = string.Empty;
@@ -65,7 +66,7 @@ namespace Ivet.Services
 
         private List<string> BuildCompositeIndeces()
         {
-            return MetaSchema.CompositeIndexes.ConvertAll(x =>
+            return MetaSchema?.CompositeIndexes.ConvertAll(x =>
             {
                 var content = string.Empty;
 
@@ -89,12 +90,12 @@ namespace Ivet.Services
                 content += $"mgmt.updateIndex(mgmt.getGraphIndex('{x.Name}'), SchemaAction.REINDEX).get();";
 
                 return content;
-            });
+            }) ?? new List<string>();
         }
 
         private List<string> BuildMixedIndeces()
         {
-            return MetaSchema.MixedIndexes.ConvertAll(x =>
+            return MetaSchema?.MixedIndexes.ConvertAll(x =>
             {
                 var content = string.Empty;
                 content += $"// Mixed Indices{Environment.NewLine}";
@@ -117,15 +118,14 @@ namespace Ivet.Services
                 content += string.Join(Environment.NewLine, MetaSchema.MixedIndexes.Select(x => $"mgmt.updateIndex(mgmt.getGraphIndex('{x.Name}'), SchemaAction.REINDEX).get();"));
 
                 return content;
-            });
+            }) ?? new List<string>();
         }
 
-        private IEnumerable<string> BuildIndexBindings()
-        {
-            return MetaSchema.IndexBindings
+        private IEnumerable<string> BuildIndexBindings() => MetaSchema?.IndexBindings
                 .Where(x => !MetaSchema.CompositeIndexes.Any(y => y.Name == x.IndexName) && !MetaSchema.MixedIndexes.Any(y => y.Name == x.IndexName))
                 .GroupBy(x => x.IndexName)
-                .Select(y => {
+                .Select(y =>
+                {
                     var content = string.Empty;
 
                     content += string.Join(Environment.NewLine, y.Select(z => $"prop = mgmt.getPropertyKey('{z.PropertyName}');index = mgmt.getGraphIndex('{z.IndexName}').addKey(prop{(z.Mapping != MappingType.NULL ? ", Mapping." + z.Mapping + ".asParameter()" : "")});"));
@@ -146,10 +146,9 @@ namespace Ivet.Services
                     content += $"mgmt.updateIndex(mgmt.getGraphIndex('{y.Key}'), SchemaAction.REINDEX).get();";
 
                     return content;
-                });
-        }
+                }) ?? new List<string>();
 
-        private string BuildIndex<T>(T graphIndex, IEnumerable<MetaIndexBinding> properties, Func<T, string> convert)
+        private static string BuildIndex<T>(T graphIndex, IEnumerable<MetaIndexBinding> properties, Func<T, string> convert)
         {
             var result = string.Empty;
 

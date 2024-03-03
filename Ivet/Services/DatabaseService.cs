@@ -1,13 +1,17 @@
 ﻿using ExRam.Gremlinq.Core;
-using ExRam.Gremlinq.Providers.WebSocket;
+using ExRam.Gremlinq.Core.Models;
+using ExRam.Gremlinq.Providers.Core;
+using ExRam.Gremlinq.Providers.JanusGraph;
+using ExRam.Gremlinq.Support.NewtonsoftJson;
 using Gremlin.Net.Driver;
+using Ivet.Model;
 using static ExRam.Gremlinq.Core.GremlinQuerySource;
 
 namespace Ivet.Services
 {
     public class DatabaseService : IDisposable, IDatabaseService
     {
-        private GremlinClient? _client;
+        private GremlinClient _client;
         private bool disposedValue;
 
         public IGremlinQuerySource GremlinqClient { get; private set; }
@@ -18,8 +22,15 @@ namespace Ivet.Services
 
             var uri = new Uri($"ws://{ipAddress}:{port}");
 
-            GremlinqClient = g//.ConfigureEnvironment(env => env.UseModel(GraphModel.FromBaseTypes<AbstractVertex, AbstractEdge>(b => b.IncludeAssembliesOfBaseTypes())))
-                            .UseJanusGraph(builder => builder.At(uri));
+            GremlinqClient = g.UseJanusGraph<AbstractVertex, AbstractEdge>(configurator => configurator
+                                    .At(uri)
+                                    .UseNewtonsoftJson()
+                                ).ConfigureEnvironment(e => e
+                                    .UseModel(GraphModel.FromBaseTypes<AbstractVertex, AbstractEdge>()
+                                        .AddAssemblies(typeof(Migration).Assembly)
+                                    )
+                                    .UseNewtonsoftJson()
+                                );
         }
 
         protected virtual void Dispose(bool disposing)
