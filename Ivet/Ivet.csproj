@@ -16,7 +16,8 @@
     <PackageLicenseExpression>CECILL-B</PackageLicenseExpression>
     <Version>1.2.0</Version>
     <Authors>david.lecoconnier</Authors>
-    <PackageReleaseNotes>Exram.Gremlinq 12.2.1 dependecy update</PackageReleaseNotes>
+    <PackageReleaseNotes>* Allow only json files
+* Exram.Gremlinq 12.2.1 dependecy update</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
