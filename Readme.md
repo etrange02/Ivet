@@ -6,7 +6,8 @@ The **generate** command creates a json file containing commands to execute. The
 To keep trace of all applied migrations, migration names are saved into janusgraph server when **upgrade** is called.
 You can check at any moment the **list** of migrations both applied and not.
 
-A **test** command is used to populate database either for personnal tests or unit tests. Do not use it in your production environment.
+> [!CAUTION]
+> There is a fourth command `test`. It is used to populate database either for personnal tests or unit tests. Do not use it in your production environment.
 
 Available commands
 =======
@@ -21,9 +22,6 @@ Available commands
 	* **port** _8182_
 * **upgrade**
 	* **input*** Can be a file or a directory containing migrations to be applied
-	* **ip** _localhost_
-	* **port** _8182_
-* test* _Must not be used in Prod. This command is only used to apply a schema to a Janusgraph server_
 	* **ip** _localhost_
 	* **port** _8182_
 
@@ -55,7 +53,7 @@ Ivet list --input "C:\MigrationFiles"
 
 How to tag code?
 =======
-Add `Ivet.Model` to your project. You are now ready to tag your code.
+Add `Ivet.Model` (https://www.nuget.org/packages/Ivet.Model) to your project. You are now ready to tag your code.
 All names and possibilities are listed in Janusgraph documentation at https://docs.janusgraph.org/schema/.
 
 Tag a Vertex:
@@ -110,4 +108,37 @@ public class MyVertex
     [MixedIndex("vertex2_mixed", Backend = "search", Mapping = MappingType.TEXTSTRING)]
     public string SearchProperty { get; set; }
 }
+```
+
+
+What's next?
+=======
+You can now run a `generate` command in order to create migration files.
+
+> [!NOTE]
+> Many files are created by the `generate` command. One contains vertices and edges and properties. Indices are in different files to avoid timeout at migration time.
+
+You can can have some details of migrations with `list`.
+
+> [!TIP]
+> You can open and manually edit your migration files. In particular there is a description field whose content can be seen with `list` command
+
+```
+> Ivet list --input ".\Migrations"
+
+-------------------------------------------------------------------------------------------------------
+ | Name                            | Description                                 | Date                |
+ -------------------------------------------------------------------------------------------------------
+ | Migration_202403032330_000      | Vertex and edge creation for my new feature | 10/03/2024 14:21:54 |
+ -------------------------------------------------------------------------------------------------------
+ | Migration_202403032330_001      |                                             | 10/03/2024 14:22:04 |
+ -------------------------------------------------------------------------------------------------------
+ | Migration_202403032330_002      |                                             | 10/03/2024 14:22:14 |
+ -------------------------------------------------------------------------------------------------------
+ | Migration_202403032330_003      |                                             | 10/03/2024 14:22:24 |
+ -------------------------------------------------------------------------------------------------------
+ | Migration_202403032330_004      |                                             | 10/03/2024 14:22:34 |
+ -------------------------------------------------------------------------------------------------------
+
+ Count:5
 ```

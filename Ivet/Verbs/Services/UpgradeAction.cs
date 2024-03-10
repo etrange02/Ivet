@@ -2,6 +2,7 @@
 using Ivet.Model;
 using Ivet.Services;
 using Ivet.Verbs.Model;
+using System.Globalization;
 using System.Text.Json;
 
 namespace Ivet.Verbs.Services
@@ -14,11 +15,14 @@ namespace Ivet.Verbs.Services
 
             if (File.Exists(options.Input))
             {
-                files.Add(options.Input);
+                if (options.Input.EndsWith(".json", true, CultureInfo.InvariantCulture))
+                    files.Add(options.Input);
+                else
+                    throw new FormatException("Bad extension. Must be a json file or a directory.");
             }
             else
             {
-                files.AddRange(Directory.EnumerateFiles(options.Input));
+                files.AddRange(Directory.EnumerateFiles(options.Input, "*.json"));
             }
 
             using var database = new DatabaseService(options.IpAddress, options.Port);
