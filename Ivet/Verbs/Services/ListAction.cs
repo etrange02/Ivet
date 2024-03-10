@@ -12,7 +12,7 @@ namespace Ivet.Verbs.Services
         public static void Do(ListOptions options)
         {
             var files = new List<string>();
-            files.AddRange(Directory.EnumerateFiles(options.Input));
+            files.AddRange(Directory.EnumerateFiles(options.Input, "*.json"));
 
             var migrations = files.ConvertAll(x => new { Name = Path.GetFileNameWithoutExtension(x), Migration = JsonSerializer.Deserialize<MigrationFile>(File.ReadAllText(x)) });
 
