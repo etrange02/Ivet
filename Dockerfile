@@ -1,6 +1,6 @@
 FROM alpine:latest as build-env
 RUN apk update
-RUN apk add dotnet6-sdk
+RUN apk add dotnet8-sdk
 WORKDIR /app
 COPY . ./
 RUN dotnet restore
@@ -10,7 +10,7 @@ RUN dotnet publish -c Release -o out
 # Build runtime image
 FROM alpine:latest
 RUN apk update
-RUN apk add dotnet6-runtime
+RUN apk add dotnet8-runtime
 COPY --from=build-env /app/out/ /app
 #COPY --from=build-env /app/Migrations/ /app/Migrations/
 ENV input=/app
