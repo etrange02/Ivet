@@ -22,33 +22,44 @@ namespace Ivet.Verbs.Services
             }
             else
             {
-                files.AddRange(Directory.EnumerateFiles(options.Input, "*.json"));
+                files.AddRange(Directory.EnumerateFiles(options.Input, "*.json", SearchOption.AllDirectories));
             }
 
             using var database = new DatabaseService(options.IpAddress, options.Port);
 
             var appliedMigrations = database.GremlinqClient.V<Migration>()
-                .ToArrayAsync().Result
-                .ToList();
+                .ToArrayAsync()
+                .AsTask()
+                .GetAwaiter()
+                .GetResult()
+                .Select(x => x.MigrationName);
 
             var migrationsToApply = files
-                .ConvertAll(x => new { Fullname = x, Name = Path.GetFileNameWithoutExtension(x) })
-                .Where(x => !appliedMigrations.Select(x => x.MigrationName).Contains(x.Name))
-                .Select(x => x.Fullname)
+                .Select(x => new { 
+                    Fullname = x, 
+                    Object = JsonSerializer.Deserialize<MigrationFile>(File.ReadAllText(x)) ?? throw new FormatException($"File {x} has bad format") 
+                })
+                .SelectMany(x => {
+                    var filename = Path.GetFileNameWithoutExtension(x.Fullname);
+                    if (x.Object.Scripts?.Any() ?? false)
+                        return x.Object.Scripts.Select((x, i) => new MigrationInstance { Name = $"{ filename }_#{ i }", Script = x.Script });
+                    if (!string.IsNullOrEmpty(x.Object.Content))
+                        return new List<MigrationInstance> { new() { Name = filename, Script = x.Object.Content } };
+                    return new List<MigrationInstance>();
+                })
+                .Where(x => !appliedMigrations.Contains(x.Name))
                 .ToList();
 
             migrationsToApply.ForEach(x =>
             {
-                Console.WriteLine($"Loading file {x}");
-                var migrationFile = JsonSerializer.Deserialize<MigrationFile>(File.ReadAllText(x)) ?? throw new FormatException($"File {x} has bad format");
-                var res = database.Execute(migrationFile.Content);
+                Console.WriteLine($"Applying migration {x.Name}");
+                var res = database.Execute(x.Script);
                 var migration = new Migration
                 {
-                    MigrationName = Path.GetFileNameWithoutExtension(x),
+                    MigrationName = x.Name,
                     MigrationDate = DateTime.Now,
                 };
-                var migrationDB = database.GremlinqClient.AddV(migration).FirstAsync().Result;
-
+                var migrationDB = database.GremlinqClient.AddV(migration).FirstAsync().AsTask().GetAwaiter().GetResult();
             });
         }
     }
