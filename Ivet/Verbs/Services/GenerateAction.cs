@@ -31,14 +31,29 @@ namespace Ivet.Verbs.Services
                 MetaSchema = metaSchema.Difference
             };
 
-            var migrations = builder.BuildFileContent();
+            var outputDirectory = options.OutputDirectory;
+            if (!string.IsNullOrEmpty(options.SprintNo))
+                outputDirectory = Path.Combine(options.OutputDirectory, options.SprintNo);
+            Directory.CreateDirectory(outputDirectory);
 
-            Directory.CreateDirectory(options.OutputDirectory);
-
-            foreach (var (migration, i) in migrations.Select((v, i) => (v, i)))
+            if (options.OneScriptPerFile)
             {
-                var fileName = Path.Combine(options.OutputDirectory, $"Migration_{DateTime.Now:yyyyMMddHHmm}_{i:D3}.json");
-                File.WriteAllText(fileName, JsonSerializer.Serialize(migration, new JsonSerializerOptions { WriteIndented = true,  }));
+                var migrations = builder.BuildFileContents();
+
+                foreach (var (migration, i) in migrations.Select((v, i) => (v, i)))
+                {
+                    var fileName = Path.Combine(options.OutputDirectory, $"Migration_{DateTime.Now:yyyyMMddHHmm}_{i:D3}.json");
+                    File.WriteAllText(fileName, JsonSerializer.Serialize(migration, new JsonSerializerOptions { WriteIndented = true, }));
+                }
+
+                return;
+            }
+            else
+            {
+                var migration = builder.BuildFileContent();
+
+                var fileName = Path.Combine(outputDirectory, $"Migration_{DateTime.Now:yyyyMMddHHmm}.json");
+                File.WriteAllText(fileName, JsonSerializer.Serialize(migration, new JsonSerializerOptions { WriteIndented = true }));
             }
         }
     }

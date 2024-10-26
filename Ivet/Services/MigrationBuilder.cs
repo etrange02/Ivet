@@ -168,7 +168,18 @@ namespace Ivet.Services
             return result;
         }
 
-        public List<MigrationFile> BuildFileContent()
+        public MigrationFile BuildFileContent()
+        {
+            return new MigrationFile
+            {
+                Scripts = Build().Where(x => !string.IsNullOrEmpty(x)).Select(x =>
+                {
+                    return new MigrationScript { Script = skeleton.Replace("%CONTENT%", x).Replace($"{Environment.NewLine}", $"{Environment.NewLine}   ") };
+                }).ToList()
+            };
+        }
+
+        public List<MigrationFile> BuildFileContents()
         {
             return Build().Where(x => !string.IsNullOrEmpty(x)).Select(x =>
             {
@@ -176,7 +187,7 @@ namespace Ivet.Services
                 {
                     Content = skeleton.Replace("%CONTENT%", x).Replace($"{Environment.NewLine}", $"{Environment.NewLine}   ")
                 };
-            }).ToList();
+        }).ToList();
         }
     }
 }
