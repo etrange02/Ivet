@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackAsTool>True</PackAsTool>
@@ -14,9 +14,11 @@
     <PackageProjectUrl>https://github.com/etrange02/Ivet</PackageProjectUrl>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
     <PackageLicenseExpression>CECILL-B</PackageLicenseExpression>
-    <Version>1.3.0</Version>
+    <Version>1.4.0</Version>
     <Authors>david.lecoconnier</Authors>
-    <PackageReleaseNotes>* Exram.Gremlinq 12.6.1 dependecy update</PackageReleaseNotes>
+    <PackageReleaseNotes>* NetCore 8.0
+* Exram.Gremlinq 12.10.2 dependecy update
+* Add multi script per file</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,10 +30,10 @@
 
   <ItemGroup>
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
-    <PackageReference Include="ConsoleTables" Version="2.6.1" />
-    <PackageReference Include="CsvHelper" Version="31.0.4" />
-    <PackageReference Include="ExRam.Gremlinq.Providers.JanusGraph" Version="12.6.1" />
-    <PackageReference Include="ExRam.Gremlinq.Support.NewtonsoftJson" Version="12.6.1" />
+    <PackageReference Include="ConsoleTables" Version="2.6.2" />
+    <PackageReference Include="CsvHelper" Version="33.0.1" />
+    <PackageReference Include="ExRam.Gremlinq.Providers.JanusGraph" Version="12.10.2" />
+    <PackageReference Include="ExRam.Gremlinq.Support.NewtonsoftJson" Version="12.10.2" />
     <PackageReference Include="JanusGraph.Net" Version="1.0.0" />
   </ItemGroup>
 
