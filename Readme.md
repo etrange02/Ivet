@@ -12,18 +12,18 @@ You can check at any moment the **list** of migrations both applied and not.
 Available commands
 =======
 * **generate**
-	* **dir*** Dlls to analyze
-	* **output*** Directory where to put migration file
+	* **dir** Dlls to analyze. If not set look in current working directory.
+	* **output** Directory where to put migration file. If not set files are created in current directory.
 	* **ip** _localhost_
 	* **port** _8182_
     * **sprintno** Add a subdirectory when generating. Use it as you want
     * **onefile** Create one file per script
 * **list** Display list of all migrations
-	* **input*** Directory where to find migration files
+	* **input** Directory where to find migration files. If not set look in current working directory.
 	* **ip** _localhost_
 	* **port** _8182_
 * **upgrade**
-	* **input*** Can be a file or a directory containing migrations to be applied
+	* **input** Can be a file or a directory containing migrations to be applied. If not set look in current working directory.
 	* **ip** _localhost_
 	* **port** _8182_
 
@@ -128,19 +128,22 @@ You can can have some details of migrations with `list`.
 ```
 > Ivet list --input ".\Migrations"
 
--------------------------------------------------------------------------------------------------------
- | Name                            | Description                                 | Date                |
- -------------------------------------------------------------------------------------------------------
- | Migration_202403032330_000      | Vertex and edge creation for my new feature | 10/03/2024 14:21:54 |
- -------------------------------------------------------------------------------------------------------
- | Migration_202403032330_001      |                                             | 10/03/2024 14:22:04 |
- -------------------------------------------------------------------------------------------------------
- | Migration_202403032330_002      |                                             | 10/03/2024 14:22:14 |
- -------------------------------------------------------------------------------------------------------
- | Migration_202403032330_003      |                                             | 10/03/2024 14:22:24 |
- -------------------------------------------------------------------------------------------------------
- | Migration_202403032330_004      |                                             | 10/03/2024 14:22:34 |
- -------------------------------------------------------------------------------------------------------
+Directory: D:\Migrations
+
+Migrations:
+ -----------------------------------------------------------------------------------------------------------
+ | Name                      | Relative path                  | Description | Date                | Multi? |
+ -----------------------------------------------------------------------------------------------------------
+ | Migration_202403032330_#0 | 12\Migration_202403032330.json | Part #0     | 10/03/2024 14:21:54 | True   |
+ -----------------------------------------------------------------------------------------------------------
+ | Migration_202403032330_#1 | 12\Migration_202403032330.json | Part #1     | 10/03/2024 14:22:04 | True   |
+ -----------------------------------------------------------------------------------------------------------
+ | Migration_202403032330_#2 | 12\Migration_202403032330.json | Part #2     | 10/03/2024 14:22:14 | True   |
+ -----------------------------------------------------------------------------------------------------------
+ | Migration_202403032330_#3 | 12\Migration_202403032330.json | Part #3     | 10/03/2024 14:22:24 | True   |
+ -----------------------------------------------------------------------------------------------------------
+ | Migration_202403032330_#4 | 12\Migration_202403032330.json | Part #4     | 10/03/2024 14:22:34 | True   |
+ -----------------------------------------------------------------------------------------------------------
 
  Count:5
 ```

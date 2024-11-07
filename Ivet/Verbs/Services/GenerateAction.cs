@@ -31,7 +31,7 @@ namespace Ivet.Verbs.Services
                 MetaSchema = metaSchema.Difference
             };
 
-            var outputDirectory = options.OutputDirectory;
+            var outputDirectory = string.IsNullOrEmpty(options.OutputDirectory) ? Directory.GetCurrentDirectory() : options.OutputDirectory;
             if (!string.IsNullOrEmpty(options.SprintNo))
                 outputDirectory = Path.Combine(options.OutputDirectory, options.SprintNo);
             Directory.CreateDirectory(outputDirectory);

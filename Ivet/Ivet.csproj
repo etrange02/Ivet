@@ -14,7 +14,7 @@
     <PackageProjectUrl>https://github.com/etrange02/Ivet</PackageProjectUrl>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
     <PackageLicenseExpression>CECILL-B</PackageLicenseExpression>
-    <Version>1.4.0</Version>
+    <Version>1.5.0</Version>
     <Authors>david.lecoconnier</Authors>
     <PackageReleaseNotes>* NetCore 8.0
 * Exram.Gremlinq 12.10.2 dependecy update

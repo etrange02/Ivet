@@ -13,6 +13,8 @@ namespace Ivet.Verbs.Services
         {
             var files = new List<string>();
 
+            var input = string.IsNullOrEmpty(options.Input) ? Directory.GetCurrentDirectory() : options.Input;
+
             if (File.Exists(options.Input))
             {
                 if (options.Input.EndsWith(".json", true, CultureInfo.InvariantCulture))
@@ -22,7 +24,8 @@ namespace Ivet.Verbs.Services
             }
             else
             {
-                files.AddRange(Directory.EnumerateFiles(options.Input, "*.json", SearchOption.AllDirectories));
+                Console.WriteLine($"Directory: {input}");
+                files.AddRange(Directory.EnumerateFiles(input, "*.json", SearchOption.AllDirectories));
             }
 
             using var database = new DatabaseService(options.IpAddress, options.Port);
@@ -35,16 +38,16 @@ namespace Ivet.Verbs.Services
                 .Select(x => x.MigrationName);
 
             var migrationsToApply = files
-                .Select(x => new { 
-                    Fullname = x, 
+                .Select(x => new  { 
+                    Fullname = x,
                     Object = JsonSerializer.Deserialize<MigrationFile>(File.ReadAllText(x)) ?? throw new FormatException($"File {x} has bad format") 
                 })
                 .SelectMany(x => {
                     var filename = Path.GetFileNameWithoutExtension(x.Fullname);
                     if (x.Object.Scripts?.Any() ?? false)
-                        return x.Object.Scripts.Select((x, i) => new MigrationInstance { Name = $"{ filename }_#{ i }", Script = x.Script });
+                        return x.Object.Scripts.Select((y, i) => new MigrationInstance { Name = $"{ filename }_#{ i }", Script = y.Script, RelativePath = Path.GetRelativePath(input, x.Fullname) });
                     if (!string.IsNullOrEmpty(x.Object.Content))
-                        return new List<MigrationInstance> { new() { Name = filename, Script = x.Object.Content } };
+                        return new List<MigrationInstance> { new() { Name = filename, Script = x.Object.Content, RelativePath = Path.GetRelativePath(input, x.Fullname) } };
                     return new List<MigrationInstance>();
                 })
                 .Where(x => !appliedMigrations.Contains(x.Name))
@@ -52,7 +55,7 @@ namespace Ivet.Verbs.Services
 
             migrationsToApply.ForEach(x =>
             {
-                Console.WriteLine($"Applying migration {x.Name}");
+                Console.WriteLine($"Applying migration {x.Name} ({x.RelativePath})");
                 var res = database.Execute(x.Script);
                 var migration = new Migration
                 {
