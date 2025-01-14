@@ -20,7 +20,8 @@ namespace Ivet.Verbs.Services
             metaSchema.Source = DatabaseToSchemaConverter.Convert(databaseSchema);
 
             var librarySchemaLoader = new LibraySchemaLoaderService();
-            var librarySchema = librarySchemaLoader.Load(options.Directory);
+            var directory = string.IsNullOrEmpty(options.Directory) ? Directory.GetCurrentDirectory() : options.Directory;
+            var librarySchema = librarySchemaLoader.Load(directory);
             metaSchema.Target = LibraryToSchemaConverter.Convert(librarySchema);
 
             var deltaSchemaMaker = new DeltaSchemaMakerService();

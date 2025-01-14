@@ -14,11 +14,10 @@
     <PackageProjectUrl>https://github.com/etrange02/Ivet</PackageProjectUrl>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
     <PackageLicenseExpression>CECILL-B</PackageLicenseExpression>
-    <Version>1.5.0</Version>
+    <Version>1.5.1</Version>
     <Authors>david.lecoconnier</Authors>
-    <PackageReleaseNotes>* NetCore 8.0
-* Exram.Gremlinq 12.10.2 dependecy update
-* Add multi script per file</PackageReleaseNotes>
+    <PackageReleaseNotes>* Include inherited properties
+* Fix relative path for generate command</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

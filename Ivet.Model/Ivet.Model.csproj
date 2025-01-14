@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>david.lecoconnier</Authors>
-    <Version>1.3.0</Version>
+    <Version>1.4.0</Version>
     <Title>Ivet.Model</Title>
     <PackageProjectUrl>https://github.com/etrange02/Ivet</PackageProjectUrl>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
@@ -14,7 +14,7 @@
     <Description>Ivet's attributes. Tag your code with these classes then use Ivet to generate and update your Janusgraph schema</Description>
     <PackageLicenseExpression>CECILL-B</PackageLicenseExpression>
     <PackageTags>janusgraph;graph;database schema;generator;update</PackageTags>
-    <PackageReleaseNotes></PackageReleaseNotes>
+    <PackageReleaseNotes>* .Net 8.0</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

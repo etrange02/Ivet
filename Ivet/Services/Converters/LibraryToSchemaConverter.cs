@@ -82,11 +82,11 @@ namespace Ivet.Services.Converters
         {
             return schema.Vertices.Concat(schema.Edges).SelectMany(x =>
             {
-                var properties = x.GetProperties().Where(y => y.GetCustomAttribute<PropertyKeyAttribute>() != null);
+                var properties = x.GetProperties().Where(y => y.GetCustomAttribute<PropertyKeyAttribute>(true) != null);
 
                 return properties.Select(y =>
                 {
-                    var attribute = y.GetCustomAttribute<PropertyKeyAttribute>() ?? throw new AttributeNotFoundException($"Attribute not found on {x.FullName}");
+                    var attribute = y.GetCustomAttribute<PropertyKeyAttribute>(true) ?? throw new AttributeNotFoundException($"Attribute not found on {x.FullName}");
                     return new MetaPropertyKey
                     {
                         Name = attribute.Name ?? y.Name,
@@ -128,11 +128,11 @@ namespace Ivet.Services.Converters
         {
             return items.Where(x => x.Type != null).SelectMany(x =>
             {
-                var properties = x.Type.GetProperties().Where(y => y.GetCustomAttribute<PropertyKeyAttribute>() != null);
+                var properties = x.Type.GetProperties().Where(y => y.GetCustomAttribute<PropertyKeyAttribute>(true) != null);
 
                 return properties.Select(y =>
                 {
-                    var attribute = y.GetCustomAttribute<PropertyKeyAttribute>();
+                    var attribute = y.GetCustomAttribute<PropertyKeyAttribute>(true);
                     return new MetaPropertyBinding
                     {
                         Name = attribute?.Name ?? y.Name,
@@ -181,7 +181,7 @@ namespace Ivet.Services.Converters
         {
             return items.SelectMany(x =>
             {
-                var properties = x.Type.GetProperties().Where(y => y.GetCustomAttribute<PropertyKeyAttribute>() != null && y.GetCustomAttribute(typeof(T)) != null);
+                var properties = x.Type.GetProperties().Where(y => y.GetCustomAttribute<PropertyKeyAttribute>(true) != null && y.GetCustomAttribute(typeof(T)) != null);
 
                 return properties.Select(y => convert(x, y));
             });
@@ -191,7 +191,7 @@ namespace Ivet.Services.Converters
         {
             return schema.Vertices.Concat(schema.Edges).SelectMany(x =>
             {
-                var properties = x.GetProperties().Where(y => y.GetCustomAttribute<PropertyKeyAttribute>() != null && y.GetCustomAttribute<MixedIndexAttribute>() != null);
+                var properties = x.GetProperties().Where(y => y.GetCustomAttribute<PropertyKeyAttribute>(true) != null && y.GetCustomAttribute<MixedIndexAttribute>() != null);
 
                 if (x.GetCustomAttribute<AbstractGraphItemAttribute>() == null) return new List<MetaMixedIndex>();
 
@@ -225,7 +225,7 @@ namespace Ivet.Services.Converters
         {
             return items.SelectMany(x =>
             {
-                var properties = x.Type.GetProperties().Where(y => y.GetCustomAttribute<PropertyKeyAttribute>() != null && y.GetCustomAttribute(typeof(T)) != null);
+                var properties = x.Type.GetProperties().Where(y => y.GetCustomAttribute<PropertyKeyAttribute>(true) != null && y.GetCustomAttribute(typeof(T)) != null);
 
                 if (x.Type.GetCustomAttribute<AbstractGraphItemAttribute>() == null) return new List<MetaIndexBinding>();
 
