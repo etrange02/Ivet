@@ -1,6 +1,6 @@
 FROM alpine:latest as build-env
 RUN apk update
-RUN apk add dotnet9-sdk
+RUN apk add dotnet9-sdk dotnet8-sdk
 WORKDIR /app
 COPY . ./
 RUN dotnet restore
