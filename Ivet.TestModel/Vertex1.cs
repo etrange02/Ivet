@@ -23,6 +23,12 @@ namespace Ivet.TestModel
         public short[] ShortArray { get; set; }
         [PropertyKey]
         public IEnumerable<short> ShortEnumerable { get; set; }
+        [PropertyKey]
+        public IEnumerable<short?> NullableShortEnumerable { get; set; }
+        [PropertyKey]
+        public List<short> ShortList { get; set; }
+        [PropertyKey]
+        public List<short?> NullableShortList { get; set; }
 
         [PropertyKey]
         public int Integer { get; set; }
@@ -38,6 +44,8 @@ namespace Ivet.TestModel
         public IEnumerable<int?> NullableIntegerEnumerable { get; set; }
         [PropertyKey]
         public List<int> IntegerList { get; set; }
+        [PropertyKey]
+        public List<int?> NullableIntegerList { get; set; }
 
         [PropertyKey]
         public long Long { get; set; }
@@ -47,16 +55,28 @@ namespace Ivet.TestModel
         public long[] LongArray { get; set; }
         [PropertyKey]
         public IEnumerable<long> LongEnumerable { get; set; }
+        [PropertyKey]
+        public IEnumerable<long?> NullableLongEnumerable { get; set; }
+        [PropertyKey]
+        public List<long> LongList { get; set; }
+        [PropertyKey]
+        public List<long?> NullableLongList { get; set; }
 
 
         [PropertyKey]
-        public char Charracter { get; set; }
+        public char Character { get; set; }
         [PropertyKey]
-        public char? NullableCharracter { get; set; }
+        public char? NullableCharacter { get; set; }
         [PropertyKey]
-        public char[] CharracterArray { get; set; }
+        public char[] CharacterArray { get; set; }
         [PropertyKey]
-        public IEnumerable<char> CharracterEnumerable { get; set; }
+        public IEnumerable<char> CharacterEnumerable { get; set; }
+        [PropertyKey]
+        public IEnumerable<char?> NullableCharacterEnumerable { get; set; }
+        [PropertyKey]
+        public List<char> CharacterList{ get; set; }
+        [PropertyKey]
+        public List<char?> NullableCharracterList { get; set; }
 
         [PropertyKey]
         public string String { get; set; }
@@ -64,6 +84,8 @@ namespace Ivet.TestModel
         public string[] StringArray { get; set; }
         [PropertyKey]
         public IEnumerable<string> StringEnumerable { get; set; }
+        [PropertyKey]
+        public List<string> StringList { get; set; }
 
         [PropertyKey]
         public bool Boolean { get; set; }
@@ -73,6 +95,12 @@ namespace Ivet.TestModel
         public bool[] BooleanArray { get; set; }
         [PropertyKey]
         public IEnumerable<bool> BooleanEnumerable { get; set; }
+        [PropertyKey]
+        public IEnumerable<bool?> NullableBooleanEnumerable { get; set; }
+        [PropertyKey]
+        public List<bool> BooleanList { get; set; }
+        [PropertyKey]
+        public List<bool?> NullableBooleanList{ get; set; }
 
         [PropertyKey]
         public float Float { get; set; }
@@ -82,6 +110,12 @@ namespace Ivet.TestModel
         public float[] FloatArray { get; set; }
         [PropertyKey]
         public IEnumerable<float> FloatEnumerable { get; set; }
+        [PropertyKey]
+        public IEnumerable<float?> NullableFloatEnumerable { get; set; }
+        [PropertyKey]
+        public List<float> FloatList { get; set; }
+        [PropertyKey]
+        public List<float?> NullableFloatList{ get; set; }
 
         [PropertyKey]
         public double Double { get; set; }
@@ -91,6 +125,12 @@ namespace Ivet.TestModel
         public double[] DoubleArray { get; set; }
         [PropertyKey]
         public IEnumerable<double> DoubleEnumerable { get; set; }
+        [PropertyKey]
+        public IEnumerable<double?> NullableDoubleEnumerable { get; set; }
+        [PropertyKey]
+        public List<double> DoubleList { get; set; }
+        [PropertyKey]
+        public List<double?> NullableDoubleList { get; set; }
 
         [PropertyKey]
         public byte Byte { get; set; }
@@ -100,6 +140,12 @@ namespace Ivet.TestModel
         public byte[] ByteArray { get; set; }
         [PropertyKey]
         public IEnumerable<byte> ByteEnumerable { get; set; }
+        [PropertyKey]
+        public IEnumerable<byte?> NullableByteEnumerable { get; set; }
+        [PropertyKey]
+        public List<byte> ByteList { get; set; }
+        [PropertyKey]
+        public List<byte?> NullableByteList { get; set; }
 
         [PropertyKey]
         public DateTime DateTime { get; set; }
@@ -109,6 +155,12 @@ namespace Ivet.TestModel
         public DateTime[] DateTimeArray { get; set; }
         [PropertyKey]
         public IEnumerable<DateTime> DateTimeEnumerable { get; set; }
+        [PropertyKey]
+        public IEnumerable<DateTime?> NullableDateTimeEnumerable { get; set; }
+        [PropertyKey]
+        public List<DateTime> DateTimeList { get; set; }
+        [PropertyKey]
+        public List<DateTime?> NullableDateTimeList { get; set; }
 
         [PropertyKey]
         public DateOnly DateOnly { get; set; }
@@ -118,6 +170,12 @@ namespace Ivet.TestModel
         public DateOnly[] DateOnlyArray { get; set; }
         [PropertyKey]
         public IEnumerable<DateOnly> DateOnlyEnumerable { get; set; }
+        [PropertyKey]
+        public IEnumerable<DateOnly?> NullableDateOnlyEnumerable { get; set; }
+        [PropertyKey]
+        public List<DateOnly> DateOnlyList { get; set; }
+        [PropertyKey]
+        public List<DateOnly?> NullableDateOnlyList { get; set; }
 
         [PropertyKey]
         public TimeOnly TimeOnly { get; set; }
@@ -127,6 +185,12 @@ namespace Ivet.TestModel
         public TimeOnly[] TimeOnlyArray { get; set; }
         [PropertyKey]
         public IEnumerable<TimeOnly> TimeOnlyEnumerable { get; set; }
+        [PropertyKey]
+        public IEnumerable<TimeOnly?> NullableTimeOnlyEnumerable { get; set; }
+        [PropertyKey]
+        public List<TimeOnly> TimeOnlyList { get; set; }
+        [PropertyKey]
+        public List<TimeOnly?> NullableTimeOnlyList{ get; set; }
 
         [PropertyKey]
         public Guid Guid { get; set; }
@@ -136,5 +200,11 @@ namespace Ivet.TestModel
         public Guid[] GuidArray { get; set; }
         [PropertyKey]
         public IEnumerable<Guid> GuidEnumerable { get; set; }
+        [PropertyKey]
+        public IEnumerable<Guid?> NullableGuidEnumerable { get; set; }
+        [PropertyKey]
+        public List<Guid> GuidList { get; set; }
+        [PropertyKey]
+        public List<Guid?> NullableGuidList { get; set; }
     }
 }

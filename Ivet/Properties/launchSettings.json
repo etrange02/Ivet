@@ -6,7 +6,7 @@
     },
     "generate": {
       "commandName": "Project",
-      "commandLineArgs": "generate --dir \"D:\\Workspace\\Projects\\Ivet\\Ivet.TestModel\\bin\\Debug\\net8.0\" --output \"D:\\Workspace\\Projects\\Ivet\\Migrations\" --sprintno \"15\""
+      "commandLineArgs": "generate --dir \"D:\\Workspace\\Projects\\Ivet\\Ivet.TestModel\\bin\\Debug\\net9.0\" --output \"D:\\Workspace\\Projects\\Ivet\\Migrations\" --sprintno \"16\""
     },
     "upgrade": {
       "commandName": "Project",
