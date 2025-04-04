@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackAsTool>True</PackAsTool>
@@ -14,10 +14,9 @@
     <PackageProjectUrl>https://github.com/etrange02/Ivet</PackageProjectUrl>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
     <PackageLicenseExpression>CECILL-B</PackageLicenseExpression>
-    <Version>1.5.1</Version>
+    <Version>1.6</Version>
     <Authors>david.lecoconnier</Authors>
-    <PackageReleaseNotes>* Include inherited properties
-* Fix relative path for generate command</PackageReleaseNotes>
+    <PackageReleaseNotes>* .Net 9.0</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
