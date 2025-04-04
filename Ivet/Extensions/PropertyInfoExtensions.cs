@@ -12,10 +12,10 @@ namespace Ivet.Extensions
                 return "Integer.class";
             if (memberInfo.PropertyType == typeof(long) || memberInfo.PropertyType == typeof(long?) || memberInfo.PropertyType == typeof(long[]) || typeof(IEnumerable<long>).IsAssignableFrom(memberInfo.PropertyType) || typeof(IEnumerable<long?>).IsAssignableFrom(memberInfo.PropertyType))
                 return "Long.class";
-            if (memberInfo.PropertyType == typeof(char) || memberInfo.PropertyType == typeof(char?) || memberInfo.PropertyType == typeof(char[]) || typeof(IEnumerable<char>).IsAssignableFrom(memberInfo.PropertyType) || typeof(IEnumerable<char?>).IsAssignableFrom(memberInfo.PropertyType))
-                return "Char.class";
             if (memberInfo.PropertyType == typeof(string) || /*memberInfo.PropertyType is string? ||*/ memberInfo.PropertyType == typeof(string[]) || typeof(IEnumerable<string>).IsAssignableFrom(memberInfo.PropertyType))
                 return "String.class";
+            if (memberInfo.PropertyType == typeof(char) || memberInfo.PropertyType == typeof(char?) || memberInfo.PropertyType == typeof(char[]) || typeof(IEnumerable<char>).IsAssignableFrom(memberInfo.PropertyType) || typeof(IEnumerable<char?>).IsAssignableFrom(memberInfo.PropertyType))
+                return "Char.class";
             if (memberInfo.PropertyType == typeof(bool) || memberInfo.PropertyType == typeof(bool?) || memberInfo.PropertyType == typeof(bool[]) || typeof(IEnumerable<bool>).IsAssignableFrom(memberInfo.PropertyType) || typeof(IEnumerable<bool?>).IsAssignableFrom(memberInfo.PropertyType))
                 return "Boolean.class";
             if (memberInfo.PropertyType == typeof(float) || memberInfo.PropertyType == typeof(float?) || memberInfo.PropertyType == typeof(float[]) || typeof(IEnumerable<float>).IsAssignableFrom(memberInfo.PropertyType) || typeof(IEnumerable<float?>).IsAssignableFrom(memberInfo.PropertyType))
