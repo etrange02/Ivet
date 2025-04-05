@@ -211,7 +211,7 @@ namespace Ivet.Tests.Services.Converters
             Assert.Equal(Cardinality.SINGLE, result.Properties[0].Cardinality);
             Assert.NotNull(result.Properties[0].PropertyInfo);
             Assert.Equal("MyCharProperty", result.Properties[1].Name);
-            Assert.Equal("Char.class", result.Properties[1].DataType);
+            Assert.Equal("Character.class", result.Properties[1].DataType);
             Assert.Equal(Cardinality.SINGLE, result.Properties[1].Cardinality);
             Assert.NotNull(result.Properties[1].PropertyInfo);
             Assert.NotEmpty(result.EdgePropertyBindings);
@@ -245,7 +245,7 @@ namespace Ivet.Tests.Services.Converters
             Assert.Equal(Cardinality.SINGLE, result.Properties[0].Cardinality);
             Assert.NotNull(result.Properties[0].PropertyInfo);
             Assert.Equal("MyCharProperty", result.Properties[1].Name);
-            Assert.Equal("Char.class", result.Properties[1].DataType);
+            Assert.Equal("Character.class", result.Properties[1].DataType);
             Assert.Equal(Cardinality.SINGLE, result.Properties[1].Cardinality);
             Assert.NotNull(result.Properties[1].PropertyInfo);
             Assert.NotEmpty(result.EdgePropertyBindings);
@@ -335,7 +335,7 @@ namespace Ivet.Tests.Services.Converters
             Assert.Equal("PropertyEdge", result.EdgePropertyBindings[0].Entity);
             Assert.Equal("MyProperty", result.EdgePropertyBindings[0].Name);
             Assert.Equal("MyCharProperty", result.Properties[1].Name);
-            Assert.Equal("Char.class", result.Properties[1].DataType);
+            Assert.Equal("Character.class", result.Properties[1].DataType);
             Assert.Single(result.VertexPropertyBindings);
             Assert.Equal("PropertyVertex", result.VertexPropertyBindings[0].Entity);
             Assert.Equal("MyProperty", result.VertexPropertyBindings[0].Name);

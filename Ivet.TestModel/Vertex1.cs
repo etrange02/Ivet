@@ -76,7 +76,7 @@ namespace Ivet.TestModel
         [PropertyKey]
         public List<char> CharacterList{ get; set; }
         [PropertyKey]
-        public List<char?> NullableCharracterList { get; set; }
+        public List<char?> NullableCharacterList { get; set; }
 
         [PropertyKey]
         public string String { get; set; }
