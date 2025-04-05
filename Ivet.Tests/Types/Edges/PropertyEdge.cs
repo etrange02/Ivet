@@ -6,7 +6,9 @@ namespace Ivet.Tests.Types.Edges
     [Edge(typeof(VertexSample), typeof(NamedVertexSample))]
     public class PropertyEdge
     {
-        [PropertyKey()]
+        [PropertyKey]
         public string? MyProperty { get; set; }
+        [PropertyKey]
+        public IEnumerable<char> MyCharProperty { get; set; }
     }
 }
