@@ -2,6 +2,6 @@
 {
     public class MigrationScript
     {
-        public string Script { get; set; }
+        public required string Script { get; set; }
     }
 }

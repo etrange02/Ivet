@@ -97,10 +97,43 @@ namespace Ivet.Tests.Services.Converters
             Assert.Empty(result.IndexBindings);
         }
 
+        [Fact]
+        public void ConvertTest_EdgeDoubled()
+        {
+            // Arrange
+            var schema = new Schema
+            {
+                Edges = { typeof(DoubleEdgeSample) }
+            };
+
+            // Act
+            var result = LibraryToSchemaConverter.Convert(schema);
+
+            //Assert
+            Assert.NotNull(result);
+            Assert.Empty(result.Vertices);
+            Assert.Equal(2, result.Edges.Count());
+            Assert.Equal("DoubleEdgeSample", result.Edges[0].Name);
+            Assert.Equal(typeof(VertexSample), result.Edges[0].In);
+            Assert.Equal(typeof(StaticVertexSample), result.Edges[0].Out);
+            Assert.Equal(Multiplicity.SIMPLE, result.Edges[0].Multiplicity);
+            Assert.Equal("DoubleEdgeSample", result.Edges[1].Name);
+            Assert.Equal(typeof(VertexSample), result.Edges[1].In);
+            Assert.Equal(typeof(NamedVertexSample), result.Edges[1].Out);
+            Assert.Equal(Multiplicity.SIMPLE, result.Edges[1].Multiplicity);
+            Assert.NotEmpty(result.Connections);
+            Assert.Empty(result.Properties);
+            Assert.Empty(result.EdgePropertyBindings);
+            Assert.Empty(result.VertexPropertyBindings);
+            Assert.Empty(result.MixedIndexes);
+            Assert.Empty(result.CompositeIndexes);
+            Assert.Empty(result.IndexBindings);
+        }
+
         [Theory]
         [InlineData(typeof(EdgeSample), new Type[] { }, "EdgeSample", null, null)]
         [InlineData(typeof(EdgeSample), new Type[] { typeof(VertexSample) }, "EdgeSample", "VertexSample", null)]
-        [InlineData(typeof(EdgeSample), new Type[] { typeof(NamedVertexSample)  }, "EdgeSample", null, "A vertex name")]
+        [InlineData(typeof(EdgeSample), new Type[] { typeof(NamedVertexSample) }, "EdgeSample", null, "A vertex name")]
         [InlineData(typeof(InOutEdgeSample), new Type[] { typeof(VertexSample) }, "InOutEdgeSample", "VertexSample", "VertexSample")]
         public void ConvertTest_Connections(Type edgeType, Type[] vertexTypes, string edgeName, string? inName, string? outName)
         {

@@ -43,20 +43,20 @@ namespace Ivet.Services.Converters
 
         private static IEnumerable<MetaEdge> GetEdges(Schema schema)
         {
-            return schema.Edges.ConvertAll(x =>
+            return schema.Edges.SelectMany(x =>
             {
-                var attribute = x.GetCustomAttribute<EdgeAttribute>() ?? throw new AttributeNotFoundException($"Attribute not found on {x.FullName}");
-                return new MetaEdge
-                {
-                    Name = attribute.Name ?? x.Name,
-                    Multiplicity = attribute.Multiplicity,
-                    Type = x,
-                    Attribute = attribute,
-                    In = attribute.In,
-                    Out = attribute.Out
-                };
+                var attributes = x.GetCustomAttributes<EdgeAttribute>() ?? throw new AttributeNotFoundException($"Attribute not found on {x.FullName}");
+                return attributes.Select(attribute => new MetaEdge
+                    {
+                        Name = attribute.Name ?? x.Name,
+                        Multiplicity = attribute.Multiplicity,
+                        Type = x,
+                        Attribute = attribute,
+                        In = attribute.In,
+                        Out = attribute.Out
+                    });
 
-            }).DistinctBy(x => x.Name)
+            }).DistinctBy(x => $"{x.Name}-{x.In?.Name}-{x.Out?.Name}")
             .Concat(schema.Vertices.SelectMany(x =>
             {
                 var properties = x.GetProperties().Where(y => y.GetCustomAttribute<EdgePropertyAttribute>() != null);
@@ -193,7 +193,7 @@ namespace Ivet.Services.Converters
             {
                 var properties = x.GetProperties().Where(y => y.GetCustomAttribute<PropertyKeyAttribute>(true) != null && y.GetCustomAttribute<MixedIndexAttribute>() != null);
 
-                if (x.GetCustomAttribute<AbstractGraphItemAttribute>() == null) return new List<MetaMixedIndex>();
+                if (!x.GetCustomAttributes<AbstractGraphItemAttribute>().Any()) return new List<MetaMixedIndex>();
 
                 return properties.Select(y =>
                 {
@@ -227,7 +227,7 @@ namespace Ivet.Services.Converters
             {
                 var properties = x.Type.GetProperties().Where(y => y.GetCustomAttribute<PropertyKeyAttribute>(true) != null && y.GetCustomAttribute(typeof(T)) != null);
 
-                if (x.Type.GetCustomAttribute<AbstractGraphItemAttribute>() == null) return new List<MetaIndexBinding>();
+                if (!x.Type.GetCustomAttributes<AbstractGraphItemAttribute>().Any()) return new List<MetaIndexBinding>();
 
                 return properties.Select(y => convert(x, y));
             });

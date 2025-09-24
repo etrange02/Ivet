@@ -4,9 +4,10 @@ using Ivet.Model.Meta;
 
 namespace Ivet.Services
 {
-    public class MigrationBuilder
+    public class MigrationBuilder(MetaSchema metaSchema)
     {
-        public MetaSchema? MetaSchema { get; set; }
+        public MetaSchema? MetaSchema { get; private set; } = metaSchema;
+        public string? Description { get; set; }
 
         private readonly string skeleton = "graph.tx().rollback();" + Environment.NewLine +
             "mgmt = graph.openManagement();" + Environment.NewLine +
@@ -172,6 +173,7 @@ namespace Ivet.Services
         {
             return new MigrationFile
             {
+                Description = Description ?? string.Empty,
                 Scripts = Build().Where(x => !string.IsNullOrEmpty(x)).Select(x =>
                 {
                     return new MigrationScript { Script = skeleton.Replace("%CONTENT%", x).Replace($"{Environment.NewLine}", $"{Environment.NewLine}   ") };
@@ -185,6 +187,7 @@ namespace Ivet.Services
             {
                 return new MigrationFile
                 {
+                    Description = Description ?? string.Empty,
                     Content = skeleton.Replace("%CONTENT%", x).Replace($"{Environment.NewLine}", $"{Environment.NewLine}   ")
                 };
         }).ToList();

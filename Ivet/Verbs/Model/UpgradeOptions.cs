@@ -9,7 +9,7 @@ namespace Ivet.Verbs.Model
         public string Input { get; set; } = string.Empty;
 
         [Option("ip", HelpText = "Server IP", Default = "localhost")]
-        public string IpAddress { get; set; }
+        public string? IpAddress { get; set; }
 
         [Option("port", HelpText = "Server Port", Default = 8182)]
         public int Port { get; set; }
