@@ -27,15 +27,14 @@ namespace Ivet.Verbs.Services
             var deltaSchemaMaker = new DeltaSchemaMakerService();
             metaSchema.Difference = deltaSchemaMaker.Difference(metaSchema.Source, metaSchema.Target);
 
-            var builder = new MigrationBuilder
-            {
-                MetaSchema = metaSchema.Difference
-            };
+            var builder = new MigrationBuilder(metaSchema.Difference);
 
             var outputDirectory = string.IsNullOrEmpty(options.OutputDirectory) ? Directory.GetCurrentDirectory() : options.OutputDirectory;
             if (!string.IsNullOrEmpty(options.SprintNo))
                 outputDirectory = Path.Combine(options.OutputDirectory, options.SprintNo);
             Directory.CreateDirectory(outputDirectory);
+
+            var jsonSerializerOption = new JsonSerializerOptions {  WriteIndented = true };
 
             if (options.OneScriptPerFile)
             {
@@ -44,7 +43,7 @@ namespace Ivet.Verbs.Services
                 foreach (var (migration, i) in migrations.Select((v, i) => (v, i)))
                 {
                     var fileName = Path.Combine(options.OutputDirectory, $"Migration_{DateTime.Now:yyyyMMddHHmm}_{i:D3}.json");
-                    File.WriteAllText(fileName, JsonSerializer.Serialize(migration, new JsonSerializerOptions { WriteIndented = true, }));
+                    File.WriteAllText(fileName, JsonSerializer.Serialize(migration, jsonSerializerOption));
                 }
 
                 return;
@@ -54,7 +53,7 @@ namespace Ivet.Verbs.Services
                 var migration = builder.BuildFileContent();
 
                 var fileName = Path.Combine(outputDirectory, $"Migration_{DateTime.Now:yyyyMMddHHmm}.json");
-                File.WriteAllText(fileName, JsonSerializer.Serialize(migration, new JsonSerializerOptions { WriteIndented = true }));
+                File.WriteAllText(fileName, JsonSerializer.Serialize(migration, jsonSerializerOption));
             }
         }
     }

@@ -1,16 +1,17 @@
-FROM alpine:latest as build-env
+# Stage 1: Base environment
+FROM alpine:3.22.1 AS base
 RUN apk update
-RUN apk add dotnet9-sdk
+	
+FROM base as build-env
+RUN apk add --no-cache dotnet9-sdk
 WORKDIR /app
 COPY . ./
-RUN dotnet restore
-# COPY \bin\Release\net6.0\publish/* /app
-RUN dotnet publish -c Release -o out
+RUN dotnet restore && \
+	dotnet publish -c Release -o out
 
 # Build runtime image
-FROM alpine:latest
-RUN apk update
-RUN apk add dotnet9-runtime
+FROM base as final
+RUN apk add --no-cache dotnet9-runtime
 COPY --from=build-env /app/out/ /app
 #COPY --from=build-env /app/Migrations/ /app/Migrations/
 ENV input=/app

@@ -22,5 +22,7 @@ namespace Ivet.Verbs.Model
 
         [Option("onefile", HelpText = "Create one file per script", Default = false)]
         public bool OneScriptPerFile { get; set; }
+        [Option("comment", HelpText = "Comment to be added in generated script", Default = null)]
+        public string? Comment { get; set; }
     }
 }

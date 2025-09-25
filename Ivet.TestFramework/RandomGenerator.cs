@@ -14,7 +14,7 @@
         public static T RandomEnum<T>() where T : Enum
         {
             var enumValues = Enum.GetValues(typeof(T));
-            return (T)enumValues.GetValue(_random.Next(enumValues.Length));
+            return (T)enumValues.GetValue(_random.Next(enumValues.Length))!;
         }
     }
 }

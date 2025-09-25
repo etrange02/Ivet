@@ -9,17 +9,11 @@ namespace Ivet.Tests.Services
 {
     public class MigrationBuilderTests
     {
-        RandomGenerator _randomGenerator = new RandomGenerator();
-
         [Fact]
         public void BuildTest_EmptySchema()
         {
             // Arrange
-            var sut = new MigrationBuilder { MetaSchema = new MetaSchema() };
-            sut.MetaSchema = new MetaSchema
-            {
-
-            };
+            var sut = new MigrationBuilder(new MetaSchema());
 
             // Act
             var result = sut.Build();
@@ -33,7 +27,7 @@ namespace Ivet.Tests.Services
         public void BuildTest_Vertex()
         {
             // Arrange
-            var sut = new MigrationBuilder { MetaSchema = new MetaSchema() };
+            var sut = new MigrationBuilder(new MetaSchema());
             var name = RandomGenerator.RandomString();
             sut.MetaSchema.Vertices.Add(new MetaVertex
             {
@@ -52,7 +46,7 @@ namespace Ivet.Tests.Services
         public void BuildTest_VertexPartitioned()
         {
             // Arrange
-            var sut = new MigrationBuilder { MetaSchema = new MetaSchema() };
+            var sut = new MigrationBuilder(new MetaSchema());
             var name = RandomGenerator.RandomString();
             var partitioned = RandomGenerator.RandomBool();
             var staticValue = RandomGenerator.RandomBool();
@@ -74,7 +68,7 @@ namespace Ivet.Tests.Services
         public void BuildTest_VertexStatic()
         {
             // Arrange
-            var sut = new MigrationBuilder { MetaSchema = new MetaSchema() };
+            var sut = new MigrationBuilder(new MetaSchema());
             var name = RandomGenerator.RandomString();
             sut.MetaSchema.Vertices.Add(new MetaVertex
             {
@@ -94,7 +88,7 @@ namespace Ivet.Tests.Services
         public void BuildTest_VertexStaticPartitioned()
         {
             // Arrange
-            var sut = new MigrationBuilder { MetaSchema = new MetaSchema() };
+            var sut = new MigrationBuilder(new MetaSchema());
             var name = RandomGenerator.RandomString();
             sut.MetaSchema.Vertices.Add(new MetaVertex
             {
@@ -115,7 +109,7 @@ namespace Ivet.Tests.Services
         public void BuildTest_Edge()
         {
             // Arrange
-            var sut = new MigrationBuilder { MetaSchema = new MetaSchema() };
+            var sut = new MigrationBuilder(new MetaSchema());
             var name = RandomGenerator.RandomString();
             var multiplicity = RandomGenerator.RandomEnum<Multiplicity>();
             sut.MetaSchema.Edges.Add(new MetaEdge
@@ -136,7 +130,7 @@ namespace Ivet.Tests.Services
         public void BuildTest_Property()
         {
             // Arrange
-            var sut = new MigrationBuilder { MetaSchema = new MetaSchema() };
+            var sut = new MigrationBuilder(new MetaSchema());
             var name = RandomGenerator.RandomString();
             var cardinality = RandomGenerator.RandomEnum<Cardinality>();
             var dataType = RandomGenerator.RandomString();
@@ -159,7 +153,7 @@ namespace Ivet.Tests.Services
         public void BuildTest_VertexPropertyBinding()
         {
             // Arrange
-            var sut = new MigrationBuilder { MetaSchema = new MetaSchema() };
+            var sut = new MigrationBuilder(new MetaSchema());
             var name = RandomGenerator.RandomString();
             var entity = RandomGenerator.RandomString();
             sut.MetaSchema.VertexPropertyBindings.Add(new MetaPropertyBinding
@@ -180,7 +174,7 @@ namespace Ivet.Tests.Services
         public void BuildTest_EdgePropertyBinding()
         {
             // Arrange
-            var sut = new MigrationBuilder { MetaSchema = new MetaSchema() };
+            var sut = new MigrationBuilder(new MetaSchema());
             var name = RandomGenerator.RandomString();
             var entity = RandomGenerator.RandomString();
             sut.MetaSchema.EdgePropertyBindings.Add(new MetaPropertyBinding
@@ -201,7 +195,7 @@ namespace Ivet.Tests.Services
         public void BuildTest_Connection()
         {
             // Arrange
-            var sut = new MigrationBuilder { MetaSchema = new MetaSchema() };
+            var sut = new MigrationBuilder(new MetaSchema());
             var edge = RandomGenerator.RandomString();
             var ingoing = RandomGenerator.RandomString();
             var outgoing = RandomGenerator.RandomString();

@@ -12,11 +12,13 @@ namespace Ivet
             var types = LoadVerbs();
 
             Parser.Default.ParseArguments(args, types)
-                .WithParsed<UpgradeOptions>(options => UpgradeAction.Do(options))
-                .WithParsed<GenerateOptions>(options => GenerateAction.Do(options))
-                .WithParsed<ListOptions>(options => ListAction.Do(options))
-                .WithParsed<TestOptions>(options => TestAction.Do(options))
-                .WithNotParsed(errors => HandleErrors(errors));
+                .WithParsed<UpgradeOptions>(UpgradeAction.Do)
+                .WithParsed<GenerateOptions>(GenerateAction.Do)
+                .WithParsed<ListOptions>(ListAction.Do)
+#if DEBUG
+                .WithParsed<TestOptions>(TestAction.Do)
+#endif
+                .WithNotParsed(HandleErrors);
         }
 
         //load all types using Reflection
