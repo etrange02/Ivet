@@ -6,9 +6,6 @@ The **generate** command creates a json file containing commands to execute. The
 To keep trace of all applied migrations, migration names are saved into janusgraph server when **upgrade** is called.
 You can check at any moment the **list** of migrations both applied and not.
 
-> [!CAUTION]
-> There is a fourth command `test`. It is used to populate database either for personnal tests or unit tests. Do not use it in your production environment.
-
 Available commands
 =======
 * **generate**
@@ -18,6 +15,7 @@ Available commands
 	* **port** _8182_
     * **sprintno** Add a subdirectory when generating. Use it as you want
     * **onefile** Create one file per script
+    * **comment** Add a description to your migration
 * **list** Display list of all migrations
 	* **input** Directory where to find migration files. If not set look in current working directory.
 	* **ip** _localhost_
@@ -89,6 +87,7 @@ public string ANamedProperty { get; set; }
 Tag an Edge:
 ```
 [Edge(typeof(MyVertex1), typeof(MyVertex2))]
+[Edge(typeof(MyVertex1), typeof(MyVertex3))]
 public class EdgeWithProperties
 {
     [PropertyKey]
