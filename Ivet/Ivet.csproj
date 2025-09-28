@@ -14,9 +14,9 @@
     <PackageProjectUrl>https://github.com/etrange02/Ivet</PackageProjectUrl>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
     <PackageLicenseExpression>CECILL-B</PackageLicenseExpression>
-    <Version>1.7.1</Version>
+    <Version>1.7.2</Version>
     <Authors>david.lecoconnier</Authors>
-    <PackageReleaseNotes>* Manage enums either as integer or as string</PackageReleaseNotes>
+    <PackageReleaseNotes>* Fix Ivet.Model .Net Framework</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

@@ -15,7 +15,7 @@ Available commands
 	* **port** _8182_
     * **sprintno** Add a subdirectory when generating. Use it as you want
     * **onefile** Create one file per script
-    * **comment** Add a description to your migration
+    * **description** Add a description to your migration
 * **list** Display list of all migrations
 	* **input** Directory where to find migration files. If not set look in current working directory.
 	* **ip** _localhost_
