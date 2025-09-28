@@ -27,7 +27,10 @@ namespace Ivet.Verbs.Services
             var deltaSchemaMaker = new DeltaSchemaMakerService();
             metaSchema.Difference = deltaSchemaMaker.Difference(metaSchema.Source, metaSchema.Target);
 
-            var builder = new MigrationBuilder(metaSchema.Difference);
+            var builder = new MigrationBuilder(metaSchema.Difference)
+            { 
+                Description = options.Description,
+            };
 
             var outputDirectory = string.IsNullOrEmpty(options.OutputDirectory) ? Directory.GetCurrentDirectory() : options.OutputDirectory;
             if (!string.IsNullOrEmpty(options.SprintNo))

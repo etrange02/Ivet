@@ -376,5 +376,63 @@ namespace Ivet.Tests.Services.Converters
             Assert.Empty(result.CompositeIndexes);
             Assert.Empty(result.IndexBindings);
         }
+
+        [Fact]
+        public void ConvertTest_EnumProperty()
+        {
+            // Arrange
+            var schema = new Schema
+            {
+                Vertices = { typeof(PropertyEnumVertex) }
+            };
+
+            // Act
+            var result = LibraryToSchemaConverter.Convert(schema);
+
+            //Assert
+            Assert.NotNull(result);
+            Assert.NotEmpty(result.Vertices);
+            Assert.Empty(result.Edges);
+            Assert.Empty(result.Connections);
+            Assert.NotEmpty(result.Properties);
+            Assert.NotNull(result.Properties[0].PropertyInfo);
+            Assert.Equal("Property", result.Properties[0].Name);
+            Assert.Equal("Integer.class", result.Properties[0].DataType);
+            Assert.Single(result.VertexPropertyBindings);
+            Assert.Equal("PropertyEnumVertex", result.VertexPropertyBindings[0].Entity);
+            Assert.Equal("Property", result.VertexPropertyBindings[0].Name);
+            Assert.Empty(result.MixedIndexes);
+            Assert.Empty(result.CompositeIndexes);
+            Assert.Empty(result.IndexBindings);
+        }
+
+        [Fact]
+        public void ConvertTest_StringEnumProperty()
+        {
+            // Arrange
+            var schema = new Schema
+            {
+                Vertices = { typeof(StringPropertyEnumVertex) }
+            };
+
+            // Act
+            var result = LibraryToSchemaConverter.Convert(schema);
+
+            //Assert
+            Assert.NotNull(result);
+            Assert.NotEmpty(result.Vertices);
+            Assert.Empty(result.Edges);
+            Assert.Empty(result.Connections);
+            Assert.NotEmpty(result.Properties);
+            Assert.NotNull(result.Properties[0].PropertyInfo);
+            Assert.Equal("Property", result.Properties[0].Name);
+            Assert.Equal("String.class", result.Properties[0].DataType);
+            Assert.Single(result.VertexPropertyBindings);
+            Assert.Equal("StringPropertyEnumVertex", result.VertexPropertyBindings[0].Entity);
+            Assert.Equal("Property", result.VertexPropertyBindings[0].Name);
+            Assert.Empty(result.MixedIndexes);
+            Assert.Empty(result.CompositeIndexes);
+            Assert.Empty(result.IndexBindings);
+        }
     }
 }
