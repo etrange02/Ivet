@@ -1,10 +1,11 @@
+using Ivet.Model;
 using System.Reflection;
 
 namespace Ivet.Extensions
 {
     public static class PropertyInfoExtensions
     {
-        public static string ToJavaType(this PropertyInfo memberInfo)
+        public static string ToJavaType(this PropertyInfo memberInfo, PropertyKeyAttribute attribute)
         {
             if (memberInfo.PropertyType == typeof(short) || memberInfo.PropertyType == typeof(short?) || memberInfo.PropertyType == typeof(short[]) || typeof(IEnumerable<short>).IsAssignableFrom(memberInfo.PropertyType) || typeof(IEnumerable<short?>).IsAssignableFrom(memberInfo.PropertyType))
                 return "Short.class";
@@ -30,6 +31,8 @@ namespace Ivet.Extensions
                 return "Date.class";
             if (memberInfo.PropertyType == typeof(Guid) || memberInfo.PropertyType == typeof(Guid?) || memberInfo.PropertyType == typeof(Guid[]) || typeof(IEnumerable<Guid>).IsAssignableFrom(memberInfo.PropertyType) || typeof(IEnumerable<Guid?>).IsAssignableFrom(memberInfo.PropertyType))
                 return "UUID.class";
+            if (memberInfo.PropertyType.IsEnum)
+                return attribute.EnumAsString ? "String.class" : "Integer.class";
             throw new ArgumentException($"Type unknown: {memberInfo.PropertyType.Name}");
         }
     }

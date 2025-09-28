@@ -91,7 +91,7 @@ namespace Ivet.Services.Converters
                     {
                         Name = attribute.Name ?? y.Name,
                         Cardinality = attribute.Cardinality,
-                        DataType = y.ToJavaType(),
+                        DataType = y.ToJavaType(attribute),
                         PropertyInfo = y,
                     };
                 });
