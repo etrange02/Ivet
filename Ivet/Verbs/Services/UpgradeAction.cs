@@ -25,7 +25,7 @@ namespace Ivet.Verbs.Services
             else
             {
                 Console.WriteLine($"Directory: {input}");
-                files.AddRange(Directory.EnumerateFiles(input, "*.json", SearchOption.AllDirectories));
+                files.AddRange(Directory.EnumerateFiles(input, "*.json", SearchOption.AllDirectories).Order());
             }
 
             using var database = new DatabaseService(options.IpAddress, options.Port);
@@ -51,6 +51,8 @@ namespace Ivet.Verbs.Services
                     return new List<MigrationInstance>();
                 })
                 .Where(x => !appliedMigrations.Contains(x.Name))
+                .OrderBy(x => x.RelativePath)
+                .ThenBy(x => x.Name)
                 .ToList();
 
             migrationsToApply.ForEach(x =>
