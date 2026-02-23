@@ -67,5 +67,30 @@ namespace Ivet.Tests.Services.Comparers
             // Assert
             Assert.False(result);
         }
+
+        [Fact]
+        public void GetHashCodeTest_SameNameSameHash()
+        {
+            // Arrange
+            var sut = new CompositeIndexComparer();
+            var name = RandomGenerator.RandomString();
+            var a = new MetaCompositeIndex { Name = name };
+            var b = new MetaCompositeIndex { Name = name };
+
+            // Act & Assert
+            Assert.Equal(sut.GetHashCode(a), sut.GetHashCode(b));
+        }
+
+        [Fact]
+        public void GetHashCodeTest_DifferentNameDifferentHash()
+        {
+            // Arrange
+            var sut = new CompositeIndexComparer();
+            var a = new MetaCompositeIndex { Name = RandomGenerator.RandomString() };
+            var b = new MetaCompositeIndex { Name = RandomGenerator.RandomString() };
+
+            // Act & Assert
+            Assert.NotEqual(sut.GetHashCode(a), sut.GetHashCode(b));
+        }
     }
 }

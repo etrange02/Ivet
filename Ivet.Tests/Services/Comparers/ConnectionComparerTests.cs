@@ -105,5 +105,30 @@ namespace Ivet.Tests.Services.Comparers
             // Assert
             Assert.False(result);
         }
+
+        [Fact]
+        public void GetHashCodeTest_SameEdgeSameHash()
+        {
+            // Arrange
+            var sut = new ConnectionComparer();
+            var edge = RandomGenerator.RandomString();
+            var a = new MetaConnection { Edge = edge, Ingoing = RandomGenerator.RandomString(), Outgoing = RandomGenerator.RandomString() };
+            var b = new MetaConnection { Edge = edge, Ingoing = RandomGenerator.RandomString(), Outgoing = RandomGenerator.RandomString() };
+
+            // Act & Assert
+            Assert.Equal(sut.GetHashCode(a), sut.GetHashCode(b));
+        }
+
+        [Fact]
+        public void GetHashCodeTest_DifferentEdgeDifferentHash()
+        {
+            // Arrange
+            var sut = new ConnectionComparer();
+            var a = new MetaConnection { Edge = RandomGenerator.RandomString() };
+            var b = new MetaConnection { Edge = RandomGenerator.RandomString() };
+
+            // Act & Assert
+            Assert.NotEqual(sut.GetHashCode(a), sut.GetHashCode(b));
+        }
     }
 }

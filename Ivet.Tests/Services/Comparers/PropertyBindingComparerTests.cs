@@ -85,5 +85,30 @@ namespace Ivet.Tests.Services.Comparers
             // Assert
             Assert.False(result);
         }
+
+        [Fact]
+        public void GetHashCodeTest_SameNameSameHash()
+        {
+            // Arrange
+            var sut = new PropertyBindingComparer();
+            var name = RandomGenerator.RandomString();
+            var a = new MetaPropertyBinding { Name = name, Entity = RandomGenerator.RandomString() };
+            var b = new MetaPropertyBinding { Name = name, Entity = RandomGenerator.RandomString() };
+
+            // Act & Assert
+            Assert.Equal(sut.GetHashCode(a), sut.GetHashCode(b));
+        }
+
+        [Fact]
+        public void GetHashCodeTest_DifferentNameDifferentHash()
+        {
+            // Arrange
+            var sut = new PropertyBindingComparer();
+            var a = new MetaPropertyBinding { Name = RandomGenerator.RandomString() };
+            var b = new MetaPropertyBinding { Name = RandomGenerator.RandomString() };
+
+            // Act & Assert
+            Assert.NotEqual(sut.GetHashCode(a), sut.GetHashCode(b));
+        }
     }
 }
