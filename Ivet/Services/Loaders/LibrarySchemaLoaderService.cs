@@ -1,10 +1,10 @@
-﻿using Ivet.Model;
+using Ivet.Model;
 using System.Reflection;
 using Ivet.Model.Library;
 
 namespace Ivet.Services.Loaders
 {
-    public class LibraySchemaLoaderService
+    public class LibrarySchemaLoaderService
     {
         public Schema Load(string path)
         {
@@ -25,7 +25,10 @@ namespace Ivet.Services.Loaders
                         schema.Edges.AddRange(graphClasses.Where(t => t.GetCustomAttributes<EdgeAttribute>().Any()));
                     }
                 }
-                catch { }
+                catch (ReflectionTypeLoadException)
+                {
+                    // DLL cannot be introspected (e.g. native dependency), skip it
+                }
             });
 
             return schema;

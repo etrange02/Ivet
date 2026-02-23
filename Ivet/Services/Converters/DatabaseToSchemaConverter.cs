@@ -1,4 +1,5 @@
-﻿using Ivet.Model.Database;
+﻿using Ivet.Model;
+using Ivet.Model.Database;
 using Ivet.Model.Meta;
 
 namespace Ivet.Services.Converters
@@ -56,12 +57,15 @@ namespace Ivet.Services.Converters
                 BackendIndex = x.BackendIndex,
                 IndexedElement = x.IndexedElement,
             }));
-            result.IndexBindings.AddRange(schema.IndexBindings.ConvertAll(x => new MetaIndexBinding
-            {
-                IndexName = x.IndexName,
-                PropertyName = x.PropertyName,
-                // Mapping = x.Parameter
-            }));
+            result.IndexBindings.AddRange(schema.IndexBindings
+                .GroupBy(x => new { x.IndexName, x.PropertyName })
+                .Select(g => new MetaIndexBinding
+                {
+                    IndexName = g.Key.IndexName,
+                    PropertyName = g.Key.PropertyName,
+                    Mapping = g.Select(x => Enum.TryParse<MappingType>(x.Parameter, out var m) && m != MappingType.NULL ? m : (MappingType?)null)
+                        .FirstOrDefault(m => m != null) ?? MappingType.NULL,
+                }));
 
             return result;
         }

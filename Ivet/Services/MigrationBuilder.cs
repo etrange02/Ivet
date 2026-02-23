@@ -67,59 +67,64 @@ namespace Ivet.Services
 
         private List<string> BuildCompositeIndeces()
         {
-            return MetaSchema?.CompositeIndexes.ConvertAll(x =>
+            if (MetaSchema?.CompositeIndexes == null || !MetaSchema.CompositeIndexes.Any()) return new List<string>();
+
+            var content = string.Empty;
+
+            content += $"// Composite Indices{Environment.NewLine}";
+            foreach (var x in MetaSchema.CompositeIndexes)
             {
-                var content = string.Empty;
-
-                content += $"// Composite Indices{Environment.NewLine}";
-                content += BuildIndex(x, MetaSchema.IndexBindings.Where(p => p.IndexName == x.Name), x => $"vertex = mgmt.getVertexLabel('{x.IndexedElement}');index = mgmt.buildIndex('{x.Name}', {x.Kind}).indexOnly(vertex){(x.IsUnique ? ".unique()" : "")}");
+                content += BuildIndex(x, MetaSchema.IndexBindings.Where(p => p.IndexName == x.Name), ci => $"vertex = mgmt.getVertexLabel('{ci.IndexedElement}');index = mgmt.buildIndex('{ci.Name}', {ci.Kind}).indexOnly(vertex){(ci.IsUnique ? ".unique()" : "")}");
                 content += $".buildCompositeIndex();";
+                content += $"{Environment.NewLine}";
+            }
 
-                content += $"{Environment.NewLine}";
-                content += "mgmt.commit();";
-                content += $"{Environment.NewLine}";
-                content += $"{Environment.NewLine}";
+            content += "mgmt.commit();";
+            content += $"{Environment.NewLine}";
+            content += $"{Environment.NewLine}";
 
-                content += $"// Index: Waiting for registered status{Environment.NewLine}";
-                content += $"ManagementSystem.awaitGraphIndexStatus(graph, '{x.Name}').call();";
-                content += $"{Environment.NewLine}";
-                content += $"{Environment.NewLine}";
+            content += $"// Index: Waiting for registered status{Environment.NewLine}";
+            content += string.Join(Environment.NewLine, MetaSchema.CompositeIndexes.Select(x => $"ManagementSystem.awaitGraphIndexStatus(graph, '{x.Name}').call();"));
+            content += $"{Environment.NewLine}";
+            content += $"{Environment.NewLine}";
 
-                content += $"// Index: Reindexing{Environment.NewLine}";
-                content += $"mgmt = graph.openManagement();";
-                content += $"{Environment.NewLine}";
-                content += $"mgmt.updateIndex(mgmt.getGraphIndex('{x.Name}'), SchemaAction.REINDEX).get();";
+            content += $"// Index: Reindexing{Environment.NewLine}";
+            content += $"mgmt = graph.openManagement();";
+            content += $"{Environment.NewLine}";
+            content += string.Join(Environment.NewLine, MetaSchema.CompositeIndexes.Select(x => $"mgmt.updateIndex(mgmt.getGraphIndex('{x.Name}'), SchemaAction.REINDEX).get();"));
 
-                return content;
-            }) ?? new List<string>();
+            return new List<string> { content };
         }
 
         private List<string> BuildMixedIndeces()
         {
-            return MetaSchema?.MixedIndexes.ConvertAll(x =>
+            if (MetaSchema?.MixedIndexes == null || !MetaSchema.MixedIndexes.Any()) return new List<string>();
+
+            var content = string.Empty;
+
+            content += $"// Mixed Indices{Environment.NewLine}";
+            foreach (var x in MetaSchema.MixedIndexes)
             {
-                var content = string.Empty;
-                content += $"// Mixed Indices{Environment.NewLine}";
-                content += BuildIndex(x, MetaSchema.IndexBindings.Where(p => p.IndexName == x.Name), x => $"vertex = mgmt.getVertexLabel('{x.IndexedElement}');index = mgmt.buildIndex('{x.Name}', {x.Kind}).indexOnly(vertex)");
+                content += BuildIndex(x, MetaSchema.IndexBindings.Where(p => p.IndexName == x.Name), mi => $"vertex = mgmt.getVertexLabel('{mi.IndexedElement}');index = mgmt.buildIndex('{mi.Name}', {mi.Kind}).indexOnly(vertex)");
                 content += $".buildMixedIndex('{x.BackendIndex}');";
+                content += $"{Environment.NewLine}";
+            }
 
-                content += $"{Environment.NewLine}";
-                content += "mgmt.commit();";
-                content += $"{Environment.NewLine}";
-                content += $"{Environment.NewLine}";
+            content += "mgmt.commit();";
+            content += $"{Environment.NewLine}";
+            content += $"{Environment.NewLine}";
 
-                content += $"// Index: Waiting for registered status{Environment.NewLine}";
-                content += string.Join(Environment.NewLine, MetaSchema.MixedIndexes.Select(x => $"ManagementSystem.awaitGraphIndexStatus(graph, '{x.Name}').call();"));
-                content += $"{Environment.NewLine}";
-                content += $"{Environment.NewLine}";
+            content += $"// Index: Waiting for registered status{Environment.NewLine}";
+            content += string.Join(Environment.NewLine, MetaSchema.MixedIndexes.Select(x => $"ManagementSystem.awaitGraphIndexStatus(graph, '{x.Name}').call();"));
+            content += $"{Environment.NewLine}";
+            content += $"{Environment.NewLine}";
 
-                content += $"// Index: Reindexing{Environment.NewLine}";
-                content += $"mgmt = graph.openManagement();";
-                content += $"{Environment.NewLine}";
-                content += string.Join(Environment.NewLine, MetaSchema.MixedIndexes.Select(x => $"mgmt.updateIndex(mgmt.getGraphIndex('{x.Name}'), SchemaAction.REINDEX).get();"));
+            content += $"// Index: Reindexing{Environment.NewLine}";
+            content += $"mgmt = graph.openManagement();";
+            content += $"{Environment.NewLine}";
+            content += string.Join(Environment.NewLine, MetaSchema.MixedIndexes.Select(x => $"mgmt.updateIndex(mgmt.getGraphIndex('{x.Name}'), SchemaAction.REINDEX).get();"));
 
-                return content;
-            }) ?? new List<string>();
+            return new List<string> { content };
         }
 
         private IEnumerable<string> BuildIndexBindings() => MetaSchema?.IndexBindings

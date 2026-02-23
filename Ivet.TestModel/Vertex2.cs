@@ -1,6 +1,6 @@
 ﻿using Ivet.Model;
 
-namespace Ivet.TestModel
+namespace Ivet.TestModel1
 {
     [Vertex]
     public class Vertex2
