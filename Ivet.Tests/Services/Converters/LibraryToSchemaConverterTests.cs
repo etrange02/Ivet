@@ -1,5 +1,6 @@
 ﻿using Ivet.Model;
 using Ivet.Model.Library;
+using Ivet.Model.Meta;
 using Ivet.Services.Converters;
 using Ivet.Tests.Types;
 using Ivet.Tests.Types.Edges;
@@ -433,6 +434,97 @@ namespace Ivet.Tests.Services.Converters
             Assert.Empty(result.MixedIndexes);
             Assert.Empty(result.CompositeIndexes);
             Assert.Empty(result.IndexBindings);
+        }
+
+        [Fact]
+        public void ConvertTest_CompositeIndex()
+        {
+            // Arrange
+            var schema = new Schema
+            {
+                Vertices = { typeof(CompositeIndexVertex) }
+            };
+
+            // Act
+            var result = LibraryToSchemaConverter.Convert(schema);
+
+            // Assert
+            Assert.Single(result.CompositeIndexes);
+            Assert.Equal("composite_idx", result.CompositeIndexes[0].Name);
+            Assert.True(result.CompositeIndexes[0].IsUnique);
+            Assert.Equal("CompositeIndexVertex", result.CompositeIndexes[0].IndexedElement);
+            Assert.Equal("Vertex.class", result.CompositeIndexes[0].Kind);
+            Assert.Single(result.IndexBindings);
+            Assert.Equal("composite_idx", result.IndexBindings[0].IndexName);
+            Assert.Equal("IndexedProperty", result.IndexBindings[0].PropertyName);
+        }
+
+        [Fact]
+        public void ConvertTest_MixedIndex()
+        {
+            // Arrange
+            var schema = new Schema
+            {
+                Vertices = { typeof(MixedIndexVertex) }
+            };
+
+            // Act
+            var result = LibraryToSchemaConverter.Convert(schema);
+
+            // Assert
+            Assert.Single(result.MixedIndexes);
+            Assert.Equal("mixed_idx", result.MixedIndexes[0].Name);
+            Assert.Equal("search", result.MixedIndexes[0].BackendIndex);
+            Assert.Equal("MixedIndexVertex", result.MixedIndexes[0].IndexedElement);
+            Assert.Equal("Vertex.class", result.MixedIndexes[0].Kind);
+            Assert.Single(result.IndexBindings);
+            Assert.Equal("mixed_idx", result.IndexBindings[0].IndexName);
+            Assert.Equal("SearchProperty", result.IndexBindings[0].PropertyName);
+            Assert.Equal(MappingType.TEXT, result.IndexBindings[0].Mapping);
+        }
+
+        [Fact]
+        public void ConvertTest_PrimaryKey()
+        {
+            // Arrange
+            var schema = new Schema
+            {
+                Vertices = { typeof(PrimaryKeyVertex) }
+            };
+
+            // Act
+            var result = LibraryToSchemaConverter.Convert(schema);
+
+            // Assert
+            Assert.Single(result.CompositeIndexes);
+            Assert.Equal("PrimaryKeyVertex_PK", result.CompositeIndexes[0].Name);
+            Assert.True(result.CompositeIndexes[0].IsUnique);
+            Assert.Equal("PrimaryKeyVertex", result.CompositeIndexes[0].IndexedElement);
+            Assert.Equal("Vertex.class", result.CompositeIndexes[0].Kind);
+            Assert.Single(result.IndexBindings);
+            Assert.Equal("PrimaryKeyVertex_PK", result.IndexBindings[0].IndexName);
+            Assert.Equal("Id", result.IndexBindings[0].PropertyName);
+        }
+
+        [Fact]
+        public void ConvertTest_EdgePropertyAttribute()
+        {
+            // Arrange
+            var schema = new Schema
+            {
+                Vertices = { typeof(EdgePropertyVertex), typeof(VertexSample) }
+            };
+
+            // Act
+            var result = LibraryToSchemaConverter.Convert(schema);
+
+            // Assert
+            Assert.Equal(2, result.Vertices.Count());
+            Assert.Single(result.Edges);
+            Assert.Equal("EdgePropertyVertex_Related", result.Edges[0].Name);
+            Assert.Equal(typeof(EdgePropertyVertex), result.Edges[0].In);
+            Assert.Equal(typeof(VertexSample), result.Edges[0].Out);
+            Assert.Single(result.Connections);
         }
     }
 }
