@@ -3,6 +3,7 @@ using Ivet.Model;
 using Ivet.Model.Library;
 using Ivet.Model.Meta;
 using System.Reflection;
+using static Ivet.Services.GremlinIdentifierValidator;
 
 namespace Ivet.Services.Converters
 {
@@ -32,7 +33,7 @@ namespace Ivet.Services.Converters
                 var attribute = x.GetCustomAttribute<VertexAttribute>() ?? throw new AttributeNotFoundException($"Attribute not found on { x.FullName }");
                 return new MetaVertex
                 {
-                    Name = attribute.Name ?? x.Name,
+                    Name = Validate(attribute.Name ?? x.Name, "vertex name"),
                     Partitioned = attribute.Partitioned,
                     Static = attribute.Static,
                     Type = x,
@@ -48,7 +49,7 @@ namespace Ivet.Services.Converters
                 var attributes = x.GetCustomAttributes<EdgeAttribute>() ?? throw new AttributeNotFoundException($"Attribute not found on {x.FullName}");
                 return attributes.Select(attribute => new MetaEdge
                     {
-                        Name = attribute.Name ?? x.Name,
+                        Name = Validate(attribute.Name ?? x.Name, "edge name"),
                         Multiplicity = attribute.Multiplicity,
                         Type = x,
                         Attribute = attribute,
@@ -67,7 +68,7 @@ namespace Ivet.Services.Converters
                     var type = y.PropertyType.IsGenericType ? y.PropertyType.GenericTypeArguments[0] : y.PropertyType.GetElementType();
                     return new MetaEdge
                     {
-                        Name = attribute.Name ?? $"{x.Name}_{y.Name}",
+                        Name = Validate(attribute.Name ?? $"{x.Name}_{y.Name}", "edge name"),
                         Multiplicity = attribute.Multiplicity,
                         Type = null,
                         Attribute = null,
@@ -89,7 +90,7 @@ namespace Ivet.Services.Converters
                     var attribute = y.GetCustomAttribute<PropertyKeyAttribute>(true) ?? throw new AttributeNotFoundException($"Attribute not found on {x.FullName}");
                     return new MetaPropertyKey
                     {
-                        Name = attribute.Name ?? y.Name,
+                        Name = Validate(attribute.Name ?? y.Name, "property key name"),
                         Cardinality = attribute.Cardinality,
                         DataType = y.ToJavaType(attribute),
                         PropertyInfo = y,
@@ -157,7 +158,7 @@ namespace Ivet.Services.Converters
 
             return new MetaCompositeIndex
             {
-                Name = compositeKeyAttribute.IndexName,
+                Name = Validate(compositeKeyAttribute.IndexName, "composite index name"),
                 IsUnique = compositeKeyAttribute.IsUnique,
                 IndexedElement = graphItem.Name,
                 Kind = graphItem.Type.GetCustomAttribute<VertexAttribute>() != null ? "Vertex.class" : "Edge.class"
@@ -170,7 +171,7 @@ namespace Ivet.Services.Converters
 
             return new MetaCompositeIndex
             {
-                Name = graphItemAttribute.Name ?? $"{graphItem.Name}_PK",
+                Name = Validate(graphItemAttribute.Name ?? $"{graphItem.Name}_PK", "primary key index name"),
                 IsUnique = true,
                 IndexedElement = graphItem.Name,
                 Kind = graphItem.Type.GetCustomAttribute<VertexAttribute>() != null ? "Vertex.class" : "Edge.class"
@@ -201,8 +202,8 @@ namespace Ivet.Services.Converters
 
                     return new MetaMixedIndex
                     {
-                        Name = mixedKeyAttribute.IndexName,
-                        BackendIndex = mixedKeyAttribute.Backend,
+                        Name = Validate(mixedKeyAttribute.IndexName, "mixed index name"),
+                        BackendIndex = Validate(mixedKeyAttribute.Backend, "mixed index backend"),
                         IndexedElement = x.Name,
                         Kind = x.GetCustomAttribute<VertexAttribute>() != null ? "Vertex.class" : "Edge.class"
                     };
@@ -239,8 +240,8 @@ namespace Ivet.Services.Converters
 
             return new MetaIndexBinding
             {
-                IndexName = compositeKeyAttribute.IndexName,
-                PropertyName = property.Name
+                IndexName = Validate(compositeKeyAttribute.IndexName, "composite index binding name"),
+                PropertyName = Validate(property.Name, "property name")
             };
         }
 
@@ -250,8 +251,8 @@ namespace Ivet.Services.Converters
 
             return new MetaIndexBinding
             {
-                IndexName = graphItemAttribute.Name ?? $"{graphItem.Name}_PK",
-                PropertyName = property.Name
+                IndexName = Validate(graphItemAttribute.Name ?? $"{graphItem.Name}_PK", "primary key binding name"),
+                PropertyName = Validate(property.Name, "property name")
             };
         }
 
@@ -261,8 +262,8 @@ namespace Ivet.Services.Converters
 
             return new MetaIndexBinding
             {
-                IndexName = mixedKeyAttribute.IndexName,
-                PropertyName = property.Name,
+                IndexName = Validate(mixedKeyAttribute.IndexName, "mixed index binding name"),
+                PropertyName = Validate(property.Name, "property name"),
                 Mapping = mixedKeyAttribute.Mapping
             };
         }
