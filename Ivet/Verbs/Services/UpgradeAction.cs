@@ -28,7 +28,7 @@ namespace Ivet.Verbs.Services
                 files.AddRange(Directory.EnumerateFiles(input, "*.json", SearchOption.AllDirectories).Order());
             }
 
-            using var database = new DatabaseService(options.IpAddress, options.Port);
+            using var database = new DatabaseService(options.IpAddress, options.Port, options.UseSsl);
 
             var appliedMigrations = database.GremlinqClient.V<Migration>()
                 .ToArrayAsync()

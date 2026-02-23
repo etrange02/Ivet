@@ -16,11 +16,12 @@ namespace Ivet.Services
 
         public IGremlinQuerySource GremlinqClient { get; private set; }
 
-        public DatabaseService(string ipAddress, int port)
+        public DatabaseService(string ipAddress, int port, bool useSsl = false)
         {
-            _client = new GremlinClient(new GremlinServer(ipAddress, port));
+            _client = new GremlinClient(new GremlinServer(ipAddress, port, enableSsl: useSsl));
 
-            var uri = new Uri($"ws://{ipAddress}:{port}");
+            var scheme = useSsl ? "wss" : "ws";
+            var uri = new Uri($"{scheme}://{ipAddress}:{port}");
 
             GremlinqClient = g.UseJanusGraph<AbstractVertex, AbstractEdge>(configurator => configurator
                                     .At(uri)

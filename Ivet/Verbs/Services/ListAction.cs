@@ -29,7 +29,7 @@ namespace Ivet.Verbs.Services
 
             var migrations = files.ConvertAll(x => new { Name = Path.GetFileNameWithoutExtension(x), Migration = JsonSerializer.Deserialize<MigrationFile>(File.ReadAllText(x)) });
 
-            using var database = new DatabaseService(options.IpAddress, options.Port);
+            using var database = new DatabaseService(options.IpAddress, options.Port, options.UseSsl);
 
             var appliedMigrations = database.GremlinqClient.V<Migration>().ToArrayAsync().AsTask().GetAwaiter().GetResult();
 

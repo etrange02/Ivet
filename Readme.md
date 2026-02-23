@@ -13,6 +13,7 @@ Available commands
 	* **output** Directory where to put migration file. If not set files are created in current directory.
 	* **ip** _localhost_
 	* **port** _8182_
+	* **ssl** Use SSL/TLS for JanusGraph connection (default: false)
     * **sprintno** Add a subdirectory when generating. Use it as you want
     * **onefile** Create one file per script
     * **description** Add a description to your migration
@@ -20,10 +21,12 @@ Available commands
 	* **input** Directory where to find migration files. If not set look in current working directory.
 	* **ip** _localhost_
 	* **port** _8182_
+	* **ssl** Use SSL/TLS for JanusGraph connection (default: false)
 * **upgrade**
 	* **input** Can be a file or a directory containing migrations to be applied. If not set look in current working directory.
 	* **ip** _localhost_
 	* **port** _8182_
+	* **ssl** Use SSL/TLS for JanusGraph connection (default: false)
 
 Docker image
 =======

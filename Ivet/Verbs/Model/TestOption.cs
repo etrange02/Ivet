@@ -10,5 +10,8 @@ namespace Ivet.Verbs.Model
 
         [Option("port", HelpText = "Server Port", Default = 8182)]
         public int Port { get; set; }
+
+        [Option("ssl", HelpText = "Use SSL/TLS for JanusGraph connection", Default = false)]
+        public bool UseSsl { get; set; }
     }
 }

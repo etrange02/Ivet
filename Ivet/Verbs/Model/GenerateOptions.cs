@@ -20,6 +20,9 @@ namespace Ivet.Verbs.Model
         [Option("sprintno", HelpText = "Sprint/Version number of this new migration", Default = null)]
         public string? SprintNo { get; set; }
 
+        [Option("ssl", HelpText = "Use SSL/TLS for JanusGraph connection", Default = false)]
+        public bool UseSsl { get; set; }
+
         [Option("onefile", HelpText = "Create one file per script", Default = false)]
         public bool OneScriptPerFile { get; set; }
         [Option("description", HelpText = "Description to be added in generated script", Default = null)]

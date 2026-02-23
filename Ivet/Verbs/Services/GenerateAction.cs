@@ -11,7 +11,7 @@ namespace Ivet.Verbs.Services
     {
         public static void Do(GenerateOptions options)
         {
-            using var database = new DatabaseService(options.IpAddress, options.Port);
+            using var database = new DatabaseService(options.IpAddress, options.Port, options.UseSsl);
 
             var metaSchema = new TransitiveSchema();
 
