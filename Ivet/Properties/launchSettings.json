@@ -6,15 +6,15 @@
     },
     "generate": {
       "commandName": "Project",
-      "commandLineArgs": "generate --dir \"D:\\Workspace\\Projects\\Ivet\\Ivet.TestModel\\bin\\Debug\\net9.0\" --output \"D:\\Workspace\\Projects\\Ivet\\Migrations\" --sprintno \"16\""
+      "commandLineArgs": "generate --dir \"..\\Ivet.TestModel\\bin\\Debug\\net9.0\" --output \"..\\Migrations\" --sprintno \"1\" --description \"Test\""
     },
     "upgrade": {
       "commandName": "Project",
-      "commandLineArgs": "upgrade --input \"D:\\Workspace\\Projects\\Ivet\\Migrations\""
+      "commandLineArgs": "upgrade --input \"..\\Migrations\""
     },
     "list": {
       "commandName": "Project",
-      "commandLineArgs": "list --input \"D:\\Workspace\\Projects\\Ivet\\Migrations\""
+      "commandLineArgs": "list --input \"..\\Migrations\""
     },
     "test": {
       "commandName": "Project",

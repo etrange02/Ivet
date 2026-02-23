@@ -1,0 +1,14 @@
+.git
+.github
+.dockerignore
+Dockerfile
+*.md
+Ivet.Tests/
+Ivet.TestFramework/
+Ivet.TestModel/
+Migrations/
+Migrations2/
+conf/
+**/bin/
+**/obj/
+**/.vs/

@@ -9,14 +9,14 @@
     <Title>Ivet</Title>
     <RepositoryUrl>https://github.com/etrange02/Ivet</RepositoryUrl>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Description>Janusgraph schema generator and updator</Description>
+    <Description>Janusgraph schema generator and updater</Description>
     <PackageTags>janusgraph;graph;database schema;generator;update</PackageTags>
     <PackageProjectUrl>https://github.com/etrange02/Ivet</PackageProjectUrl>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
     <PackageLicenseExpression>CECILL-B</PackageLicenseExpression>
-    <Version>1.7.2</Version>
+    <Version>1.7.3</Version>
     <Authors>david.lecoconnier</Authors>
-    <PackageReleaseNotes>* Fix Ivet.Model .Net Framework</PackageReleaseNotes>
+    <PackageReleaseNotes>* Fix script order upgrade</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

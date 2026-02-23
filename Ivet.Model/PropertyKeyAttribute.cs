@@ -7,7 +7,7 @@
 
         /// <summary>
         /// Quantity of data, SINGLE, LIST or SET.
-        /// A LIST allows unique values instead of SET which allows duplicates
+        /// A SET allows unique values while LIST allows duplicates.
         /// </summary>
         public Cardinality Cardinality { get; set; } = Cardinality.SINGLE;
         public bool EnumAsString { get; set; }

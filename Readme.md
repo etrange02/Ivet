@@ -31,7 +31,7 @@ Docker image is available there:
 - https://hub.docker.com/r/dlecoconnier/ivet
 - https://github.com/etrange02/Ivet/pkgs/container/ivet
 
-To use Docker image, run the following command replacing `MyDir` with your local dierctory
+To use Docker image, run the following command replacing `MyDir` with your local directory
 
 ```
 docker run -v MyDir:/app/Migrations -e ip=localhost ivet
@@ -119,7 +119,7 @@ You can now run a `generate` command in order to create migration files.
 > [!NOTE]
 > Many files are created by the `generate` command. One contains vertices and edges and properties. Indices are in different files to avoid timeout at migration time.
 
-You can can have some details of migrations with `list`.
+You can have some details of migrations with `list`.
 
 > [!TIP]
 > You can open and manually edit your migration files. In particular there is a description field whose content can be seen with `list` command

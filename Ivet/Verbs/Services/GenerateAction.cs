@@ -19,7 +19,7 @@ namespace Ivet.Verbs.Services
             var databaseSchema = databaseSchemaLoader.Load();
             metaSchema.Source = DatabaseToSchemaConverter.Convert(databaseSchema);
 
-            var librarySchemaLoader = new LibraySchemaLoaderService();
+            var librarySchemaLoader = new LibrarySchemaLoaderService();
             var directory = string.IsNullOrEmpty(options.Directory) ? Directory.GetCurrentDirectory() : options.Directory;
             var librarySchema = librarySchemaLoader.Load(directory);
             metaSchema.Target = LibraryToSchemaConverter.Convert(librarySchema);
@@ -34,7 +34,7 @@ namespace Ivet.Verbs.Services
 
             var outputDirectory = string.IsNullOrEmpty(options.OutputDirectory) ? Directory.GetCurrentDirectory() : options.OutputDirectory;
             if (!string.IsNullOrEmpty(options.SprintNo))
-                outputDirectory = Path.Combine(options.OutputDirectory, options.SprintNo);
+                outputDirectory = Path.Combine(outputDirectory, options.SprintNo);
             Directory.CreateDirectory(outputDirectory);
 
             var jsonSerializerOption = new JsonSerializerOptions {  WriteIndented = true };
@@ -45,7 +45,7 @@ namespace Ivet.Verbs.Services
 
                 foreach (var (migration, i) in migrations.Select((v, i) => (v, i)))
                 {
-                    var fileName = Path.Combine(options.OutputDirectory, $"Migration_{DateTime.Now:yyyyMMddHHmm}_{i:D3}.json");
+                    var fileName = Path.Combine(outputDirectory, $"Migration_{DateTime.Now:yyyyMMddHHmm}_{i:D3}.json");
                     File.WriteAllText(fileName, JsonSerializer.Serialize(migration, jsonSerializerOption));
                 }
 
