@@ -62,5 +62,31 @@ namespace Ivet.Tests.Services
             var ex = Assert.Throws<ArgumentException>(() => CliArgumentValidator.ValidateSprintNo(sprintNo));
             Assert.Contains("path traversal", ex.Message);
         }
+
+        [Fact]
+        public void ValidateTimeout_Null_ReturnsNull()
+        {
+            var result = CliArgumentValidator.ValidateTimeout(null);
+            Assert.Null(result);
+        }
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(1000)]
+        [InlineData(300000)]
+        public void ValidateTimeout_ValidValue_ReturnsValue(long timeout)
+        {
+            var result = CliArgumentValidator.ValidateTimeout(timeout);
+            Assert.Equal(timeout, result);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        [InlineData(-1000)]
+        public void ValidateTimeout_InvalidValue_ThrowsArgumentOutOfRangeException(long timeout)
+        {
+            Assert.Throws<ArgumentOutOfRangeException>(() => CliArgumentValidator.ValidateTimeout(timeout));
+        }
     }
 }

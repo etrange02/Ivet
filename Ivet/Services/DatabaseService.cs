@@ -4,6 +4,7 @@ using ExRam.Gremlinq.Providers.Core;
 using ExRam.Gremlinq.Providers.JanusGraph;
 using ExRam.Gremlinq.Support.NewtonsoftJson;
 using Gremlin.Net.Driver;
+using Gremlin.Net.Driver.Messages;
 using Ivet.Model;
 using static ExRam.Gremlinq.Core.GremlinQuerySource;
 
@@ -178,8 +179,16 @@ namespace Ivet.Services
             return res;
         }
 
-        public string Execute(string request)
+        public string Execute(string request, long? evaluationTimeout = null)
         {
+            if (evaluationTimeout.HasValue)
+            {
+                var msg = RequestMessage.Build(Tokens.OpsEval)
+                    .AddArgument(Tokens.ArgsGremlin, request)
+                    .AddArgument(Tokens.ArgsEvalTimeout, evaluationTimeout.Value)
+                    .Create();
+                return _client.SubmitAsync<string>(msg).Result.Single();
+            }
             return _client.SubmitAsync<string>(request).Result.Single();
         }
     }

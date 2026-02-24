@@ -7,5 +7,6 @@
         public required string Script { get; set; }
         public required string RelativePath { get; set; }
         public bool IsMulti { get; set; }
+        public long? EvaluationTimeout { get; set; }
     }
 }

@@ -43,21 +43,21 @@ namespace Ivet.Verbs.Services
                 .SelectMany(x => {
                     var filename = Path.GetFileNameWithoutExtension(x.Fullname);
                     if (x.Object.Scripts?.Any() ?? false)
-                        return x.Object.Scripts.Select((y, i) => new MigrationInstance { Name = $"{filename}_#{i}", Script = y.Script, Description = $"{x.Object.Description} Part #{i}", IsMulti = true, RelativePath = Path.GetRelativePath(input, x.Fullname) });
+                        return x.Object.Scripts.Select((y, i) => new MigrationInstance { Name = $"{filename}_#{i}", Script = y.Script, Description = $"{x.Object.Description} Part #{i}", IsMulti = true, RelativePath = Path.GetRelativePath(input, x.Fullname), EvaluationTimeout = y.EvaluationTimeout ?? x.Object.EvaluationTimeout });
                     if (!string.IsNullOrEmpty(x.Object.Content))
-                        return new List<MigrationInstance> { new() { Name = filename, Script = x.Object.Content, Description = x.Object.Description, IsMulti = false, RelativePath = Path.GetRelativePath(input, x.Fullname) } };
+                        return new List<MigrationInstance> { new() { Name = filename, Script = x.Object.Content, Description = x.Object.Description, IsMulti = false, RelativePath = Path.GetRelativePath(input, x.Fullname), EvaluationTimeout = x.Object.EvaluationTimeout } };
                     return new List<MigrationInstance>();
                 })
                 .Select(x =>
                 {
                     var y = appliedMigrations.FirstOrDefault(migr => migr.MigrationName == x.Name);
-                    return new { x.Name, x.Description, Date = y?.MigrationDate, x.IsMulti, x.RelativePath };
+                    return new { x.Name, x.Description, Date = y?.MigrationDate, x.IsMulti, x.RelativePath, x.EvaluationTimeout };
                 })
                 .OrderBy(x => x.Name)
                 .ToList();
 
-            var table = new ConsoleTable("Name", "Relative path", "Description", "Date", "Multi?");
-            allMigrations.ForEach(x => table.AddRow(x.Name, x.RelativePath, x.Description, x.Date, x.IsMulti));
+            var table = new ConsoleTable("Name", "Relative path", "Description", "Date", "Multi?", "Timeout");
+            allMigrations.ForEach(x => table.AddRow(x.Name, x.RelativePath, x.Description, x.Date, x.IsMulti, x.EvaluationTimeout.HasValue ? $"{x.EvaluationTimeout}ms" : ""));
 
             Console.WriteLine($"Directory: {input}");
             Console.WriteLine();

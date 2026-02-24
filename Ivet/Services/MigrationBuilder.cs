@@ -6,6 +6,8 @@ namespace Ivet.Services
 {
     public class MigrationBuilder(MetaSchema metaSchema)
     {
+        public const long DefaultIndexTimeoutMs = 300_000;
+
         public MetaSchema? MetaSchema { get; private set; } = metaSchema;
         public string? Description { get; set; }
 
@@ -20,13 +22,13 @@ namespace Ivet.Services
             "mgmt.commit();" + Environment.NewLine +
             "graph.tx().commit();";
 
-        public List<string> Build()
+        public List<(string Script, long? EvaluationTimeout)> Build()
         {
-            var results = new List<string>();
-            results.Add(BuildMain());
-            results.AddRange(BuildCompositeIndeces());
-            results.AddRange(BuildMixedIndeces());
-            results.AddRange(BuildIndexBindings());
+            var results = new List<(string, long?)>();
+            results.Add((BuildMain(), null));
+            results.AddRange(BuildCompositeIndeces().Select(s => (s, (long?)DefaultIndexTimeoutMs)));
+            results.AddRange(BuildMixedIndeces().Select(s => (s, (long?)DefaultIndexTimeoutMs)));
+            results.AddRange(BuildIndexBindings().Select(s => (s, (long?)DefaultIndexTimeoutMs)));
 
             return results;
         }
@@ -179,21 +181,26 @@ namespace Ivet.Services
             return new MigrationFile
             {
                 Description = Description ?? string.Empty,
-                Scripts = Build().Where(x => !string.IsNullOrEmpty(x)).Select(x =>
+                Scripts = Build().Where(x => !string.IsNullOrEmpty(x.Script)).Select(x =>
                 {
-                    return new MigrationScript { Script = skeleton.Replace("%CONTENT%", x).Replace($"{Environment.NewLine}", $"{Environment.NewLine}   ") };
+                    return new MigrationScript
+                    {
+                        Script = skeleton.Replace("%CONTENT%", x.Script).Replace($"{Environment.NewLine}", $"{Environment.NewLine}   "),
+                        EvaluationTimeout = x.EvaluationTimeout
+                    };
                 }).ToList()
             };
         }
 
         public List<MigrationFile> BuildFileContents()
         {
-            return Build().Where(x => !string.IsNullOrEmpty(x)).Select(x =>
+            return Build().Where(x => !string.IsNullOrEmpty(x.Script)).Select(x =>
             {
                 return new MigrationFile
                 {
                     Description = Description ?? string.Empty,
-                    Content = skeleton.Replace("%CONTENT%", x).Replace($"{Environment.NewLine}", $"{Environment.NewLine}   ")
+                    Content = skeleton.Replace("%CONTENT%", x.Script).Replace($"{Environment.NewLine}", $"{Environment.NewLine}   "),
+                    EvaluationTimeout = x.EvaluationTimeout
                 };
         }).ToList();
         }

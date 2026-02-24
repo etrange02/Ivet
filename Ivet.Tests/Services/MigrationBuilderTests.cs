@@ -20,7 +20,8 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Single(result);
-            Assert.Empty(result[0]);
+            Assert.Empty(result[0].Script);
+            Assert.Null(result[0].EvaluationTimeout);
         }
 
         [Fact]
@@ -39,7 +40,7 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Single(result);
-            Assert.Equal($"// Vertices{ Environment.NewLine }mgmt.makeVertexLabel('{name}').make();{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0]);
+            Assert.Equal($"// Vertices{ Environment.NewLine }mgmt.makeVertexLabel('{name}').make();{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0].Script);
         }
 
         [Fact]
@@ -61,7 +62,7 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Single(result);
-            Assert.Equal($"// Vertices{ Environment.NewLine }mgmt.makeVertexLabel('{name}').partition().make();{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0]);
+            Assert.Equal($"// Vertices{ Environment.NewLine }mgmt.makeVertexLabel('{name}').partition().make();{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0].Script);
         }
 
         [Fact]
@@ -81,7 +82,7 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Single(result);
-            Assert.Equal($"// Vertices{ Environment.NewLine }mgmt.makeVertexLabel('{name}').setStatic().make();{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0]);
+            Assert.Equal($"// Vertices{ Environment.NewLine }mgmt.makeVertexLabel('{name}').setStatic().make();{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0].Script);
         }
 
         [Fact]
@@ -102,7 +103,7 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Single(result);
-            Assert.Equal($"// Vertices{ Environment.NewLine }mgmt.makeVertexLabel('{name}').partition().setStatic().make();{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0]);
+            Assert.Equal($"// Vertices{ Environment.NewLine }mgmt.makeVertexLabel('{name}').partition().setStatic().make();{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0].Script);
         }
 
         [Fact]
@@ -123,7 +124,7 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Single(result);
-            Assert.Equal($"// Vertices{ Environment.NewLine }{ Environment.NewLine }// Edges{ Environment.NewLine }mgmt.makeEdgeLabel('{ name }').multiplicity({ multiplicity.ToJavaString() }).make();{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0]);
+            Assert.Equal($"// Vertices{ Environment.NewLine }{ Environment.NewLine }// Edges{ Environment.NewLine }mgmt.makeEdgeLabel('{ name }').multiplicity({ multiplicity.ToJavaString() }).make();{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0].Script);
         }
 
         [Fact]
@@ -146,7 +147,7 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Single(result);
-            Assert.Equal($"// Vertices{ Environment.NewLine }{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }mgmt.makePropertyKey('{ name }').dataType({ dataType }).cardinality({ cardinality.ToJavaString() }).make();{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0]);
+            Assert.Equal($"// Vertices{ Environment.NewLine }{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }mgmt.makePropertyKey('{ name }').dataType({ dataType }).cardinality({ cardinality.ToJavaString() }).make();{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0].Script);
         }
 
         [Fact]
@@ -167,7 +168,7 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Single(result);
-            Assert.Equal($"// Vertices{ Environment.NewLine }{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }vertex = mgmt.getVertexLabel('{ entity }');prop = mgmt.getPropertyKey('{ name }');mgmt.addProperties(vertex, prop);{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0]);
+            Assert.Equal($"// Vertices{ Environment.NewLine }{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }vertex = mgmt.getVertexLabel('{ entity }');prop = mgmt.getPropertyKey('{ name }');mgmt.addProperties(vertex, prop);{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0].Script);
         }
 
         [Fact]
@@ -188,7 +189,7 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Single(result);
-            Assert.Equal($"// Vertices{ Environment.NewLine }{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }edge = mgmt.getEdgeLabel('{ entity }');prop = mgmt.getPropertyKey('{ name }');mgmt.addProperties(edge, prop);{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0]);
+            Assert.Equal($"// Vertices{ Environment.NewLine }{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }edge = mgmt.getEdgeLabel('{ entity }');prop = mgmt.getPropertyKey('{ name }');mgmt.addProperties(edge, prop);{ Environment.NewLine }// Connections{ Environment.NewLine }{ Environment.NewLine }", result[0].Script);
         }
 
         [Fact]
@@ -211,7 +212,7 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Single(result);
-            Assert.Equal($"// Vertices{ Environment.NewLine }{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }input = mgmt.getVertexLabel('{ ingoing }');output = mgmt.getVertexLabel('{ outgoing }');edge = mgmt.getEdgeLabel('{ edge }');mgmt.addConnection(edge, output, input);{ Environment.NewLine }", result[0]);
+            Assert.Equal($"// Vertices{ Environment.NewLine }{ Environment.NewLine }// Edges{ Environment.NewLine }{ Environment.NewLine }// Properties{ Environment.NewLine }{ Environment.NewLine }// Vertex property bindings{ Environment.NewLine }{ Environment.NewLine }// Edge property bindings{ Environment.NewLine }{ Environment.NewLine }// Connections{ Environment.NewLine }input = mgmt.getVertexLabel('{ ingoing }');output = mgmt.getVertexLabel('{ outgoing }');edge = mgmt.getEdgeLabel('{ edge }');mgmt.addConnection(edge, output, input);{ Environment.NewLine }", result[0].Script);
         }
 
         [Fact]
@@ -241,12 +242,14 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Equal(2, result.Count);
-            Assert.Contains($"// Composite Indices", result[1]);
-            Assert.Contains($"mgmt.buildIndex('{indexName}', {kind}).indexOnly(vertex).unique()", result[1]);
-            Assert.Contains($".buildCompositeIndex();", result[1]);
-            Assert.Contains($"prop_0 = mgmt.getPropertyKey('{propertyName}');", result[1]);
-            Assert.Contains($"ManagementSystem.awaitGraphIndexStatus(graph, '{indexName}').call();", result[1]);
-            Assert.Contains($"mgmt.updateIndex(mgmt.getGraphIndex('{indexName}'), SchemaAction.REINDEX).get();", result[1]);
+            Assert.Null(result[0].EvaluationTimeout);
+            Assert.Equal(MigrationBuilder.DefaultIndexTimeoutMs, result[1].EvaluationTimeout);
+            Assert.Contains($"// Composite Indices", result[1].Script);
+            Assert.Contains($"mgmt.buildIndex('{indexName}', {kind}).indexOnly(vertex).unique()", result[1].Script);
+            Assert.Contains($".buildCompositeIndex();", result[1].Script);
+            Assert.Contains($"prop_0 = mgmt.getPropertyKey('{propertyName}');", result[1].Script);
+            Assert.Contains($"ManagementSystem.awaitGraphIndexStatus(graph, '{indexName}').call();", result[1].Script);
+            Assert.Contains($"mgmt.updateIndex(mgmt.getGraphIndex('{indexName}'), SchemaAction.REINDEX).get();", result[1].Script);
         }
 
         [Fact]
@@ -268,7 +271,7 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Equal(2, result.Count);
-            Assert.DoesNotContain(".unique()", result[1]);
+            Assert.DoesNotContain(".unique()", result[1].Script);
         }
 
         [Fact]
@@ -300,13 +303,15 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Equal(2, result.Count);
-            Assert.Contains($"// Mixed Indices", result[1]);
-            Assert.Contains($"mgmt.buildIndex('{indexName}', {kind}).indexOnly(vertex)", result[1]);
-            Assert.Contains($".buildMixedIndex('{backend}');", result[1]);
-            Assert.Contains($"prop_0 = mgmt.getPropertyKey('{propertyName}');", result[1]);
-            Assert.Contains($".addKey(prop_0, Mapping.TEXT.asParameter())", result[1]);
-            Assert.Contains($"ManagementSystem.awaitGraphIndexStatus(graph, '{indexName}').call();", result[1]);
-            Assert.Contains($"mgmt.updateIndex(mgmt.getGraphIndex('{indexName}'), SchemaAction.REINDEX).get();", result[1]);
+            Assert.Null(result[0].EvaluationTimeout);
+            Assert.Equal(MigrationBuilder.DefaultIndexTimeoutMs, result[1].EvaluationTimeout);
+            Assert.Contains($"// Mixed Indices", result[1].Script);
+            Assert.Contains($"mgmt.buildIndex('{indexName}', {kind}).indexOnly(vertex)", result[1].Script);
+            Assert.Contains($".buildMixedIndex('{backend}');", result[1].Script);
+            Assert.Contains($"prop_0 = mgmt.getPropertyKey('{propertyName}');", result[1].Script);
+            Assert.Contains($".addKey(prop_0, Mapping.TEXT.asParameter())", result[1].Script);
+            Assert.Contains($"ManagementSystem.awaitGraphIndexStatus(graph, '{indexName}').call();", result[1].Script);
+            Assert.Contains($"mgmt.updateIndex(mgmt.getGraphIndex('{indexName}'), SchemaAction.REINDEX).get();", result[1].Script);
         }
 
         [Fact]
@@ -335,8 +340,8 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Equal(2, result.Count);
-            Assert.Contains($".addKey(prop_0)", result[1]);
-            Assert.DoesNotContain("Mapping.", result[1]);
+            Assert.Contains($".addKey(prop_0)", result[1].Script);
+            Assert.DoesNotContain("Mapping.", result[1].Script);
         }
 
         [Fact]
@@ -354,10 +359,10 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Equal(2, result.Count);
-            Assert.Contains($"ManagementSystem.awaitGraphIndexStatus(graph, '{indexName1}').call();", result[1]);
-            Assert.Contains($"ManagementSystem.awaitGraphIndexStatus(graph, '{indexName2}').call();", result[1]);
-            Assert.Contains($"mgmt.updateIndex(mgmt.getGraphIndex('{indexName1}'), SchemaAction.REINDEX).get();", result[1]);
-            Assert.Contains($"mgmt.updateIndex(mgmt.getGraphIndex('{indexName2}'), SchemaAction.REINDEX).get();", result[1]);
+            Assert.Contains($"ManagementSystem.awaitGraphIndexStatus(graph, '{indexName1}').call();", result[1].Script);
+            Assert.Contains($"ManagementSystem.awaitGraphIndexStatus(graph, '{indexName2}').call();", result[1].Script);
+            Assert.Contains($"mgmt.updateIndex(mgmt.getGraphIndex('{indexName1}'), SchemaAction.REINDEX).get();", result[1].Script);
+            Assert.Contains($"mgmt.updateIndex(mgmt.getGraphIndex('{indexName2}'), SchemaAction.REINDEX).get();", result[1].Script);
         }
 
         [Fact]
@@ -379,9 +384,11 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Equal(2, result.Count);
-            Assert.Contains($"prop = mgmt.getPropertyKey('{propertyName}');index = mgmt.getGraphIndex('{indexName}').addKey(prop, Mapping.TEXTSTRING.asParameter());", result[1]);
-            Assert.Contains($"ManagementSystem.awaitGraphIndexStatus(graph, '{indexName}').call();", result[1]);
-            Assert.Contains($"mgmt.updateIndex(mgmt.getGraphIndex('{indexName}'), SchemaAction.REINDEX).get();", result[1]);
+            Assert.Null(result[0].EvaluationTimeout);
+            Assert.Equal(MigrationBuilder.DefaultIndexTimeoutMs, result[1].EvaluationTimeout);
+            Assert.Contains($"prop = mgmt.getPropertyKey('{propertyName}');index = mgmt.getGraphIndex('{indexName}').addKey(prop, Mapping.TEXTSTRING.asParameter());", result[1].Script);
+            Assert.Contains($"ManagementSystem.awaitGraphIndexStatus(graph, '{indexName}').call();", result[1].Script);
+            Assert.Contains($"mgmt.updateIndex(mgmt.getGraphIndex('{indexName}'), SchemaAction.REINDEX).get();", result[1].Script);
         }
 
         [Fact]

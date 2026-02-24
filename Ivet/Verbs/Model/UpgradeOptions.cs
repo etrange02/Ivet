@@ -16,5 +16,8 @@ namespace Ivet.Verbs.Model
 
         [Option("ssl", HelpText = "Use SSL/TLS for JanusGraph connection", Default = false)]
         public bool UseSsl { get; set; }
+
+        [Option("timeout", HelpText = "Default evaluation timeout in milliseconds for Gremlin scripts", Default = null)]
+        public long? Timeout { get; set; }
     }
 }

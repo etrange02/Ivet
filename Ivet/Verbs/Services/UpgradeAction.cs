@@ -9,9 +9,21 @@ namespace Ivet.Verbs.Services
 {
     public class UpgradeAction
     {
+        internal static bool IsTimeoutException(Exception ex)
+        {
+            if (ex is TimeoutException) return true;
+            if (ex.Message.Contains("timeout", StringComparison.OrdinalIgnoreCase)) return true;
+            if (ex is AggregateException agg)
+                return agg.InnerExceptions.Any(IsTimeoutException);
+            if (ex.InnerException != null)
+                return IsTimeoutException(ex.InnerException);
+            return false;
+        }
+
         public static void Do(UpgradeOptions options)
         {
             CliArgumentValidator.ValidatePort(options.Port);
+            CliArgumentValidator.ValidateTimeout(options.Timeout);
 
             var files = new List<string>();
 
@@ -47,9 +59,9 @@ namespace Ivet.Verbs.Services
                 .SelectMany(x => {
                     var filename = Path.GetFileNameWithoutExtension(x.Fullname);
                     if (x.Object.Scripts?.Any() ?? false)
-                        return x.Object.Scripts.Select((y, i) => new MigrationInstance { Name = $"{ filename }_#{ i }", Script = y.Script, RelativePath = Path.GetRelativePath(input, x.Fullname) });
+                        return x.Object.Scripts.Select((y, i) => new MigrationInstance { Name = $"{ filename }_#{ i }", Script = y.Script, RelativePath = Path.GetRelativePath(input, x.Fullname), EvaluationTimeout = y.EvaluationTimeout ?? x.Object.EvaluationTimeout });
                     if (!string.IsNullOrEmpty(x.Object.Content))
-                        return new List<MigrationInstance> { new() { Name = filename, Script = x.Object.Content, RelativePath = Path.GetRelativePath(input, x.Fullname) } };
+                        return new List<MigrationInstance> { new() { Name = filename, Script = x.Object.Content, RelativePath = Path.GetRelativePath(input, x.Fullname), EvaluationTimeout = x.Object.EvaluationTimeout } };
                     return new List<MigrationInstance>();
                 })
                 .Where(x => !appliedMigrations.Contains(x.Name))
@@ -61,13 +73,24 @@ namespace Ivet.Verbs.Services
             {
                 Console.WriteLine($"Applying migration {x.Name} ({x.RelativePath})");
                 GremlinScriptValidator.Validate(x.Script);
-                var res = database.Execute(x.Script);
+                var timeout = x.EvaluationTimeout ?? options.Timeout;
+                var hasExplicitTimeout = x.EvaluationTimeout.HasValue || options.Timeout.HasValue;
+
+                try
+                {
+                    database.Execute(x.Script, timeout);
+                }
+                catch (Exception ex) when (hasExplicitTimeout && IsTimeoutException(ex))
+                {
+                    Console.WriteLine($"Warning: Migration {x.Name} timed out. The index operation was submitted and will be completed by JanusGraph on restart. ({ex.Message})");
+                }
+
                 var migration = new Migration
                 {
                     MigrationName = x.Name,
                     MigrationDate = DateTime.Now,
                 };
-                var migrationDB = database.GremlinqClient.AddV(migration).FirstAsync().AsTask().GetAwaiter().GetResult();
+                database.GremlinqClient.AddV(migration).FirstAsync().AsTask().GetAwaiter().GetResult();
             });
         }
     }

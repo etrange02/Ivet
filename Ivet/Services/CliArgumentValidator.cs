@@ -9,6 +9,13 @@ namespace Ivet.Services
             return port;
         }
 
+        public static long? ValidateTimeout(long? timeout)
+        {
+            if (timeout.HasValue && timeout.Value < 1)
+                throw new ArgumentOutOfRangeException(nameof(timeout), $"Timeout must be positive, got {timeout}");
+            return timeout;
+        }
+
         public static string? ValidateSprintNo(string? sprintNo)
         {
             if (string.IsNullOrWhiteSpace(sprintNo))

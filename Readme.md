@@ -27,6 +27,7 @@ Available commands
 	* **ip** _localhost_
 	* **port** _8182_
 	* **ssl** Use SSL/TLS for JanusGraph connection (default: false)
+	* **timeout** Default evaluation timeout in milliseconds for Gremlin scripts. Can be overridden per script or per migration file in JSON
 
 Docker image
 =======
@@ -115,6 +116,22 @@ public class MyVertex
 ```
 
 
+Timeout & Resilience
+=======
+Index operations (`awaitGraphIndexStatus`, `REINDEX`) can take a long time. By default, generated index scripts include a 5-minute evaluation timeout (300000 ms).
+
+You can control the timeout at three levels (highest priority first):
+1. **Per script** in JSON: `"evaluationTimeout": 600000` inside a script entry
+2. **Per file** in JSON: `"evaluationTimeout": 600000` at the migration file level
+3. **CLI flag**: `--timeout 600000` on the `upgrade` command
+
+```
+Ivet upgrade --input ".\Migrations" --timeout 600000
+```
+
+> [!NOTE]
+> If an index script times out, the migration is still marked as applied. JanusGraph registers the index operation and will complete it on restart. Re-running the same script would fail with "index already exists". Scripts without an explicit timeout (e.g., entity creation scripts) are NOT marked as applied on timeout — the error propagates normally.
+
 What's next?
 =======
 You can now run a `generate` command in order to create migration files.
@@ -133,19 +150,15 @@ You can have some details of migrations with `list`.
 Directory: D:\Migrations
 
 Migrations:
- -----------------------------------------------------------------------------------------------------------
- | Name                      | Relative path                  | Description | Date                | Multi? |
- -----------------------------------------------------------------------------------------------------------
- | Migration_202403032330_#0 | 12\Migration_202403032330.json | Part #0     | 10/03/2024 14:21:54 | True   |
- -----------------------------------------------------------------------------------------------------------
- | Migration_202403032330_#1 | 12\Migration_202403032330.json | Part #1     | 10/03/2024 14:22:04 | True   |
- -----------------------------------------------------------------------------------------------------------
- | Migration_202403032330_#2 | 12\Migration_202403032330.json | Part #2     | 10/03/2024 14:22:14 | True   |
- -----------------------------------------------------------------------------------------------------------
- | Migration_202403032330_#3 | 12\Migration_202403032330.json | Part #3     | 10/03/2024 14:22:24 | True   |
- -----------------------------------------------------------------------------------------------------------
- | Migration_202403032330_#4 | 12\Migration_202403032330.json | Part #4     | 10/03/2024 14:22:34 | True   |
- -----------------------------------------------------------------------------------------------------------
+ --------------------------------------------------------------------------------------------------------------------------
+ | Name                      | Relative path                  | Description | Date                | Multi? | Timeout  |
+ --------------------------------------------------------------------------------------------------------------------------
+ | Migration_202403032330_#0 | 12\Migration_202403032330.json | Part #0     | 10/03/2024 14:21:54 | True   |          |
+ --------------------------------------------------------------------------------------------------------------------------
+ | Migration_202403032330_#1 | 12\Migration_202403032330.json | Part #1     | 10/03/2024 14:22:04 | True   | 300000ms |
+ --------------------------------------------------------------------------------------------------------------------------
+ | Migration_202403032330_#2 | 12\Migration_202403032330.json | Part #2     | 10/03/2024 14:22:14 | True   | 300000ms |
+ --------------------------------------------------------------------------------------------------------------------------
 
- Count:5
+ Count:3
 ```
