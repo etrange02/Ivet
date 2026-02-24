@@ -11,6 +11,8 @@ namespace Ivet.Verbs.Services
     {
         public static void Do(UpgradeOptions options)
         {
+            CliArgumentValidator.ValidatePort(options.Port);
+
             var files = new List<string>();
 
             var input = string.IsNullOrEmpty(options.Input) ? Directory.GetCurrentDirectory() : options.Input;
@@ -58,6 +60,7 @@ namespace Ivet.Verbs.Services
             migrationsToApply.ForEach(x =>
             {
                 Console.WriteLine($"Applying migration {x.Name} ({x.RelativePath})");
+                GremlinScriptValidator.Validate(x.Script);
                 var res = database.Execute(x.Script);
                 var migration = new Migration
                 {

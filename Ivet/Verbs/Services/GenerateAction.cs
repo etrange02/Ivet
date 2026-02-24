@@ -11,6 +11,9 @@ namespace Ivet.Verbs.Services
     {
         public static void Do(GenerateOptions options)
         {
+            CliArgumentValidator.ValidatePort(options.Port);
+            CliArgumentValidator.ValidateSprintNo(options.SprintNo);
+
             using var database = new DatabaseService(options.IpAddress, options.Port, options.UseSsl);
 
             var metaSchema = new TransitiveSchema();

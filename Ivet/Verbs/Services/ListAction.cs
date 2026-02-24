@@ -12,6 +12,8 @@ namespace Ivet.Verbs.Services
     {
         public static void Do(ListOptions options)
         {
+            CliArgumentValidator.ValidatePort(options.Port);
+
             var files = new List<string>();
             var input = string.IsNullOrEmpty(options.Input) ? Directory.GetCurrentDirectory() : options.Input;
 
