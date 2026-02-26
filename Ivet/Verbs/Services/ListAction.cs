@@ -1,8 +1,9 @@
-﻿using ConsoleTables;
+using ConsoleTables;
 using ExRam.Gremlinq.Core;
 using Ivet.Model;
 using Ivet.Services;
 using Ivet.Verbs.Model;
+using Microsoft.Extensions.Logging;
 using System.Globalization;
 using System.Text.Json;
 
@@ -10,7 +11,7 @@ namespace Ivet.Verbs.Services
 {
     public class ListAction
     {
-        public static void Do(ListOptions options)
+        public static void Do(ListOptions options, ILoggerFactory loggerFactory)
         {
             CliArgumentValidator.ValidatePort(options.Port);
 

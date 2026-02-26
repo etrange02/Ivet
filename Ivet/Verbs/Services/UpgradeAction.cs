@@ -1,7 +1,8 @@
-﻿using ExRam.Gremlinq.Core;
+using ExRam.Gremlinq.Core;
 using Ivet.Model;
 using Ivet.Services;
 using Ivet.Verbs.Model;
+using Microsoft.Extensions.Logging;
 using System.Globalization;
 using System.Text.Json;
 
@@ -20,10 +21,12 @@ namespace Ivet.Verbs.Services
             return false;
         }
 
-        public static void Do(UpgradeOptions options)
+        public static void Do(UpgradeOptions options, ILoggerFactory loggerFactory)
         {
             CliArgumentValidator.ValidatePort(options.Port);
             CliArgumentValidator.ValidateTimeout(options.Timeout);
+
+            var logger = loggerFactory.CreateLogger<UpgradeAction>();
 
             var files = new List<string>();
 
@@ -38,7 +41,7 @@ namespace Ivet.Verbs.Services
             }
             else
             {
-                Console.WriteLine($"Directory: {input}");
+                logger.LogInformation("Directory: {Input}", input);
                 files.AddRange(Directory.EnumerateFiles(input, "*.json", SearchOption.AllDirectories).Order());
             }
 
@@ -52,9 +55,9 @@ namespace Ivet.Verbs.Services
                 .Select(x => x.MigrationName);
 
             var migrationsToApply = files
-                .Select(x => new  { 
+                .Select(x => new  {
                     Fullname = x,
-                    Object = JsonSerializer.Deserialize<MigrationFile>(File.ReadAllText(x)) ?? throw new FormatException($"File {x} has bad format") 
+                    Object = JsonSerializer.Deserialize<MigrationFile>(File.ReadAllText(x)) ?? throw new FormatException($"File {x} has bad format")
                 })
                 .SelectMany(x => {
                     var filename = Path.GetFileNameWithoutExtension(x.Fullname);
@@ -71,7 +74,7 @@ namespace Ivet.Verbs.Services
 
             migrationsToApply.ForEach(x =>
             {
-                Console.WriteLine($"Applying migration {x.Name} ({x.RelativePath})");
+                logger.LogInformation("Applying migration {Name} ({RelativePath})", x.Name, x.RelativePath);
                 GremlinScriptValidator.Validate(x.Script);
                 var timeout = x.EvaluationTimeout ?? options.Timeout;
                 var hasExplicitTimeout = x.EvaluationTimeout.HasValue || options.Timeout.HasValue;
@@ -82,7 +85,7 @@ namespace Ivet.Verbs.Services
                 }
                 catch (Exception ex) when (hasExplicitTimeout && IsTimeoutException(ex))
                 {
-                    Console.WriteLine($"Warning: Migration {x.Name} timed out. The index operation was submitted and will be completed by JanusGraph on restart. ({ex.Message})");
+                    logger.LogWarning("Migration {Name} timed out. The index operation was submitted and will be completed by JanusGraph on restart. ({Message})", x.Name, ex.Message);
                 }
 
                 var migration = new Migration

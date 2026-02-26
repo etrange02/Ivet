@@ -1,18 +1,21 @@
-﻿using Ivet.Model;
+using Ivet.Model;
 using Ivet.Services;
 using Ivet.Services.Converters;
 using Ivet.Services.Loaders;
 using Ivet.Verbs.Model;
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
 namespace Ivet.Verbs.Services
 {
     public class GenerateAction
     {
-        public static void Do(GenerateOptions options)
+        public static void Do(GenerateOptions options, ILoggerFactory loggerFactory)
         {
             CliArgumentValidator.ValidatePort(options.Port);
             CliArgumentValidator.ValidateSprintNo(options.SprintNo);
+
+            var logger = loggerFactory.CreateLogger<GenerateAction>();
 
             using var database = new DatabaseService(options.IpAddress, options.Port, options.UseSsl);
 
@@ -22,7 +25,7 @@ namespace Ivet.Verbs.Services
             var databaseSchema = databaseSchemaLoader.Load();
             metaSchema.Source = DatabaseToSchemaConverter.Convert(databaseSchema);
 
-            var librarySchemaLoader = new LibrarySchemaLoaderService();
+            var librarySchemaLoader = new LibrarySchemaLoaderService(loggerFactory.CreateLogger<LibrarySchemaLoaderService>());
             var directory = string.IsNullOrEmpty(options.Directory) ? Directory.GetCurrentDirectory() : options.Directory;
             var librarySchema = librarySchemaLoader.Load(directory);
             metaSchema.Target = LibraryToSchemaConverter.Convert(librarySchema);
@@ -31,10 +34,10 @@ namespace Ivet.Verbs.Services
             metaSchema.Difference = deltaSchemaMaker.Difference(metaSchema.Source, metaSchema.Target);
 
             var removals = deltaSchemaMaker.Removals(metaSchema.Source, metaSchema.Target);
-            SchemaWarningService.PrintRemovals(removals);
+            SchemaWarningService.PrintRemovals(removals, logger);
 
             var modifications = deltaSchemaMaker.Modifications(metaSchema.Source, metaSchema.Target);
-            SchemaWarningService.PrintModifications(modifications);
+            SchemaWarningService.PrintModifications(modifications, logger);
 
             if (options.DryRun)
             {
@@ -43,7 +46,7 @@ namespace Ivet.Verbs.Services
             }
 
             var builder = new MigrationBuilder(metaSchema.Difference)
-            { 
+            {
                 Description = options.Description,
             };
 

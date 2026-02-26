@@ -13,5 +13,8 @@ namespace Ivet.Verbs.Model
 
         [Option("ssl", HelpText = "Use SSL/TLS for JanusGraph connection", Default = false)]
         public bool UseSsl { get; set; }
+
+        [Option('v', "verbose", HelpText = "Enable verbose logging (debug level)", Default = false)]
+        public bool Verbose { get; set; }
     }
 }

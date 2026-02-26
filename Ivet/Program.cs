@@ -1,6 +1,9 @@
-﻿using CommandLine;
+using CommandLine;
+using Ivet.Services;
 using Ivet.Verbs.Model;
 using Ivet.Verbs.Services;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 using System.Reflection;
 
 namespace Ivet
@@ -11,27 +14,42 @@ namespace Ivet
         {
             var types = LoadVerbs();
 
-            Parser.Default.ParseArguments(args, types)
-                .WithParsed<UpgradeOptions>(options => Run(() => UpgradeAction.Do(options)))
-                .WithParsed<GenerateOptions>(options => Run(() => GenerateAction.Do(options)))
-                .WithParsed<ListOptions>(options => Run(() => ListAction.Do(options)))
+            CommandLine.Parser.Default.ParseArguments(args, types)
+                .WithParsed<UpgradeOptions>(opts => Run(opts.Verbose, factory => UpgradeAction.Do(opts, factory)))
+                .WithParsed<GenerateOptions>(opts => Run(opts.Verbose, factory => GenerateAction.Do(opts, factory)))
+                .WithParsed<ListOptions>(opts => Run(opts.Verbose, factory => ListAction.Do(opts, factory)))
 #if DEBUG
-                .WithParsed<TestOptions>(options => Run(() => TestAction.Do(options)))
+                .WithParsed<TestOptions>(opts => Run(opts.Verbose, factory => TestAction.Do(opts, factory)))
 #endif
                 .WithNotParsed(HandleErrors);
         }
 
-        private static void Run(Action action)
+        private static void Run(bool verbose, Action<ILoggerFactory> action)
         {
+            using var loggerFactory = CreateLoggerFactory(verbose);
             try
             {
-                action();
+                action(loggerFactory);
             }
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"Error: {ex.Message}");
                 Environment.ExitCode = 1;
             }
+        }
+
+        private static ILoggerFactory CreateLoggerFactory(bool verbose)
+        {
+            return LoggerFactory.Create(builder =>
+            {
+                builder.SetMinimumLevel(verbose ? LogLevel.Debug : LogLevel.Information);
+                builder.AddConsole(options =>
+                {
+                    options.FormatterName = "cli";
+                    options.LogToStandardErrorThreshold = LogLevel.Error;
+                });
+                builder.AddConsoleFormatter<CliConsoleFormatter, ConsoleFormatterOptions>();
+            });
         }
 
         //load all types using Reflection

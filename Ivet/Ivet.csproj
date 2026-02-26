@@ -31,6 +31,8 @@
     <PackageReference Include="ConsoleTables" Version="2.7.0" />
     <PackageReference Include="CsvHelper" Version="33.1.0" />
     <PackageReference Include="ExRam.Gremlinq.Providers.JanusGraph" Version="13.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.2" />
     <PackageReference Include="ExRam.Gremlinq.Support.NewtonsoftJson" Version="13.0.0" />
     <PackageReference Include="JanusGraph.Net" Version="1.1.0" />
   </ItemGroup>

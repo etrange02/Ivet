@@ -1,10 +1,12 @@
 using Ivet.Model.Meta;
+using Microsoft.Extensions.Logging;
+using System.Text;
 
 namespace Ivet.Services
 {
     public static class SchemaWarningService
     {
-        public static void PrintRemovals(MetaSchema removals)
+        public static void PrintRemovals(MetaSchema removals, ILogger logger)
         {
             var sections = new List<(string Category, List<string> Names)>();
 
@@ -30,43 +32,35 @@ namespace Ivet.Services
             if (sections.Count == 0)
                 return;
 
-            var previousColor = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Yellow;
-
-            Console.WriteLine();
-            Console.WriteLine("Warning: The following elements exist in the database but not in the code:");
+            var sb = new StringBuilder();
+            sb.AppendLine();
+            sb.AppendLine("Warning: The following elements exist in the database but not in the code:");
             foreach (var (category, names) in sections)
             {
-                Console.WriteLine($"  {category}:");
+                sb.AppendLine($"  {category}:");
                 foreach (var name in names)
-                    Console.WriteLine($"    - {name}");
+                    sb.AppendLine($"    - {name}");
             }
-            Console.WriteLine("These elements will NOT be removed (JanusGraph does not support schema deletion).");
-            Console.WriteLine();
-
-            Console.ForegroundColor = previousColor;
+            sb.Append("These elements will NOT be removed (JanusGraph does not support schema deletion).");
+            logger.LogWarning("{Message}", sb.ToString());
         }
 
-        public static void PrintModifications(List<MetaSchemaModification> modifications)
+        public static void PrintModifications(List<MetaSchemaModification> modifications, ILogger logger)
         {
             if (modifications.Count == 0)
                 return;
 
-            var previousColor = Console.ForegroundColor;
-            Console.ForegroundColor = ConsoleColor.Yellow;
-
-            Console.WriteLine();
-            Console.WriteLine("Warning: The following schema elements have been modified:");
+            var sb = new StringBuilder();
+            sb.AppendLine();
+            sb.AppendLine("Warning: The following schema elements have been modified:");
             foreach (var group in modifications.GroupBy(m => m.ElementType))
             {
-                Console.WriteLine($"  {group.Key}:");
+                sb.AppendLine($"  {group.Key}:");
                 foreach (var mod in group)
-                    Console.WriteLine($"    - {mod.ElementName}.{mod.PropertyName}: {mod.SourceValue} -> {mod.TargetValue}");
+                    sb.AppendLine($"    - {mod.ElementName}.{mod.PropertyName}: {mod.SourceValue} -> {mod.TargetValue}");
             }
-            Console.WriteLine("JanusGraph does not support modifying existing schema elements.");
-            Console.WriteLine();
-
-            Console.ForegroundColor = previousColor;
+            sb.Append("JanusGraph does not support modifying existing schema elements.");
+            logger.LogWarning("{Message}", sb.ToString());
         }
     }
 }

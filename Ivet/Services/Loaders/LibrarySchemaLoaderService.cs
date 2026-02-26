@@ -1,4 +1,5 @@
 using Ivet.Model;
+using Microsoft.Extensions.Logging;
 using System.Reflection;
 using Ivet.Model.Library;
 
@@ -6,6 +7,13 @@ namespace Ivet.Services.Loaders
 {
     public class LibrarySchemaLoaderService
     {
+        private readonly ILogger _logger;
+
+        public LibrarySchemaLoaderService(ILogger<LibrarySchemaLoaderService> logger)
+        {
+            _logger = logger;
+        }
+
         public Schema Load(string path)
         {
             if (!Directory.Exists(path))
@@ -17,13 +25,13 @@ namespace Ivet.Services.Loaders
             schema.Vertices.Add(typeof(Migration));
 
             var files = Directory.EnumerateFiles(fullPath, "*.dll").ToList();
-            Console.WriteLine($"Loading {files.Count} DLL(s) from {fullPath}");
+            _logger.LogInformation("Loading {Count} DLL(s) from {Path}", files.Count, fullPath);
 
             files.ForEach(x =>
             {
                 try
                 {
-                    Console.WriteLine($"  Loading: {Path.GetFileName(x)}");
+                    _logger.LogDebug("  Loading: {FileName}", Path.GetFileName(x));
                     var assembly = Assembly.LoadFrom(x);
                     var graphClasses = assembly.GetTypes().Where(t => t.GetCustomAttributes<AbstractGraphItemAttribute>().Any()).ToList();
                     if (graphClasses.Any())
@@ -34,11 +42,11 @@ namespace Ivet.Services.Loaders
                 }
                 catch (ReflectionTypeLoadException)
                 {
-                    Console.WriteLine($"  Skipped: {Path.GetFileName(x)} (not introspectable)");
+                    _logger.LogWarning("  Skipped: {FileName} (not introspectable)", Path.GetFileName(x));
                 }
                 catch (BadImageFormatException)
                 {
-                    Console.WriteLine($"  Skipped: {Path.GetFileName(x)} (not a valid .NET assembly)");
+                    _logger.LogWarning("  Skipped: {FileName} (not a valid .NET assembly)", Path.GetFileName(x));
                 }
             });
 

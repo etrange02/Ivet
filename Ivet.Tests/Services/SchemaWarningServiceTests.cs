@@ -1,6 +1,7 @@
 using Ivet.Model.Meta;
 using Ivet.Services;
 using Ivet.TestFramework;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace Ivet.Tests.Services
@@ -11,12 +12,11 @@ namespace Ivet.Tests.Services
         public void PrintRemovals_EmptySchema_NoOutput()
         {
             var removals = new MetaSchema();
-            var writer = new StringWriter();
-            Console.SetOut(writer);
+            var logger = new TestLogger();
 
-            SchemaWarningService.PrintRemovals(removals);
+            SchemaWarningService.PrintRemovals(removals, logger);
 
-            Assert.Empty(writer.ToString());
+            Assert.Empty(logger.Entries);
         }
 
         [Fact]
@@ -24,16 +24,16 @@ namespace Ivet.Tests.Services
         {
             var removals = new MetaSchema();
             removals.Vertices.Add(new MetaVertex { Name = "TestVertex" });
-            var writer = new StringWriter();
-            Console.SetOut(writer);
+            var logger = new TestLogger();
 
-            SchemaWarningService.PrintRemovals(removals);
+            SchemaWarningService.PrintRemovals(removals, logger);
 
-            var output = writer.ToString();
-            Assert.Contains("Warning", output);
-            Assert.Contains("Vertices", output);
-            Assert.Contains("TestVertex", output);
-            Assert.Contains("will NOT be removed", output);
+            Assert.Single(logger.Entries);
+            Assert.Equal(LogLevel.Warning, logger.Entries[0].Level);
+            Assert.Contains("Warning", logger.Entries[0].Message);
+            Assert.Contains("Vertices", logger.Entries[0].Message);
+            Assert.Contains("TestVertex", logger.Entries[0].Message);
+            Assert.Contains("will NOT be removed", logger.Entries[0].Message);
         }
 
         [Fact]
@@ -43,25 +43,25 @@ namespace Ivet.Tests.Services
             removals.Vertices.Add(new MetaVertex { Name = "V1" });
             removals.Edges.Add(new MetaEdge { Name = "E1" });
             removals.Properties.Add(new MetaPropertyKey { Name = "P1" });
-            var writer = new StringWriter();
-            Console.SetOut(writer);
+            var logger = new TestLogger();
 
-            SchemaWarningService.PrintRemovals(removals);
+            SchemaWarningService.PrintRemovals(removals, logger);
 
-            var output = writer.ToString();
-            Assert.Contains("Vertices", output);
-            Assert.Contains("Edges", output);
-            Assert.Contains("Properties", output);
+            Assert.Single(logger.Entries);
+            Assert.Equal(LogLevel.Warning, logger.Entries[0].Level);
+            Assert.Contains("Vertices", logger.Entries[0].Message);
+            Assert.Contains("Edges", logger.Entries[0].Message);
+            Assert.Contains("Properties", logger.Entries[0].Message);
         }
+
         [Fact]
         public void PrintModifications_EmptyList_NoOutput()
         {
-            var writer = new StringWriter();
-            Console.SetOut(writer);
+            var logger = new TestLogger();
 
-            SchemaWarningService.PrintModifications(new List<MetaSchemaModification>());
+            SchemaWarningService.PrintModifications(new List<MetaSchemaModification>(), logger);
 
-            Assert.Empty(writer.ToString());
+            Assert.Empty(logger.Entries);
         }
 
         [Fact]
@@ -78,17 +78,17 @@ namespace Ivet.Tests.Services
                     TargetValue = "True"
                 }
             };
-            var writer = new StringWriter();
-            Console.SetOut(writer);
+            var logger = new TestLogger();
 
-            SchemaWarningService.PrintModifications(modifications);
+            SchemaWarningService.PrintModifications(modifications, logger);
 
-            var output = writer.ToString();
-            Assert.Contains("Warning", output);
-            Assert.Contains("Vertex", output);
-            Assert.Contains("MyVertex.Partitioned", output);
-            Assert.Contains("False -> True", output);
-            Assert.Contains("does not support modifying", output);
+            Assert.Single(logger.Entries);
+            Assert.Equal(LogLevel.Warning, logger.Entries[0].Level);
+            Assert.Contains("Warning", logger.Entries[0].Message);
+            Assert.Contains("Vertex", logger.Entries[0].Message);
+            Assert.Contains("MyVertex.Partitioned", logger.Entries[0].Message);
+            Assert.Contains("False -> True", logger.Entries[0].Message);
+            Assert.Contains("does not support modifying", logger.Entries[0].Message);
         }
     }
 }

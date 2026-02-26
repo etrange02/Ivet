@@ -1,4 +1,5 @@
 using Ivet.Services.Loaders;
+using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 
 namespace Ivet.Tests.Services.Loaders
@@ -9,7 +10,7 @@ namespace Ivet.Tests.Services.Loaders
         public void Load_DirectoryNotFound_ThrowsDirectoryNotFoundException()
         {
             // Arrange
-            var service = new LibrarySchemaLoaderService();
+            var service = new LibrarySchemaLoaderService(NullLogger<LibrarySchemaLoaderService>.Instance);
             var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 
             // Act & Assert
@@ -20,7 +21,7 @@ namespace Ivet.Tests.Services.Loaders
         public void Load_EmptyDirectory_ReturnsSchemaWithMigrationOnly()
         {
             // Arrange
-            var service = new LibrarySchemaLoaderService();
+            var service = new LibrarySchemaLoaderService(NullLogger<LibrarySchemaLoaderService>.Instance);
             var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             Directory.CreateDirectory(path);
 

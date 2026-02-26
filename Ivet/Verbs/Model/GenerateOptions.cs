@@ -26,6 +26,9 @@ namespace Ivet.Verbs.Model
         [Option("dry-run", HelpText = "Preview migration without writing files", Default = false)]
         public bool DryRun { get; set; }
 
+        [Option('v', "verbose", HelpText = "Enable verbose logging (debug level)", Default = false)]
+        public bool Verbose { get; set; }
+
         [Option("onefile", HelpText = "Create one file per script", Default = false)]
         public bool OneScriptPerFile { get; set; }
         [Option("description", HelpText = "Description to be added in generated script", Default = null)]
