@@ -20,9 +20,13 @@ namespace Ivet.Services
         {
             if (string.IsNullOrWhiteSpace(sprintNo))
                 return sprintNo;
-            if (sprintNo.Contains("..") || Path.IsPathRooted(sprintNo))
+            if (sprintNo.Contains("..") || Path.IsPathRooted(sprintNo) || IsWindowsRootedPath(sprintNo))
                 throw new ArgumentException($"Invalid sprint number '{sprintNo}'. Must not contain path traversal sequences.");
             return sprintNo;
+        }
+        private static bool IsWindowsRootedPath(string path)
+        {
+            return path.Length >= 3 && char.IsLetter(path[0]) && path[1] == ':' && (path[2] == '\\' || path[2] == '/');
         }
     }
 }

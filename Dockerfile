@@ -1,12 +1,13 @@
 # Stage 1: Base environment
 FROM alpine:3.22.1 AS base
+RUN apk update
 
 FROM base as build-env
 RUN apk add --no-cache dotnet9-sdk
 WORKDIR /app
 COPY . ./
-RUN dotnet restore && \
-	dotnet publish Ivet/Ivet.csproj -c Release -o out
+RUN dotnet restore Ivet/Ivet.csproj && \
+	dotnet publish Ivet/Ivet.csproj -c Release -o out -p:GeneratePackageOnBuild=false
 
 # Build runtime image
 FROM base as final
