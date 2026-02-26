@@ -12,7 +12,7 @@ namespace Ivet.Services
 {
     public class DatabaseService : IDisposable, IDatabaseService
     {
-        private GremlinClient _client;
+        private GremlinClient? _client;
         private bool disposedValue;
 
         public IGremlinQuerySource GremlinqClient { get; private set; }
@@ -41,13 +41,9 @@ namespace Ivet.Services
             {
                 if (disposing)
                 {
-                    // TODO: supprimer l'état managé (objets managés)
+                    _client?.Dispose();
+                    _client = null;
                 }
-
-                // TODO: libérer les ressources non managées (objets non managés) et substituer le finaliseur
-                // TODO: affecter aux grands champs une valeur null
-                _client?.Dispose();
-                _client = null;
                 disposedValue = true;
             }
         }

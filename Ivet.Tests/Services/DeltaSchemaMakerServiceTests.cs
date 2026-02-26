@@ -1,4 +1,5 @@
-﻿using Ivet.Model.Meta;
+﻿using Ivet.Model;
+using Ivet.Model.Meta;
 using Ivet.Services;
 using Ivet.TestFramework;
 using Xunit;
@@ -786,6 +787,694 @@ namespace Ivet.Tests.Services
             Assert.Empty(result.CompositeIndexes);
             Assert.Empty(result.MixedIndexes);
             Assert.Empty(result.IndexBindings);
+        }
+
+        // ==================== Removals Tests ====================
+
+        [Fact]
+        public void Removals_VertexInSourceOnly_ReturnsVertex()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var source = new MetaSchema();
+            source.Vertices.Add(new MetaVertex { Name = RandomGenerator.RandomString() });
+            var target = new MetaSchema();
+
+            var result = sut.Removals(source, target);
+
+            Assert.Single(result.Vertices);
+            Assert.Equal(source.Vertices[0], result.Vertices[0]);
+        }
+
+        [Fact]
+        public void Removals_VertexInTargetOnly_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var source = new MetaSchema();
+            var target = new MetaSchema();
+            target.Vertices.Add(new MetaVertex { Name = RandomGenerator.RandomString() });
+
+            var result = sut.Removals(source, target);
+
+            Assert.Empty(result.Vertices);
+        }
+
+        [Fact]
+        public void Removals_VertexInBoth_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var vertex = new MetaVertex { Name = RandomGenerator.RandomString() };
+            var source = new MetaSchema();
+            source.Vertices.Add(vertex);
+            var target = new MetaSchema();
+            target.Vertices.Add(vertex);
+
+            var result = sut.Removals(source, target);
+
+            Assert.Empty(result.Vertices);
+        }
+
+        [Fact]
+        public void Removals_EdgeInSourceOnly_ReturnsEdge()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var source = new MetaSchema();
+            source.Edges.Add(new MetaEdge { Name = RandomGenerator.RandomString() });
+            var target = new MetaSchema();
+
+            var result = sut.Removals(source, target);
+
+            Assert.Single(result.Edges);
+            Assert.Equal(source.Edges[0], result.Edges[0]);
+        }
+
+        [Fact]
+        public void Removals_EdgeInTargetOnly_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var source = new MetaSchema();
+            var target = new MetaSchema();
+            target.Edges.Add(new MetaEdge { Name = RandomGenerator.RandomString() });
+
+            var result = sut.Removals(source, target);
+
+            Assert.Empty(result.Edges);
+        }
+
+        [Fact]
+        public void Removals_EdgeInBoth_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var edge = new MetaEdge { Name = RandomGenerator.RandomString() };
+            var source = new MetaSchema();
+            source.Edges.Add(edge);
+            var target = new MetaSchema();
+            target.Edges.Add(edge);
+
+            var result = sut.Removals(source, target);
+
+            Assert.Empty(result.Edges);
+        }
+
+        [Fact]
+        public void Removals_PropertyInSourceOnly_ReturnsProperty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var source = new MetaSchema();
+            source.Properties.Add(new MetaPropertyKey { Name = RandomGenerator.RandomString() });
+            var target = new MetaSchema();
+
+            var result = sut.Removals(source, target);
+
+            Assert.Single(result.Properties);
+            Assert.Equal(source.Properties[0], result.Properties[0]);
+        }
+
+        [Fact]
+        public void Removals_PropertyInTargetOnly_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var source = new MetaSchema();
+            var target = new MetaSchema();
+            target.Properties.Add(new MetaPropertyKey { Name = RandomGenerator.RandomString() });
+
+            var result = sut.Removals(source, target);
+
+            Assert.Empty(result.Properties);
+        }
+
+        [Fact]
+        public void Removals_PropertyInBoth_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var prop = new MetaPropertyKey { Name = RandomGenerator.RandomString() };
+            var source = new MetaSchema();
+            source.Properties.Add(prop);
+            var target = new MetaSchema();
+            target.Properties.Add(prop);
+
+            var result = sut.Removals(source, target);
+
+            Assert.Empty(result.Properties);
+        }
+
+        [Fact]
+        public void Removals_ConnectionInSourceOnly_ReturnsConnection()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var source = new MetaSchema();
+            source.Connections.Add(new MetaConnection
+            {
+                Edge = RandomGenerator.RandomString(),
+                Ingoing = RandomGenerator.RandomString(),
+                Outgoing = RandomGenerator.RandomString()
+            });
+            var target = new MetaSchema();
+
+            var result = sut.Removals(source, target);
+
+            Assert.Single(result.Connections);
+        }
+
+        [Fact]
+        public void Removals_ConnectionInTargetOnly_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var source = new MetaSchema();
+            var target = new MetaSchema();
+            target.Connections.Add(new MetaConnection
+            {
+                Edge = RandomGenerator.RandomString(),
+                Ingoing = RandomGenerator.RandomString(),
+                Outgoing = RandomGenerator.RandomString()
+            });
+
+            var result = sut.Removals(source, target);
+
+            Assert.Empty(result.Connections);
+        }
+
+        [Fact]
+        public void Removals_ConnectionInBoth_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var conn = new MetaConnection
+            {
+                Edge = RandomGenerator.RandomString(),
+                Ingoing = RandomGenerator.RandomString(),
+                Outgoing = RandomGenerator.RandomString()
+            };
+            var source = new MetaSchema();
+            source.Connections.Add(conn);
+            var target = new MetaSchema();
+            target.Connections.Add(conn);
+
+            var result = sut.Removals(source, target);
+
+            Assert.Empty(result.Connections);
+        }
+
+        [Fact]
+        public void Removals_VertexPropertyBindingInSourceOnly_ReturnsBinding()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var source = new MetaSchema();
+            source.VertexPropertyBindings.Add(new MetaPropertyBinding
+            {
+                Name = RandomGenerator.RandomString(),
+                Entity = RandomGenerator.RandomString()
+            });
+            var target = new MetaSchema();
+
+            var result = sut.Removals(source, target);
+
+            Assert.Single(result.VertexPropertyBindings);
+        }
+
+        [Fact]
+        public void Removals_VertexPropertyBindingInTargetOnly_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var source = new MetaSchema();
+            var target = new MetaSchema();
+            target.VertexPropertyBindings.Add(new MetaPropertyBinding
+            {
+                Name = RandomGenerator.RandomString(),
+                Entity = RandomGenerator.RandomString()
+            });
+
+            var result = sut.Removals(source, target);
+
+            Assert.Empty(result.VertexPropertyBindings);
+        }
+
+        [Fact]
+        public void Removals_VertexPropertyBindingInBoth_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var binding = new MetaPropertyBinding
+            {
+                Name = RandomGenerator.RandomString(),
+                Entity = RandomGenerator.RandomString()
+            };
+            var source = new MetaSchema();
+            source.VertexPropertyBindings.Add(binding);
+            var target = new MetaSchema();
+            target.VertexPropertyBindings.Add(binding);
+
+            var result = sut.Removals(source, target);
+
+            Assert.Empty(result.VertexPropertyBindings);
+        }
+
+        [Fact]
+        public void Removals_EdgePropertyBindingInSourceOnly_ReturnsBinding()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var source = new MetaSchema();
+            source.EdgePropertyBindings.Add(new MetaPropertyBinding
+            {
+                Name = RandomGenerator.RandomString(),
+                Entity = RandomGenerator.RandomString()
+            });
+            var target = new MetaSchema();
+
+            var result = sut.Removals(source, target);
+
+            Assert.Single(result.EdgePropertyBindings);
+        }
+
+        [Fact]
+        public void Removals_EdgePropertyBindingInTargetOnly_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var source = new MetaSchema();
+            var target = new MetaSchema();
+            target.EdgePropertyBindings.Add(new MetaPropertyBinding
+            {
+                Name = RandomGenerator.RandomString(),
+                Entity = RandomGenerator.RandomString()
+            });
+
+            var result = sut.Removals(source, target);
+
+            Assert.Empty(result.EdgePropertyBindings);
+        }
+
+        [Fact]
+        public void Removals_EdgePropertyBindingInBoth_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var binding = new MetaPropertyBinding
+            {
+                Name = RandomGenerator.RandomString(),
+                Entity = RandomGenerator.RandomString()
+            };
+            var source = new MetaSchema();
+            source.EdgePropertyBindings.Add(binding);
+            var target = new MetaSchema();
+            target.EdgePropertyBindings.Add(binding);
+
+            var result = sut.Removals(source, target);
+
+            Assert.Empty(result.EdgePropertyBindings);
+        }
+
+        [Fact]
+        public void Removals_CompositeIndexInSourceOnly_ReturnsIndex()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var source = new MetaSchema();
+            source.CompositeIndexes.Add(new MetaCompositeIndex { Name = RandomGenerator.RandomString() });
+            var target = new MetaSchema();
+
+            var result = sut.Removals(source, target);
+
+            Assert.Single(result.CompositeIndexes);
+        }
+
+        [Fact]
+        public void Removals_CompositeIndexInTargetOnly_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var source = new MetaSchema();
+            var target = new MetaSchema();
+            target.CompositeIndexes.Add(new MetaCompositeIndex { Name = RandomGenerator.RandomString() });
+
+            var result = sut.Removals(source, target);
+
+            Assert.Empty(result.CompositeIndexes);
+        }
+
+        [Fact]
+        public void Removals_CompositeIndexInBoth_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var index = new MetaCompositeIndex { Name = RandomGenerator.RandomString() };
+            var source = new MetaSchema();
+            source.CompositeIndexes.Add(index);
+            var target = new MetaSchema();
+            target.CompositeIndexes.Add(index);
+
+            var result = sut.Removals(source, target);
+
+            Assert.Empty(result.CompositeIndexes);
+        }
+
+        [Fact]
+        public void Removals_MixedIndexInSourceOnly_ReturnsIndex()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var source = new MetaSchema();
+            source.MixedIndexes.Add(new MetaMixedIndex { Name = RandomGenerator.RandomString() });
+            var target = new MetaSchema();
+
+            var result = sut.Removals(source, target);
+
+            Assert.Single(result.MixedIndexes);
+        }
+
+        [Fact]
+        public void Removals_MixedIndexInTargetOnly_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var source = new MetaSchema();
+            var target = new MetaSchema();
+            target.MixedIndexes.Add(new MetaMixedIndex { Name = RandomGenerator.RandomString() });
+
+            var result = sut.Removals(source, target);
+
+            Assert.Empty(result.MixedIndexes);
+        }
+
+        [Fact]
+        public void Removals_MixedIndexInBoth_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var index = new MetaMixedIndex { Name = RandomGenerator.RandomString() };
+            var source = new MetaSchema();
+            source.MixedIndexes.Add(index);
+            var target = new MetaSchema();
+            target.MixedIndexes.Add(index);
+
+            var result = sut.Removals(source, target);
+
+            Assert.Empty(result.MixedIndexes);
+        }
+
+        [Fact]
+        public void Removals_IndexBindingInSourceOnly_ReturnsBinding()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var source = new MetaSchema();
+            source.IndexBindings.Add(new MetaIndexBinding
+            {
+                IndexName = RandomGenerator.RandomString(),
+                PropertyName = RandomGenerator.RandomString()
+            });
+            var target = new MetaSchema();
+
+            var result = sut.Removals(source, target);
+
+            Assert.Single(result.IndexBindings);
+        }
+
+        [Fact]
+        public void Removals_IndexBindingInTargetOnly_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var source = new MetaSchema();
+            var target = new MetaSchema();
+            target.IndexBindings.Add(new MetaIndexBinding
+            {
+                IndexName = RandomGenerator.RandomString(),
+                PropertyName = RandomGenerator.RandomString()
+            });
+
+            var result = sut.Removals(source, target);
+
+            Assert.Empty(result.IndexBindings);
+        }
+
+        [Fact]
+        public void Removals_IndexBindingInBoth_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var binding = new MetaIndexBinding
+            {
+                IndexName = RandomGenerator.RandomString(),
+                PropertyName = RandomGenerator.RandomString()
+            };
+            var source = new MetaSchema();
+            source.IndexBindings.Add(binding);
+            var target = new MetaSchema();
+            target.IndexBindings.Add(binding);
+
+            var result = sut.Removals(source, target);
+
+            Assert.Empty(result.IndexBindings);
+        }
+
+        // ==================== Modifications Tests ====================
+
+        [Fact]
+        public void Modifications_EmptySchemas_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var result = sut.Modifications(new MetaSchema(), new MetaSchema());
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public void Modifications_VertexOnlyInSource_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var source = new MetaSchema();
+            source.Vertices.Add(new MetaVertex { Name = "V1", Partitioned = true });
+            var target = new MetaSchema();
+
+            var result = sut.Modifications(source, target);
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public void Modifications_VertexOnlyInTarget_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var source = new MetaSchema();
+            var target = new MetaSchema();
+            target.Vertices.Add(new MetaVertex { Name = "V1", Partitioned = true });
+
+            var result = sut.Modifications(source, target);
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public void Modifications_VertexPartitionedChanged_ReturnsModification()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var name = RandomGenerator.RandomString();
+            var source = new MetaSchema();
+            source.Vertices.Add(new MetaVertex { Name = name, Partitioned = false });
+            var target = new MetaSchema();
+            target.Vertices.Add(new MetaVertex { Name = name, Partitioned = true });
+
+            var result = sut.Modifications(source, target);
+
+            Assert.Single(result);
+            Assert.Equal("Vertex", result[0].ElementType);
+            Assert.Equal(name, result[0].ElementName);
+            Assert.Equal("Partitioned", result[0].PropertyName);
+        }
+
+        [Fact]
+        public void Modifications_VertexStaticChanged_ReturnsModification()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var name = RandomGenerator.RandomString();
+            var source = new MetaSchema();
+            source.Vertices.Add(new MetaVertex { Name = name, Static = false });
+            var target = new MetaSchema();
+            target.Vertices.Add(new MetaVertex { Name = name, Static = true });
+
+            var result = sut.Modifications(source, target);
+
+            Assert.Single(result);
+            Assert.Equal("Static", result[0].PropertyName);
+        }
+
+        [Fact]
+        public void Modifications_VertexNoChanges_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var name = RandomGenerator.RandomString();
+            var source = new MetaSchema();
+            source.Vertices.Add(new MetaVertex { Name = name, Partitioned = true, Static = false });
+            var target = new MetaSchema();
+            target.Vertices.Add(new MetaVertex { Name = name, Partitioned = true, Static = false });
+
+            var result = sut.Modifications(source, target);
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public void Modifications_EdgeMultiplicityChanged_ReturnsModification()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var name = RandomGenerator.RandomString();
+            var source = new MetaSchema();
+            source.Edges.Add(new MetaEdge { Name = name, Multiplicity = Multiplicity.MULTI });
+            var target = new MetaSchema();
+            target.Edges.Add(new MetaEdge { Name = name, Multiplicity = Multiplicity.SIMPLE });
+
+            var result = sut.Modifications(source, target);
+
+            Assert.Single(result);
+            Assert.Equal("Edge", result[0].ElementType);
+            Assert.Equal("Multiplicity", result[0].PropertyName);
+        }
+
+        [Fact]
+        public void Modifications_EdgeNoChanges_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var name = RandomGenerator.RandomString();
+            var source = new MetaSchema();
+            source.Edges.Add(new MetaEdge { Name = name, Multiplicity = Multiplicity.MULTI });
+            var target = new MetaSchema();
+            target.Edges.Add(new MetaEdge { Name = name, Multiplicity = Multiplicity.MULTI });
+
+            var result = sut.Modifications(source, target);
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public void Modifications_PropertyCardinalityChanged_ReturnsModification()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var name = RandomGenerator.RandomString();
+            var source = new MetaSchema();
+            source.Properties.Add(new MetaPropertyKey { Name = name, Cardinality = Cardinality.SINGLE });
+            var target = new MetaSchema();
+            target.Properties.Add(new MetaPropertyKey { Name = name, Cardinality = Cardinality.LIST });
+
+            var result = sut.Modifications(source, target);
+
+            Assert.Single(result);
+            Assert.Equal("PropertyKey", result[0].ElementType);
+            Assert.Equal("Cardinality", result[0].PropertyName);
+        }
+
+        [Fact]
+        public void Modifications_PropertyDataTypeChanged_ReturnsModification()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var name = RandomGenerator.RandomString();
+            var source = new MetaSchema();
+            source.Properties.Add(new MetaPropertyKey { Name = name, DataType = "String.class" });
+            var target = new MetaSchema();
+            target.Properties.Add(new MetaPropertyKey { Name = name, DataType = "Integer.class" });
+
+            var result = sut.Modifications(source, target);
+
+            Assert.Single(result);
+            Assert.Equal("DataType", result[0].PropertyName);
+        }
+
+        [Fact]
+        public void Modifications_PropertyNoChanges_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var name = RandomGenerator.RandomString();
+            var source = new MetaSchema();
+            source.Properties.Add(new MetaPropertyKey { Name = name, Cardinality = Cardinality.SINGLE, DataType = "String.class" });
+            var target = new MetaSchema();
+            target.Properties.Add(new MetaPropertyKey { Name = name, Cardinality = Cardinality.SINGLE, DataType = "String.class" });
+
+            var result = sut.Modifications(source, target);
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public void Modifications_CompositeIndexIsUniqueChanged_ReturnsModification()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var name = RandomGenerator.RandomString();
+            var source = new MetaSchema();
+            source.CompositeIndexes.Add(new MetaCompositeIndex { Name = name, IsUnique = false });
+            var target = new MetaSchema();
+            target.CompositeIndexes.Add(new MetaCompositeIndex { Name = name, IsUnique = true });
+
+            var result = sut.Modifications(source, target);
+
+            Assert.Single(result);
+            Assert.Equal("CompositeIndex", result[0].ElementType);
+            Assert.Equal("IsUnique", result[0].PropertyName);
+        }
+
+        [Fact]
+        public void Modifications_CompositeIndexNoChanges_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var name = RandomGenerator.RandomString();
+            var source = new MetaSchema();
+            source.CompositeIndexes.Add(new MetaCompositeIndex { Name = name, IsUnique = true });
+            var target = new MetaSchema();
+            target.CompositeIndexes.Add(new MetaCompositeIndex { Name = name, IsUnique = true });
+
+            var result = sut.Modifications(source, target);
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public void Modifications_MixedIndexBackendChanged_ReturnsModification()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var name = RandomGenerator.RandomString();
+            var source = new MetaSchema();
+            source.MixedIndexes.Add(new MetaMixedIndex { Name = name, BackendIndex = "search" });
+            var target = new MetaSchema();
+            target.MixedIndexes.Add(new MetaMixedIndex { Name = name, BackendIndex = "solr" });
+
+            var result = sut.Modifications(source, target);
+
+            Assert.Single(result);
+            Assert.Equal("MixedIndex", result[0].ElementType);
+            Assert.Equal("BackendIndex", result[0].PropertyName);
+        }
+
+        [Fact]
+        public void Modifications_MixedIndexNoChanges_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var name = RandomGenerator.RandomString();
+            var source = new MetaSchema();
+            source.MixedIndexes.Add(new MetaMixedIndex { Name = name, BackendIndex = "search" });
+            var target = new MetaSchema();
+            target.MixedIndexes.Add(new MetaMixedIndex { Name = name, BackendIndex = "search" });
+
+            var result = sut.Modifications(source, target);
+
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public void Modifications_IndexBindingMappingChanged_ReturnsModification()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var indexName = RandomGenerator.RandomString();
+            var propName = RandomGenerator.RandomString();
+            var source = new MetaSchema();
+            source.IndexBindings.Add(new MetaIndexBinding { IndexName = indexName, PropertyName = propName, Mapping = MappingType.TEXT });
+            var target = new MetaSchema();
+            target.IndexBindings.Add(new MetaIndexBinding { IndexName = indexName, PropertyName = propName, Mapping = MappingType.STRING });
+
+            var result = sut.Modifications(source, target);
+
+            Assert.Single(result);
+            Assert.Equal("IndexBinding", result[0].ElementType);
+            Assert.Equal("Mapping", result[0].PropertyName);
+        }
+
+        [Fact]
+        public void Modifications_IndexBindingNoChanges_ReturnsEmpty()
+        {
+            var sut = new DeltaSchemaMakerService();
+            var indexName = RandomGenerator.RandomString();
+            var propName = RandomGenerator.RandomString();
+            var source = new MetaSchema();
+            source.IndexBindings.Add(new MetaIndexBinding { IndexName = indexName, PropertyName = propName, Mapping = MappingType.TEXT });
+            var target = new MetaSchema();
+            target.IndexBindings.Add(new MetaIndexBinding { IndexName = indexName, PropertyName = propName, Mapping = MappingType.TEXT });
+
+            var result = sut.Modifications(source, target);
+
+            Assert.Empty(result);
         }
     }
 }

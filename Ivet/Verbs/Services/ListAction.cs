@@ -43,7 +43,7 @@ namespace Ivet.Verbs.Services
                 .SelectMany(x => {
                     var filename = Path.GetFileNameWithoutExtension(x.Fullname);
                     if (x.Object.Scripts?.Any() ?? false)
-                        return x.Object.Scripts.Select((y, i) => new MigrationInstance { Name = $"{filename}_#{i}", Script = y.Script, Description = $"{x.Object.Description} Part #{i}", IsMulti = true, RelativePath = Path.GetRelativePath(input, x.Fullname), EvaluationTimeout = y.EvaluationTimeout ?? x.Object.EvaluationTimeout });
+                        return x.Object.Scripts.Select((y, i) => new MigrationInstance { Name = $"{filename}_#{i}", Script = y.Script, Description = $"[{i}] {x.Object.Description}", IsMulti = true, RelativePath = Path.GetRelativePath(input, x.Fullname), EvaluationTimeout = y.EvaluationTimeout ?? x.Object.EvaluationTimeout });
                     if (!string.IsNullOrEmpty(x.Object.Content))
                         return new List<MigrationInstance> { new() { Name = filename, Script = x.Object.Content, Description = x.Object.Description, IsMulti = false, RelativePath = Path.GetRelativePath(input, x.Fullname), EvaluationTimeout = x.Object.EvaluationTimeout } };
                     return new List<MigrationInstance>();

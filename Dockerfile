@@ -20,4 +20,6 @@ WORKDIR /app
 ENV input=/app
 ENV ip=localhost
 ENV port=8182
+ENV ssl=false
+ENV timeout=
 ENTRYPOINT ["/app/docker-entrypoint.sh"]

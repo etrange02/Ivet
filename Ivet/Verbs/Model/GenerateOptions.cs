@@ -23,6 +23,9 @@ namespace Ivet.Verbs.Model
         [Option("ssl", HelpText = "Use SSL/TLS for JanusGraph connection", Default = false)]
         public bool UseSsl { get; set; }
 
+        [Option("dry-run", HelpText = "Preview migration without writing files", Default = false)]
+        public bool DryRun { get; set; }
+
         [Option("onefile", HelpText = "Create one file per script", Default = false)]
         public bool OneScriptPerFile { get; set; }
         [Option("description", HelpText = "Description to be added in generated script", Default = null)]

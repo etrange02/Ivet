@@ -30,6 +30,18 @@ namespace Ivet.Verbs.Services
             var deltaSchemaMaker = new DeltaSchemaMakerService();
             metaSchema.Difference = deltaSchemaMaker.Difference(metaSchema.Source, metaSchema.Target);
 
+            var removals = deltaSchemaMaker.Removals(metaSchema.Source, metaSchema.Target);
+            SchemaWarningService.PrintRemovals(removals);
+
+            var modifications = deltaSchemaMaker.Modifications(metaSchema.Source, metaSchema.Target);
+            SchemaWarningService.PrintModifications(modifications);
+
+            if (options.DryRun)
+            {
+                DeltaSchemaSummaryService.Print(metaSchema.Difference);
+                return;
+            }
+
             var builder = new MigrationBuilder(metaSchema.Difference)
             { 
                 Description = options.Description,
