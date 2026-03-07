@@ -10,6 +10,9 @@ namespace Ivet.Verbs.Services
 {
     public class UpgradeAction
     {
+        private const int MaxIndexRetries = 10;
+        private static readonly int[] RetryDelaysMs = [5_000, 10_000, 15_000, 20_000, 30_000, 30_000, 30_000, 30_000, 30_000, 30_000];
+
         internal static bool IsTimeoutException(Exception ex)
         {
             if (ex is TimeoutException) return true;
@@ -19,6 +22,14 @@ namespace Ivet.Verbs.Services
             if (ex.InnerException != null)
                 return IsTimeoutException(ex.InnerException);
             return false;
+        }
+
+        internal static bool IsIndexNotReadyException(Exception ex)
+        {
+            var message = ex is AggregateException agg
+                ? string.Join(" ", agg.InnerExceptions.Select(e => e.Message))
+                : ex.Message;
+            return message.Contains("cannot be invoked for index with status", StringComparison.OrdinalIgnoreCase);
         }
 
         public static void Do(UpgradeOptions options, ILoggerFactory loggerFactory)
@@ -79,14 +90,7 @@ namespace Ivet.Verbs.Services
                 var timeout = x.EvaluationTimeout ?? options.Timeout;
                 var hasExplicitTimeout = x.EvaluationTimeout.HasValue || options.Timeout.HasValue;
 
-                try
-                {
-                    database.Execute(x.Script, timeout);
-                }
-                catch (Exception ex) when (hasExplicitTimeout && IsTimeoutException(ex))
-                {
-                    logger.LogWarning("Migration {Name} timed out. The index operation was submitted and will be completed by JanusGraph on restart. ({Message})", x.Name, ex.Message);
-                }
+                ExecuteWithRetry(database, x, timeout, hasExplicitTimeout, logger);
 
                 var migration = new Migration
                 {
@@ -95,6 +99,30 @@ namespace Ivet.Verbs.Services
                 };
                 database.GremlinqClient.AddV(migration).FirstAsync().AsTask().GetAwaiter().GetResult();
             });
+        }
+
+        private static void ExecuteWithRetry(DatabaseService database, MigrationInstance migration, long? timeout, bool hasExplicitTimeout, ILogger logger)
+        {
+            for (var attempt = 0; attempt <= MaxIndexRetries; attempt++)
+            {
+                try
+                {
+                    database.Execute(migration.Script, timeout);
+                    return;
+                }
+                catch (Exception ex) when (hasExplicitTimeout && IsTimeoutException(ex))
+                {
+                    logger.LogWarning("Migration {Name} timed out. The index operation was submitted and will be completed by JanusGraph on restart. ({Message})", migration.Name, ex.Message);
+                    return;
+                }
+                catch (Exception ex) when (IsIndexNotReadyException(ex) && attempt < MaxIndexRetries)
+                {
+                    var delay = RetryDelaysMs[attempt];
+                    logger.LogWarning("Migration {Name} failed (index not ready, attempt {Attempt}/{Max}). Retrying in {Delay}s... ({Message})",
+                        migration.Name, attempt + 1, MaxIndexRetries, delay / 1000, ex.Message);
+                    Thread.Sleep(delay);
+                }
+            }
         }
     }
 }

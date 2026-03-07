@@ -15,6 +15,7 @@ namespace Ivet.Services
             "mgmt = graph.openManagement();" + Environment.NewLine +
             "mgmt.getOpenInstances().forEach {" + Environment.NewLine +
             "if (it.reverse().take(1) != \")\") { mgmt.forceCloseInstance(it); } };" + Environment.NewLine +
+            "mgmt.commit();" + Environment.NewLine +
             "int size = graph.getOpenTransactions().size();" + Environment.NewLine +
             "for (i = 0; i < size; i++) { graph.getOpenTransactions().getAt(0).rollback();};" + Environment.NewLine +
             "mgmt = graph.openManagement();" + Environment.NewLine +
@@ -72,30 +73,18 @@ namespace Ivet.Services
             if (MetaSchema?.CompositeIndexes == null || !MetaSchema.CompositeIndexes.Any()) return new List<string>();
 
             var content = string.Empty;
-
-            content += $"// Composite Indices{Environment.NewLine}";
+            content += $"// Composite Indices (idempotent: skip creation if index already exists){Environment.NewLine}";
             foreach (var x in MetaSchema.CompositeIndexes)
             {
+                content += $"if (mgmt.getGraphIndex('{x.Name}') == null) {{";
                 content += BuildIndex(x, MetaSchema.IndexBindings.Where(p => p.IndexName == x.Name), ci => $"vertex = mgmt.getVertexLabel('{ci.IndexedElement}');index = mgmt.buildIndex('{ci.Name}', {ci.Kind}).indexOnly(vertex){(ci.IsUnique ? ".unique()" : "")}");
                 content += $".buildCompositeIndex();";
+                content += $"}}";
                 content += $"{Environment.NewLine}";
             }
+            content += BuildIndexActivation(MetaSchema.CompositeIndexes.Select(x => x.Name));
 
-            content += "mgmt.commit();";
-            content += $"{Environment.NewLine}";
-            content += $"{Environment.NewLine}";
-
-            content += $"// Index: Waiting for registered status{Environment.NewLine}";
-            content += string.Join(Environment.NewLine, MetaSchema.CompositeIndexes.Select(x => $"ManagementSystem.awaitGraphIndexStatus(graph, '{x.Name}').call();"));
-            content += $"{Environment.NewLine}";
-            content += $"{Environment.NewLine}";
-
-            content += $"// Index: Reindexing{Environment.NewLine}";
-            content += $"mgmt = graph.openManagement();";
-            content += $"{Environment.NewLine}";
-            content += string.Join(Environment.NewLine, MetaSchema.CompositeIndexes.Select(x => $"mgmt.updateIndex(mgmt.getGraphIndex('{x.Name}'), SchemaAction.REINDEX).get();"));
-
-            return new List<string> { content };
+            return [content];
         }
 
         private List<string> BuildMixedIndeces()
@@ -103,30 +92,18 @@ namespace Ivet.Services
             if (MetaSchema?.MixedIndexes == null || !MetaSchema.MixedIndexes.Any()) return new List<string>();
 
             var content = string.Empty;
-
-            content += $"// Mixed Indices{Environment.NewLine}";
+            content += $"// Mixed Indices (idempotent: skip creation if index already exists){Environment.NewLine}";
             foreach (var x in MetaSchema.MixedIndexes)
             {
+                content += $"if (mgmt.getGraphIndex('{x.Name}') == null) {{";
                 content += BuildIndex(x, MetaSchema.IndexBindings.Where(p => p.IndexName == x.Name), mi => $"vertex = mgmt.getVertexLabel('{mi.IndexedElement}');index = mgmt.buildIndex('{mi.Name}', {mi.Kind}).indexOnly(vertex)");
                 content += $".buildMixedIndex('{x.BackendIndex}');";
+                content += $"}}";
                 content += $"{Environment.NewLine}";
             }
+            content += BuildIndexActivation(MetaSchema.MixedIndexes.Select(x => x.Name));
 
-            content += "mgmt.commit();";
-            content += $"{Environment.NewLine}";
-            content += $"{Environment.NewLine}";
-
-            content += $"// Index: Waiting for registered status{Environment.NewLine}";
-            content += string.Join(Environment.NewLine, MetaSchema.MixedIndexes.Select(x => $"ManagementSystem.awaitGraphIndexStatus(graph, '{x.Name}').call();"));
-            content += $"{Environment.NewLine}";
-            content += $"{Environment.NewLine}";
-
-            content += $"// Index: Reindexing{Environment.NewLine}";
-            content += $"mgmt = graph.openManagement();";
-            content += $"{Environment.NewLine}";
-            content += string.Join(Environment.NewLine, MetaSchema.MixedIndexes.Select(x => $"mgmt.updateIndex(mgmt.getGraphIndex('{x.Name}'), SchemaAction.REINDEX).get();"));
-
-            return new List<string> { content };
+            return [content];
         }
 
         private IEnumerable<string> BuildIndexBindings() => MetaSchema?.IndexBindings
@@ -135,26 +112,50 @@ namespace Ivet.Services
                 .Select(y =>
                 {
                     var content = string.Empty;
-
                     content += string.Join(Environment.NewLine, y.Select(z => $"prop = mgmt.getPropertyKey('{z.PropertyName}');index = mgmt.getGraphIndex('{z.IndexName}').addKey(prop{(z.Mapping != MappingType.NULL ? ", Mapping." + z.Mapping + ".asParameter()" : "")});"));
-
-                    content += $"{Environment.NewLine}";
-                    content += "mgmt.commit();";
-                    content += $"{Environment.NewLine}";
-                    content += $"{Environment.NewLine}";
-
-                    content += $"// Index: Waiting for registered status{Environment.NewLine}";
-                    content += $"ManagementSystem.awaitGraphIndexStatus(graph, '{y.Key}').call();";
-                    content += $"{Environment.NewLine}";
-                    content += $"{Environment.NewLine}";
-
-                    content += $"// Index: Reindexing{Environment.NewLine}";
-                    content += $"mgmt = graph.openManagement();";
-                    content += $"{Environment.NewLine}";
-                    content += $"mgmt.updateIndex(mgmt.getGraphIndex('{y.Key}'), SchemaAction.REINDEX).get();";
-
+                    content += BuildIndexActivation([y.Key]);
                     return content;
                 }) ?? new List<string>();
+
+        /// <summary>
+        /// Generates idempotent Groovy for index activation (runs as its own script).
+        /// Uses the mgmt already opened by the skeleton.
+        /// State machine per index:
+        ///   ENABLED  → skip (already done)
+        ///   INSTALLED → REGISTER_INDEX + commit (script ends, Ivet retry handles the wait)
+        ///   REGISTERED → REINDEX + commit
+        /// The skeleton's final mgmt.commit() closes the last open mgmt.
+        /// </summary>
+        private static string BuildIndexActivation(IEnumerable<string> indexNames)
+        {
+            var content = string.Empty;
+
+            foreach (var name in indexNames)
+            {
+                content += $"// Index activation: {name} (idempotent){Environment.NewLine}";
+                content += $"idx = mgmt.getGraphIndex('{name}');";
+                content += $"allEnabled = idx.getFieldKeys().every {{ pk -> idx.getIndexStatus(pk) == SchemaStatus.ENABLED }};";
+                content += $"{Environment.NewLine}";
+                content += $"if (!allEnabled) {{";
+                content += $"{Environment.NewLine}";
+                // INSTALLED → REGISTER_INDEX to start transition
+                content += $"hasInstalled = idx.getFieldKeys().any {{ pk -> idx.getIndexStatus(pk) == SchemaStatus.INSTALLED }};";
+                content += $"{Environment.NewLine}";
+                content += $"if (hasInstalled) {{ mgmt.updateIndex(idx, SchemaAction.REGISTER_INDEX).get(); mgmt.commit(); mgmt = graph.openManagement(); }}";
+                content += $"{Environment.NewLine}";
+                // REGISTERED → REINDEX (will fail if still INSTALLED, Ivet retry handles it)
+                content += $"mgmt.updateIndex(mgmt.getGraphIndex('{name}'), SchemaAction.REINDEX).get();";
+                content += $"{Environment.NewLine}";
+                content += $"mgmt.commit();";
+                content += $"{Environment.NewLine}";
+                content += $"mgmt = graph.openManagement();";
+                content += $"{Environment.NewLine}";
+                content += $"}}";
+                content += $"{Environment.NewLine}";
+            }
+
+            return content;
+        }
 
         private static string BuildIndex<T>(T graphIndex, IEnumerable<MetaIndexBinding> properties, Func<T, string> convert)
         {

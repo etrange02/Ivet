@@ -248,7 +248,7 @@ namespace Ivet.Tests.Services
             Assert.Contains($"mgmt.buildIndex('{indexName}', {kind}).indexOnly(vertex).unique()", result[1].Script);
             Assert.Contains($".buildCompositeIndex();", result[1].Script);
             Assert.Contains($"prop_0 = mgmt.getPropertyKey('{propertyName}');", result[1].Script);
-            Assert.Contains($"ManagementSystem.awaitGraphIndexStatus(graph, '{indexName}').call();", result[1].Script);
+            Assert.Contains($"SchemaAction.REGISTER_INDEX", result[1].Script);
             Assert.Contains($"mgmt.updateIndex(mgmt.getGraphIndex('{indexName}'), SchemaAction.REINDEX).get();", result[1].Script);
         }
 
@@ -310,7 +310,7 @@ namespace Ivet.Tests.Services
             Assert.Contains($".buildMixedIndex('{backend}');", result[1].Script);
             Assert.Contains($"prop_0 = mgmt.getPropertyKey('{propertyName}');", result[1].Script);
             Assert.Contains($".addKey(prop_0, Mapping.TEXT.asParameter())", result[1].Script);
-            Assert.Contains($"ManagementSystem.awaitGraphIndexStatus(graph, '{indexName}').call();", result[1].Script);
+            Assert.Contains($"SchemaAction.REGISTER_INDEX", result[1].Script);
             Assert.Contains($"mgmt.updateIndex(mgmt.getGraphIndex('{indexName}'), SchemaAction.REINDEX).get();", result[1].Script);
         }
 
@@ -359,8 +359,7 @@ namespace Ivet.Tests.Services
 
             // Assert
             Assert.Equal(2, result.Count);
-            Assert.Contains($"ManagementSystem.awaitGraphIndexStatus(graph, '{indexName1}').call();", result[1].Script);
-            Assert.Contains($"ManagementSystem.awaitGraphIndexStatus(graph, '{indexName2}').call();", result[1].Script);
+            Assert.Contains($"SchemaAction.REGISTER_INDEX", result[1].Script);
             Assert.Contains($"mgmt.updateIndex(mgmt.getGraphIndex('{indexName1}'), SchemaAction.REINDEX).get();", result[1].Script);
             Assert.Contains($"mgmt.updateIndex(mgmt.getGraphIndex('{indexName2}'), SchemaAction.REINDEX).get();", result[1].Script);
         }
@@ -387,7 +386,7 @@ namespace Ivet.Tests.Services
             Assert.Null(result[0].EvaluationTimeout);
             Assert.Equal(MigrationBuilder.DefaultIndexTimeoutMs, result[1].EvaluationTimeout);
             Assert.Contains($"prop = mgmt.getPropertyKey('{propertyName}');index = mgmt.getGraphIndex('{indexName}').addKey(prop, Mapping.TEXTSTRING.asParameter());", result[1].Script);
-            Assert.Contains($"ManagementSystem.awaitGraphIndexStatus(graph, '{indexName}').call();", result[1].Script);
+            Assert.Contains($"SchemaAction.REGISTER_INDEX", result[1].Script);
             Assert.Contains($"mgmt.updateIndex(mgmt.getGraphIndex('{indexName}'), SchemaAction.REINDEX).get();", result[1].Script);
         }
 
