@@ -190,35 +190,51 @@ namespace Ivet.Services.Converters
 
         private static IEnumerable<MetaMixedIndex> GetMixedIndices(Schema schema)
         {
-            return schema.Vertices.Concat(schema.Edges).SelectMany(x =>
+            // Collect all (indexName, vertexName) pairs — a property may carry multiple [MixedIndex] attributes
+            var allEntries = schema.Vertices.Concat(schema.Edges).SelectMany(x =>
             {
-                var properties = x.GetProperties().Where(y => y.GetCustomAttribute<PropertyKeyAttribute>(true) != null && y.GetCustomAttribute<MixedIndexAttribute>() != null);
+                var properties = x.GetProperties().Where(y =>
+                    y.GetCustomAttribute<PropertyKeyAttribute>(true) != null &&
+                    y.GetCustomAttributes<MixedIndexAttribute>().Any());
 
-                if (!x.GetCustomAttributes<AbstractGraphItemAttribute>().Any()) return new List<MetaMixedIndex>();
+                if (!x.GetCustomAttributes<AbstractGraphItemAttribute>().Any()) return Enumerable.Empty<MetaMixedIndex>();
 
-                return properties.Select(y =>
-                {
-                    var mixedKeyAttribute = y.GetCustomAttribute<MixedIndexAttribute>() ?? throw new AttributeNotFoundException($"Attribute not found on {x.FullName}");
-
-                    return new MetaMixedIndex
+                return properties.SelectMany(y =>
+                    y.GetCustomAttributes<MixedIndexAttribute>().Select(attr => new MetaMixedIndex
                     {
-                        Name = Validate(mixedKeyAttribute.IndexName, "mixed index name"),
-                        BackendIndex = Validate(mixedKeyAttribute.Backend, "mixed index backend"),
+                        Name = Validate(attr.IndexName, "mixed index name"),
+                        BackendIndex = Validate(attr.Backend, "mixed index backend"),
                         IndexedElement = x.Name,
                         Kind = x.GetCustomAttribute<VertexAttribute>() != null ? "Vertex.class" : "Edge.class"
+                    })
+                );
+            }).ToList();
+
+            // Group by index name. If multiple vertex types share the same index → global (no indexOnly)
+            return allEntries
+                .GroupBy(x => x.Name)
+                .Select(g =>
+                {
+                    var first = g.First();
+                    var distinctVertices = g.Select(x => x.IndexedElement).Distinct().Count();
+                    return new MetaMixedIndex
+                    {
+                        Name = first.Name,
+                        BackendIndex = first.BackendIndex,
+                        IndexedElement = distinctVertices > 1 ? string.Empty : first.IndexedElement,
+                        Kind = first.Kind
                     };
                 });
-            }).DistinctBy(x => x.Name);
         }
 
         private static IEnumerable<MetaIndexBinding> GetIndexBindings(MetaSchema schema)
         {
             return GetAllIndexBindings<CompositeIndexAttribute>(schema.Vertices, ConvertCompositeBinding)
                 .Concat(GetAllIndexBindings<PrimaryKeyAttribute>(schema.Vertices, ConvertPrimaryBinding))
-                .Concat(GetAllIndexBindings<MixedIndexAttribute>(schema.Vertices, ConvertMixedBinding))
+                .Concat(GetAllMixedIndexBindings(schema.Vertices))
                 .Concat(GetAllIndexBindings<CompositeIndexAttribute>(schema.Edges.Where(x => x.Type != null), ConvertCompositeBinding))
                 .Concat(GetAllIndexBindings<PrimaryKeyAttribute>(schema.Edges.Where(x => x.Type != null), ConvertPrimaryBinding))
-                .Concat(GetAllIndexBindings<MixedIndexAttribute>(schema.Edges.Where(x => x.Type != null), ConvertMixedBinding))
+                .Concat(GetAllMixedIndexBindings(schema.Edges.Where(x => x.Type != null)))
                 .DistinctBy(x => $"{x.IndexName}@{x.PropertyName}");
         }
 
@@ -256,16 +272,25 @@ namespace Ivet.Services.Converters
             };
         }
 
-        private static MetaIndexBinding ConvertMixedBinding(AbstractMetaItem graphItem, PropertyInfo property)
+        private static IEnumerable<MetaIndexBinding> GetAllMixedIndexBindings(IEnumerable<AbstractMetaItem> items)
         {
-            var mixedKeyAttribute = property.GetCustomAttribute<MixedIndexAttribute>() ?? throw new AttributeNotFoundException($"Attribute not found on {property.Name}");
-
-            return new MetaIndexBinding
+            return items.SelectMany(x =>
             {
-                IndexName = Validate(mixedKeyAttribute.IndexName, "mixed index binding name"),
-                PropertyName = Validate(property.Name, "property name"),
-                Mapping = mixedKeyAttribute.Mapping
-            };
+                var properties = x.Type.GetProperties().Where(y =>
+                    y.GetCustomAttribute<PropertyKeyAttribute>(true) != null &&
+                    y.GetCustomAttributes<MixedIndexAttribute>().Any());
+
+                if (!x.Type.GetCustomAttributes<AbstractGraphItemAttribute>().Any()) return Enumerable.Empty<MetaIndexBinding>();
+
+                return properties.SelectMany(y =>
+                    y.GetCustomAttributes<MixedIndexAttribute>().Select(attr => new MetaIndexBinding
+                    {
+                        IndexName = Validate(attr.IndexName, "mixed index binding name"),
+                        PropertyName = Validate(y.Name, "property name"),
+                        Mapping = attr.Mapping
+                    })
+                );
+            });
         }
     }
 }

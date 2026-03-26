@@ -507,6 +507,49 @@ namespace Ivet.Tests.Services.Converters
         }
 
         [Fact]
+        public void ConvertTest_MixedIndex_SharedAcrossVertices_BecomesGlobal()
+        {
+            // Arrange — two vertex types inherit the same [MixedIndex] properties from a shared base
+            var schema = new Schema
+            {
+                Vertices = { typeof(SharedMixedIndexVertexA), typeof(SharedMixedIndexVertexB) }
+            };
+
+            // Act
+            var result = LibraryToSchemaConverter.Convert(schema);
+
+            // Assert — single index with empty IndexedElement (global, no indexOnly)
+            Assert.Single(result.MixedIndexes);
+            Assert.Equal("shared_idx", result.MixedIndexes[0].Name);
+            Assert.Equal("search", result.MixedIndexes[0].BackendIndex);
+            Assert.Equal(string.Empty, result.MixedIndexes[0].IndexedElement);
+            Assert.Equal("Vertex.class", result.MixedIndexes[0].Kind);
+
+            // Two index bindings (SharedName + SharedCode), deduplicated across vertex types
+            var mixedBindings = result.IndexBindings.Where(b => b.IndexName == "shared_idx").ToList();
+            Assert.Equal(2, mixedBindings.Count);
+            Assert.Contains(mixedBindings, b => b.PropertyName == "SharedName" && b.Mapping == MappingType.TEXT);
+            Assert.Contains(mixedBindings, b => b.PropertyName == "SharedCode" && b.Mapping == MappingType.STRING);
+        }
+
+        [Fact]
+        public void ConvertTest_MixedIndex_SingleVertex_UsesIndexOnly()
+        {
+            // Arrange — single vertex type → should keep IndexedElement (indexOnly)
+            var schema = new Schema
+            {
+                Vertices = { typeof(MixedIndexVertex) }
+            };
+
+            // Act
+            var result = LibraryToSchemaConverter.Convert(schema);
+
+            // Assert — IndexedElement is set (indexOnly will be generated)
+            Assert.Single(result.MixedIndexes);
+            Assert.Equal("MixedIndexVertex", result.MixedIndexes[0].IndexedElement);
+        }
+
+        [Fact]
         public void ConvertTest_EdgePropertyAttribute()
         {
             // Arrange

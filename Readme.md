@@ -115,6 +115,39 @@ public class MyVertex
 }
 ```
 
+Mixed index with shared properties (inheritance)
+-------
+When multiple vertex types inherit the same `[MixedIndex]` property from an abstract base class, Ivet detects that the index spans several vertex labels and generates a **global** mixed index (without `indexOnly`). The search backend will index the property on all vertex types that carry it, and the `hasLabel()` step in queries still filters efficiently.
+
+If only one vertex type uses a given index name, the generated script uses `indexOnly(vertex)` as before.
+
+```
+public abstract class AbstractItem
+{
+    [PropertyKey]
+    [MixedIndex("search", Backend = "search", Mapping = MappingType.TEXT)]
+    public string Name { get; set; }
+
+    [PropertyKey]
+    [MixedIndex("search", Backend = "search", Mapping = MappingType.STRING)]
+    public string Code { get; set; }
+}
+
+[Vertex]
+public class ConcreteItemA : AbstractItem { }
+
+[Vertex]
+public class ConcreteItemB : AbstractItem { }
+// → Ivet generates one global "search" index with Name (TEXT) + Code (STRING)
+```
+
+Mapping types:
+| MappingType | Behavior |
+|-------------|----------|
+| `TEXT` | Tokenized — splits on spaces, hyphens, etc. Good for natural text |
+| `STRING` | Not tokenized — the entire value is compared as-is. Good for codes and identifiers |
+| `TEXTSTRING` | Both tokenized and exact match |
+
 
 Timeout & Resilience
 =======
