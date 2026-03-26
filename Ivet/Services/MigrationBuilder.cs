@@ -96,7 +96,10 @@ namespace Ivet.Services
             foreach (var x in MetaSchema.MixedIndexes)
             {
                 content += $"if (mgmt.getGraphIndex('{x.Name}') == null) {{";
-                content += BuildIndex(x, MetaSchema.IndexBindings.Where(p => p.IndexName == x.Name), mi => $"vertex = mgmt.getVertexLabel('{mi.IndexedElement}');index = mgmt.buildIndex('{mi.Name}', {mi.Kind}).indexOnly(vertex)");
+                if (!string.IsNullOrEmpty(x.IndexedElement))
+                    content += BuildIndex(x, MetaSchema.IndexBindings.Where(p => p.IndexName == x.Name), mi => $"vertex = mgmt.getVertexLabel('{mi.IndexedElement}');index = mgmt.buildIndex('{mi.Name}', {mi.Kind}).indexOnly(vertex)");
+                else
+                    content += BuildIndex(x, MetaSchema.IndexBindings.Where(p => p.IndexName == x.Name), mi => $"index = mgmt.buildIndex('{mi.Name}', {mi.Kind})");
                 content += $".buildMixedIndex('{x.BackendIndex}');";
                 content += $"}}";
                 content += $"{Environment.NewLine}";
