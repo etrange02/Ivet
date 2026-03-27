@@ -1,6 +1,7 @@
 using ExRam.Gremlinq.Core;
 using Ivet.Model;
 using Ivet.Services;
+using Ivet.Services.Comparers;
 using Ivet.Verbs.Model;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
@@ -53,7 +54,7 @@ namespace Ivet.Verbs.Services
             else
             {
                 logger.LogInformation("Directory: {Input}", input);
-                files.AddRange(Directory.EnumerateFiles(input, "*.json", SearchOption.AllDirectories).Order());
+                files.AddRange(Directory.EnumerateFiles(input, "*.json", SearchOption.AllDirectories));
             }
 
             using var database = new DatabaseService(options.IpAddress, options.Port, options.UseSsl);
@@ -79,8 +80,8 @@ namespace Ivet.Verbs.Services
                     return new List<MigrationInstance>();
                 })
                 .Where(x => !appliedMigrations.Contains(x.Name))
-                .OrderBy(x => x.RelativePath)
-                .ThenBy(x => x.Name)
+                .OrderBy(x => x.RelativePath, NaturalSortComparer.Instance)
+                .ThenBy(x => x.Name, NaturalSortComparer.Instance)
                 .ToList();
 
             migrationsToApply.ForEach(x =>

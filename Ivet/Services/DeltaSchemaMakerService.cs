@@ -7,6 +7,30 @@ namespace Ivet.Services
     public class DeltaSchemaMakerService
     {
         /// <summary>
+        /// Normalize JanusGraph DataType strings for comparison.
+        /// JanusGraph returns "class java.lang.String", code generates "String.class".
+        /// </summary>
+        private static string NormalizeDataType(string? dataType)
+        {
+            if (string.IsNullOrEmpty(dataType)) return string.Empty;
+
+            // "class java.lang.String" → "String"
+            if (dataType.StartsWith("class "))
+            {
+                var className = dataType["class ".Length..];
+                var lastDot = className.LastIndexOf('.');
+                if (lastDot >= 0) className = className[(lastDot + 1)..];
+                return className;
+            }
+
+            // "String.class" → "String"
+            if (dataType.EndsWith(".class"))
+                return dataType[..^".class".Length];
+
+            return dataType;
+        }
+
+        /// <summary>
         /// Generate difference between two schemas
         /// </summary>
         /// <param name="source">Schema currently in production</param>
@@ -80,7 +104,7 @@ namespace Ivet.Services
                 if (targetProperty == null) continue;
                 if (sourceProperty.Cardinality != targetProperty.Cardinality)
                     modifications.Add(new MetaSchemaModification { ElementType = "PropertyKey", ElementName = sourceProperty.Name, PropertyName = "Cardinality", SourceValue = sourceProperty.Cardinality.ToString(), TargetValue = targetProperty.Cardinality.ToString() });
-                if (sourceProperty.DataType != targetProperty.DataType)
+                if (NormalizeDataType(sourceProperty.DataType) != NormalizeDataType(targetProperty.DataType))
                     modifications.Add(new MetaSchemaModification { ElementType = "PropertyKey", ElementName = sourceProperty.Name, PropertyName = "DataType", SourceValue = sourceProperty.DataType ?? "", TargetValue = targetProperty.DataType ?? "" });
             }
 

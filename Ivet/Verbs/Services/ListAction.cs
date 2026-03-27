@@ -2,6 +2,7 @@ using ConsoleTables;
 using ExRam.Gremlinq.Core;
 using Ivet.Model;
 using Ivet.Services;
+using Ivet.Services.Comparers;
 using Ivet.Verbs.Model;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
@@ -54,7 +55,8 @@ namespace Ivet.Verbs.Services
                     var y = appliedMigrations.FirstOrDefault(migr => migr.MigrationName == x.Name);
                     return new { x.Name, x.Description, Date = y?.MigrationDate, x.IsMulti, x.RelativePath, x.EvaluationTimeout };
                 })
-                .OrderBy(x => x.Name)
+                .OrderBy(x => x.RelativePath, NaturalSortComparer.Instance)
+                .ThenBy(x => x.Name, NaturalSortComparer.Instance)
                 .ToList();
 
             var table = new ConsoleTable("Name", "Relative path", "Description", "Date", "Multi?", "Timeout");
