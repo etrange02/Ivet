@@ -31,13 +31,7 @@ namespace Ivet.Verbs.Services
                 files.AddRange(Directory.EnumerateFiles(input, "*.json", SearchOption.AllDirectories));
             }
 
-            var migrations = files.ConvertAll(x => new { Name = Path.GetFileNameWithoutExtension(x), Migration = JsonSerializer.Deserialize<MigrationFile>(File.ReadAllText(x)) });
-
-            using var database = new DatabaseService(options.IpAddress, options.Port, options.UseSsl);
-
-            var appliedMigrations = database.GremlinqClient.V<Migration>().ToArrayAsync().AsTask().GetAwaiter().GetResult();
-
-            var allMigrations = files
+            var migrationInstances = files
                 .Select(x => new {
                     Fullname = x,
                     Object = JsonSerializer.Deserialize<MigrationFile>(File.ReadAllText(x)) ?? throw new FormatException($"File {x} has bad format")
@@ -50,10 +44,17 @@ namespace Ivet.Verbs.Services
                         return new List<MigrationInstance> { new() { Name = filename, Script = x.Object.Content, Description = x.Object.Description, IsMulti = false, RelativePath = Path.GetRelativePath(input, x.Fullname), EvaluationTimeout = x.Object.EvaluationTimeout } };
                     return new List<MigrationInstance>();
                 })
+                .ToList();
+
+            using var database = new DatabaseService(options.IpAddress, options.Port, options.UseSsl);
+
+            var appliedMigrations = FetchAppliedMigrations(database, migrationInstances.Select(x => x.Name));
+
+            var allMigrations = migrationInstances
                 .Select(x =>
                 {
-                    var y = appliedMigrations.FirstOrDefault(migr => migr.MigrationName == x.Name);
-                    return new { x.Name, x.Description, Date = y?.MigrationDate, x.IsMulti, x.RelativePath, x.EvaluationTimeout };
+                    appliedMigrations.TryGetValue(x.Name, out var date);
+                    return new { x.Name, x.Description, Date = date, x.IsMulti, x.RelativePath, x.EvaluationTimeout };
                 })
                 .OrderBy(x => x.RelativePath, NaturalSortComparer.Instance)
                 .ThenBy(x => x.Name, NaturalSortComparer.Instance)
@@ -66,6 +67,33 @@ namespace Ivet.Verbs.Services
             Console.WriteLine();
             Console.WriteLine("Migrations:");
             table.Write();
+        }
+
+        // Pushes the candidate names as a server-side filter so JanusGraph picks the
+        // composite index `Migration_PK` (scoped by indexOnly(Migration)) instead of
+        // doing a full vertex iteration. Chunked at 200 to stay below the Gremlin
+        // parameter limit and the WebSocket frame size.
+        internal static Dictionary<string, DateTime?> FetchAppliedMigrations(DatabaseService database, IEnumerable<string> candidateNames)
+        {
+            const int chunkSize = 200;
+            var applied = new Dictionary<string, DateTime?>();
+            var distinctNames = candidateNames.Distinct().ToList();
+            if (distinctNames.Count == 0) return applied;
+
+            foreach (var chunk in distinctNames.Chunk(chunkSize))
+            {
+                var found = database.GremlinqClient.V<Migration>()
+                    .Where(m => chunk.Contains(m.MigrationName!))
+                    .ToArrayAsync()
+                    .AsTask()
+                    .GetAwaiter()
+                    .GetResult();
+                foreach (var m in found)
+                {
+                    if (m.MigrationName != null) applied[m.MigrationName] = m.MigrationDate;
+                }
+            }
+            return applied;
         }
     }
 }

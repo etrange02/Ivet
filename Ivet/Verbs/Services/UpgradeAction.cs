@@ -57,16 +57,7 @@ namespace Ivet.Verbs.Services
                 files.AddRange(Directory.EnumerateFiles(input, "*.json", SearchOption.AllDirectories));
             }
 
-            using var database = new DatabaseService(options.IpAddress, options.Port, options.UseSsl);
-
-            var appliedMigrations = database.GremlinqClient.V<Migration>()
-                .ToArrayAsync()
-                .AsTask()
-                .GetAwaiter()
-                .GetResult()
-                .Select(x => x.MigrationName);
-
-            var migrationsToApply = files
+            var allMigrations = files
                 .Select(x => new  {
                     Fullname = x,
                     Object = JsonSerializer.Deserialize<MigrationFile>(File.ReadAllText(x)) ?? throw new FormatException($"File {x} has bad format")
@@ -79,6 +70,13 @@ namespace Ivet.Verbs.Services
                         return new List<MigrationInstance> { new() { Name = filename, Script = x.Object.Content, RelativePath = Path.GetRelativePath(input, x.Fullname), EvaluationTimeout = x.Object.EvaluationTimeout } };
                     return new List<MigrationInstance>();
                 })
+                .ToList();
+
+            using var database = new DatabaseService(options.IpAddress, options.Port, options.UseSsl);
+
+            var appliedMigrations = FetchAppliedMigrationNames(database, allMigrations.Select(x => x.Name));
+
+            var migrationsToApply = allMigrations
                 .Where(x => !appliedMigrations.Contains(x.Name))
                 .OrderBy(x => x.RelativePath, NaturalSortComparer.Instance)
                 .ThenBy(x => x.Name, NaturalSortComparer.Instance)
@@ -100,6 +98,33 @@ namespace Ivet.Verbs.Services
                 };
                 database.GremlinqClient.AddV(migration).FirstAsync().AsTask().GetAwaiter().GetResult();
             });
+        }
+
+        // Pushes the candidate names as a server-side filter so JanusGraph picks the
+        // composite index `Migration_PK` (scoped by indexOnly(Migration)) instead of
+        // doing a full vertex iteration. Chunked at 200 to stay below the Gremlin
+        // parameter limit and the WebSocket frame size.
+        internal static HashSet<string> FetchAppliedMigrationNames(DatabaseService database, IEnumerable<string> candidateNames)
+        {
+            const int chunkSize = 200;
+            var applied = new HashSet<string>();
+            var distinctNames = candidateNames.Distinct().ToList();
+            if (distinctNames.Count == 0) return applied;
+
+            foreach (var chunk in distinctNames.Chunk(chunkSize))
+            {
+                var found = database.GremlinqClient.V<Migration>()
+                    .Where(m => chunk.Contains(m.MigrationName!))
+                    .ToArrayAsync()
+                    .AsTask()
+                    .GetAwaiter()
+                    .GetResult();
+                foreach (var m in found)
+                {
+                    if (m.MigrationName != null) applied.Add(m.MigrationName);
+                }
+            }
+            return applied;
         }
 
         private static void ExecuteWithRetry(DatabaseService database, MigrationInstance migration, long? timeout, bool hasExplicitTimeout, ILogger logger)
