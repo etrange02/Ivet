@@ -145,46 +145,56 @@ namespace Ivet.Services.Converters
 
         private static IEnumerable<MetaCompositeIndex> GetCompositeIndices(MetaSchema schema)
         {
-            return GetAllCompositeIndices<CompositeIndexAttribute>(schema.Vertices, ConvertCompositeAttribute)
-                .Concat(GetAllCompositeIndices<PrimaryKeyAttribute>(schema.Vertices, ConvertPrimaryAttribute))
-                .Concat(GetAllCompositeIndices<CompositeIndexAttribute>(schema.Edges.Where(x => x.Type != null), ConvertCompositeAttribute))
-                .Concat(GetAllCompositeIndices<PrimaryKeyAttribute>(schema.Edges.Where(x => x.Type != null), ConvertPrimaryAttribute))
+            return GetCompositeIndexAttributes(schema.Vertices)
+                .Concat(GetCompositeIndexAttributes(schema.Edges.Where(x => x.Type != null)))
+                .Concat(GetPrimaryKeyIndices(schema.Vertices))
+                .Concat(GetPrimaryKeyIndices(schema.Edges.Where(x => x.Type != null)))
                 .DistinctBy(x => x.Name);
         }
 
-        private static MetaCompositeIndex ConvertCompositeAttribute(AbstractMetaItem graphItem, PropertyInfo property)
-        {
-            var compositeKeyAttribute = property.GetCustomAttribute<CompositeIndexAttribute>() ?? throw new AttributeNotFoundException($"Attribute not found on {property.Name}");
-
-            return new MetaCompositeIndex
-            {
-                Name = Validate(compositeKeyAttribute.IndexName, "composite index name"),
-                IsUnique = compositeKeyAttribute.IsUnique,
-                IndexedElement = graphItem.Name,
-                Kind = graphItem.Type.GetCustomAttribute<VertexAttribute>() != null ? "Vertex.class" : "Edge.class"
-            };
-        }
-
-        private static MetaCompositeIndex ConvertPrimaryAttribute(AbstractMetaItem graphItem, PropertyInfo property)
-        {
-            var graphItemAttribute = graphItem.Type.GetCustomAttribute<AbstractGraphItemAttribute>() ?? throw new AttributeNotFoundException($"Attribute not found on {graphItem.Type.FullName}");
-
-            return new MetaCompositeIndex
-            {
-                Name = Validate(graphItemAttribute.Name ?? $"{graphItem.Name}_PK", "primary key index name"),
-                IsUnique = true,
-                IndexedElement = graphItem.Name,
-                Kind = graphItem.Type.GetCustomAttribute<VertexAttribute>() != null ? "Vertex.class" : "Edge.class"
-            };
-        }
-
-        private static IEnumerable<MetaCompositeIndex> GetAllCompositeIndices<T>(IEnumerable<AbstractMetaItem> items, Func<AbstractMetaItem, PropertyInfo, MetaCompositeIndex> convert)
+        // [CompositeIndex] is AllowMultiple = true: a property may carry several attributes. Iterates per attribute.
+        // A composite index can legitimately span multiple properties (including a [PrimaryKey] one) — do NOT dedup
+        // against [PrimaryKey] here. The user is responsible for not declaring two single-property indexes with
+        // different names on the same property.
+        private static IEnumerable<MetaCompositeIndex> GetCompositeIndexAttributes(IEnumerable<AbstractMetaItem> items)
         {
             return items.SelectMany(x =>
             {
-                var properties = x.Type.GetProperties().Where(y => y.GetCustomAttribute<PropertyKeyAttribute>(true) != null && y.GetCustomAttribute(typeof(T)) != null);
+                var kind = x.Type.GetCustomAttribute<VertexAttribute>() != null ? "Vertex.class" : "Edge.class";
+                var properties = x.Type.GetProperties().Where(y =>
+                    y.GetCustomAttribute<PropertyKeyAttribute>(true) != null &&
+                    y.GetCustomAttributes<CompositeIndexAttribute>().Any());
 
-                return properties.Select(y => convert(x, y));
+                return properties.SelectMany(y => y.GetCustomAttributes<CompositeIndexAttribute>().Select(attr => new MetaCompositeIndex
+                {
+                    Name = Validate(attr.IndexName, "composite index name"),
+                    IsUnique = attr.IsUnique,
+                    IndexedElement = x.Name,
+                    Kind = kind
+                }));
+            });
+        }
+
+        private static IEnumerable<MetaCompositeIndex> GetPrimaryKeyIndices(IEnumerable<AbstractMetaItem> items)
+        {
+            return items.SelectMany(x =>
+            {
+                var properties = x.Type.GetProperties().Where(y =>
+                    y.GetCustomAttribute<PropertyKeyAttribute>(true) != null &&
+                    y.GetCustomAttribute<PrimaryKeyAttribute>() != null).ToList();
+                if (properties.Count == 0) return Enumerable.Empty<MetaCompositeIndex>();
+
+                // EdgeAttribute is AllowMultiple = true (an edge can have several In/Out pairs); use FirstOrDefault to avoid AmbiguousMatchException
+                var graphItemAttribute = x.Type.GetCustomAttributes<AbstractGraphItemAttribute>().FirstOrDefault() ?? throw new AttributeNotFoundException($"Attribute not found on {x.Type.FullName}");
+                var kind = x.Type.GetCustomAttribute<VertexAttribute>() != null ? "Vertex.class" : "Edge.class";
+
+                return properties.Select(_ => new MetaCompositeIndex
+                {
+                    Name = Validate(graphItemAttribute.Name ?? $"{x.Name}_PK", "primary key index name"),
+                    IsUnique = true,
+                    IndexedElement = x.Name,
+                    Kind = kind
+                });
             });
         }
 
@@ -229,47 +239,52 @@ namespace Ivet.Services.Converters
 
         private static IEnumerable<MetaIndexBinding> GetIndexBindings(MetaSchema schema)
         {
-            return GetAllIndexBindings<CompositeIndexAttribute>(schema.Vertices, ConvertCompositeBinding)
-                .Concat(GetAllIndexBindings<PrimaryKeyAttribute>(schema.Vertices, ConvertPrimaryBinding))
+            return GetCompositeIndexBindings(schema.Vertices)
+                .Concat(GetCompositeIndexBindings(schema.Edges.Where(x => x.Type != null)))
+                .Concat(GetPrimaryKeyBindings(schema.Vertices))
+                .Concat(GetPrimaryKeyBindings(schema.Edges.Where(x => x.Type != null)))
                 .Concat(GetAllMixedIndexBindings(schema.Vertices))
-                .Concat(GetAllIndexBindings<CompositeIndexAttribute>(schema.Edges.Where(x => x.Type != null), ConvertCompositeBinding))
-                .Concat(GetAllIndexBindings<PrimaryKeyAttribute>(schema.Edges.Where(x => x.Type != null), ConvertPrimaryBinding))
                 .Concat(GetAllMixedIndexBindings(schema.Edges.Where(x => x.Type != null)))
                 .DistinctBy(x => $"{x.IndexName}@{x.PropertyName}");
         }
 
-        private static IEnumerable<MetaIndexBinding> GetAllIndexBindings<T>(IEnumerable<AbstractMetaItem> items, Func<AbstractMetaItem, PropertyInfo, MetaIndexBinding> convert)
+        // Per-attribute iteration. No PK dedup: a composite index can include a [PrimaryKey] property as one of its keys.
+        private static IEnumerable<MetaIndexBinding> GetCompositeIndexBindings(IEnumerable<AbstractMetaItem> items)
         {
             return items.SelectMany(x =>
             {
-                var properties = x.Type.GetProperties().Where(y => y.GetCustomAttribute<PropertyKeyAttribute>(true) != null && y.GetCustomAttribute(typeof(T)) != null);
+                if (!x.Type.GetCustomAttributes<AbstractGraphItemAttribute>().Any()) return Enumerable.Empty<MetaIndexBinding>();
 
-                if (!x.Type.GetCustomAttributes<AbstractGraphItemAttribute>().Any()) return new List<MetaIndexBinding>();
+                var properties = x.Type.GetProperties().Where(y =>
+                    y.GetCustomAttribute<PropertyKeyAttribute>(true) != null &&
+                    y.GetCustomAttributes<CompositeIndexAttribute>().Any());
 
-                return properties.Select(y => convert(x, y));
+                return properties.SelectMany(y => y.GetCustomAttributes<CompositeIndexAttribute>().Select(attr => new MetaIndexBinding
+                {
+                    IndexName = Validate(attr.IndexName, "composite index binding name"),
+                    PropertyName = Validate(y.Name, "property name")
+                }));
             });
         }
 
-        private static MetaIndexBinding ConvertCompositeBinding(AbstractMetaItem graphItem, PropertyInfo property)
+        private static IEnumerable<MetaIndexBinding> GetPrimaryKeyBindings(IEnumerable<AbstractMetaItem> items)
         {
-            var compositeKeyAttribute = property.GetCustomAttribute<CompositeIndexAttribute>() ?? throw new AttributeNotFoundException($"Attribute not found on {property.Name}");
-
-            return new MetaIndexBinding
+            return items.SelectMany(x =>
             {
-                IndexName = Validate(compositeKeyAttribute.IndexName, "composite index binding name"),
-                PropertyName = Validate(property.Name, "property name")
-            };
-        }
+                var properties = x.Type.GetProperties().Where(y =>
+                    y.GetCustomAttribute<PropertyKeyAttribute>(true) != null &&
+                    y.GetCustomAttribute<PrimaryKeyAttribute>() != null).ToList();
+                if (properties.Count == 0) return Enumerable.Empty<MetaIndexBinding>();
 
-        private static MetaIndexBinding ConvertPrimaryBinding(AbstractMetaItem graphItem, PropertyInfo property)
-        {
-            var graphItemAttribute = graphItem.Type.GetCustomAttribute<AbstractGraphItemAttribute>() ?? throw new AttributeNotFoundException($"Attribute not found on {graphItem.Type.FullName}");
+                var graphItemAttribute = x.Type.GetCustomAttributes<AbstractGraphItemAttribute>().FirstOrDefault();
+                if (graphItemAttribute == null) return Enumerable.Empty<MetaIndexBinding>();
 
-            return new MetaIndexBinding
-            {
-                IndexName = Validate(graphItemAttribute.Name ?? $"{graphItem.Name}_PK", "primary key binding name"),
-                PropertyName = Validate(property.Name, "property name")
-            };
+                return properties.Select(y => new MetaIndexBinding
+                {
+                    IndexName = Validate(graphItemAttribute.Name ?? $"{x.Name}_PK", "primary key binding name"),
+                    PropertyName = Validate(y.Name, "property name")
+                });
+            });
         }
 
         private static IEnumerable<MetaIndexBinding> GetAllMixedIndexBindings(IEnumerable<AbstractMetaItem> items)
