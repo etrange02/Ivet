@@ -11,6 +11,7 @@ namespace Ivet.Services
         string GetEdgesPropertyBindingsSchema();
         string GetIndexBindingSchema();
         string GetIndexSchema();
+        string GetIndexStatusSchema();
         string GetPropertyKeysSchema();
         string GetVertexPropertyBindingsSchema();
         string GetVertexSchema();

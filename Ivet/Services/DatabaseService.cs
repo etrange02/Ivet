@@ -152,6 +152,24 @@ namespace Ivet.Services
             return res;
         }
 
+        public string GetIndexStatusSchema()
+        {
+            var res = _client.SubmitAsync<string>(
+               "mgmt = graph.openManagement(); " +
+               $"result = \"|IndexName|IndexType|IsUnique|PropertyName|DataType|Cardinality|Status|\\n\" ;" +
+                "for (cls in [Vertex.class, Edge.class]) {" +
+                    "for (idx in mgmt.getGraphIndexes(cls)) {" +
+                        "indexType = idx.isMixedIndex() ? 'mixed' : 'composite';" +
+                        "for (pk in idx.getFieldKeys()) {" +
+                            $" result += '|' << idx.name() << '|' << indexType << '|' << idx.isUnique() << '|' << pk.name() << '|' << pk.dataType().getSimpleName() << '|' << pk.cardinality() << '|' << idx.getIndexStatus(pk) << '|\\n';" +
+                        "};" +
+                    "};" +
+                "};" +
+                "return result;"
+                ).Result.Single();
+            return res;
+        }
+
         public string GetIndexBindingSchema()
         {
             var res = _client.SubmitAsync<string>(

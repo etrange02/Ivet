@@ -64,5 +64,10 @@ namespace Ivet.Services
         {
             return GetItems<IndexBinding>(csv);
         }
+
+        public List<IndexStatusRow> GetIndexStatusRows(string csv)
+        {
+            return GetItems<IndexStatusRow>(csv);
+        }
     }
 }

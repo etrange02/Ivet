@@ -18,6 +18,7 @@ namespace Ivet
                 .WithParsed<UpgradeOptions>(opts => Run(opts.Verbose, factory => UpgradeAction.Do(opts, factory)))
                 .WithParsed<GenerateOptions>(opts => Run(opts.Verbose, factory => GenerateAction.Do(opts, factory)))
                 .WithParsed<ListOptions>(opts => Run(opts.Verbose, factory => ListAction.Do(opts, factory)))
+                .WithParsed<StatusOptions>(opts => Run(opts.Verbose, factory => StatusAction.Do(opts, factory)))
 #if DEBUG
                 .WithParsed<TestOptions>(opts => Run(opts.Verbose, factory => TestAction.Do(opts, factory)))
 #endif

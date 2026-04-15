@@ -27,8 +27,8 @@ namespace Ivet.Services
         {
             var results = new List<(string, long?)>();
             results.Add((BuildMain(), null));
-            results.AddRange(BuildCompositeIndeces().Select(s => (s, (long?)DefaultIndexTimeoutMs)));
-            results.AddRange(BuildMixedIndeces().Select(s => (s, (long?)DefaultIndexTimeoutMs)));
+            results.AddRange(BuildCompositeIndices().Select(s => (s, (long?)DefaultIndexTimeoutMs)));
+            results.AddRange(BuildMixedIndices().Select(s => (s, (long?)DefaultIndexTimeoutMs)));
             results.AddRange(BuildIndexBindings().Select(s => (s, (long?)DefaultIndexTimeoutMs)));
 
             return results;
@@ -68,7 +68,7 @@ namespace Ivet.Services
             return content;
         }
 
-        private List<string> BuildCompositeIndeces()
+        private List<string> BuildCompositeIndices()
         {
             if (MetaSchema?.CompositeIndexes == null || !MetaSchema.CompositeIndexes.Any()) return new List<string>();
 
@@ -87,7 +87,7 @@ namespace Ivet.Services
             return [content];
         }
 
-        private List<string> BuildMixedIndeces()
+        private List<string> BuildMixedIndices()
         {
             if (MetaSchema?.MixedIndexes == null || !MetaSchema.MixedIndexes.Any()) return new List<string>();
 
