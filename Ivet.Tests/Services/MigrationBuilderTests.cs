@@ -385,7 +385,7 @@ namespace Ivet.Tests.Services
             Assert.Equal(2, result.Count);
             Assert.Null(result[0].EvaluationTimeout);
             Assert.Equal(MigrationBuilder.DefaultIndexTimeoutMs, result[1].EvaluationTimeout);
-            Assert.Contains($"prop = mgmt.getPropertyKey('{propertyName}');index = mgmt.getGraphIndex('{indexName}').addKey(prop, Mapping.TEXTSTRING.asParameter());", result[1].Script);
+            Assert.Contains($"prop = mgmt.getPropertyKey('{propertyName}');if (!mgmt.getGraphIndex('{indexName}').getFieldKeys().toList().contains(prop)) {{ mgmt.addIndexKey(mgmt.getGraphIndex('{indexName}'), prop, Mapping.TEXTSTRING.asParameter()); mgmt.commit(); mgmt = graph.openManagement(); }}", result[1].Script);
             Assert.Contains($"SchemaAction.REGISTER_INDEX", result[1].Script);
             Assert.Contains($"mgmt.updateIndex(mgmt.getGraphIndex('{indexName}'), SchemaAction.REINDEX).get();", result[1].Script);
         }

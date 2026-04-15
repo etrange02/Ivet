@@ -115,19 +115,36 @@ namespace Ivet.Services
                 .Select(y =>
                 {
                     var content = string.Empty;
-                    content += string.Join(Environment.NewLine, y.Select(z => $"prop = mgmt.getPropertyKey('{z.PropertyName}');index = mgmt.getGraphIndex('{z.IndexName}').addKey(prop{(z.Mapping != MappingType.NULL ? ", Mapping." + z.Mapping + ".asParameter()" : "")});"));
+                    // Extending an existing mixed/composite index: must go through
+                    // mgmt.addIndexKey(idx, key, ...) — the JanusGraphIndex wrapper returned by
+                    // mgmt.getGraphIndex(...) does not expose addKey() at runtime (it is only
+                    // available on the builder produced by mgmt.buildIndex(...)). Each
+                    // addIndexKey call is wrapped in an idempotency guard and followed by a
+                    // commit + fresh openManagement so the new key is visible to the activation
+                    // block.
+                    content += string.Join(Environment.NewLine, y.Select(z => $"prop = mgmt.getPropertyKey('{z.PropertyName}');if (!mgmt.getGraphIndex('{z.IndexName}').getFieldKeys().toList().contains(prop)) {{ mgmt.addIndexKey(mgmt.getGraphIndex('{z.IndexName}'), prop{(z.Mapping != MappingType.NULL ? ", Mapping." + z.Mapping + ".asParameter()" : "")}); mgmt.commit(); mgmt = graph.openManagement(); }}"));
                     content += BuildIndexActivation([y.Key]);
                     return content;
                 }) ?? new List<string>();
 
         /// <summary>
         /// Generates idempotent Groovy for index activation (runs as its own script).
-        /// Uses the mgmt already opened by the skeleton.
+        /// Uses the mgmt already opened by the skeleton. Applies to both composite and
+        /// mixed indexes (creation and extension paths).
         /// State machine per index:
         ///   ENABLED  → skip (already done)
-        ///   INSTALLED → REGISTER_INDEX + commit (script ends, Ivet retry handles the wait)
+        ///   INSTALLED → REGISTER_INDEX + commit + await REGISTERED + REINDEX + commit
         ///   REGISTERED → REINDEX + commit
-        /// The skeleton's final mgmt.commit() closes the last open mgmt.
+        /// The <c>awaitGraphIndexStatus(REGISTERED)</c> between REGISTER and REINDEX is
+        /// essential: REGISTER_INDEX only schedules the transition, so the subsequent
+        /// REINDEX must not run against a still-INSTALLED key (it silently no-ops).
+        /// Without the await, mixed-index extensions (addIndexKey on an existing ENABLED
+        /// mixed index) leave the new key stuck in INSTALLED with no visible error.
+        /// On a timeout (stuck open instance, cluster not converging) the script fails
+        /// with a clear diagnostic; the operator can restart JanusGraph and let Ivet retry.
+        /// Not awaiting ENABLED at the end: REINDEX on large composite indexes can exceed
+        /// the 1m default, and downstream scripts don't depend on reindex completion — the
+        /// next Ivet pass picks up from REGISTERED → REINDEX cleanly.
         /// </summary>
         private static string BuildIndexActivation(IEnumerable<string> indexNames)
         {
@@ -141,12 +158,13 @@ namespace Ivet.Services
                 content += $"{Environment.NewLine}";
                 content += $"if (!allEnabled) {{";
                 content += $"{Environment.NewLine}";
-                // INSTALLED → REGISTER_INDEX to start transition
+                // INSTALLED → REGISTER_INDEX to start transition, then await REGISTERED.
                 content += $"hasInstalled = idx.getFieldKeys().any {{ pk -> idx.getIndexStatus(pk) == SchemaStatus.INSTALLED }};";
                 content += $"{Environment.NewLine}";
-                content += $"if (hasInstalled) {{ mgmt.updateIndex(idx, SchemaAction.REGISTER_INDEX).get(); mgmt.commit(); mgmt = graph.openManagement(); }}";
+                content += $"if (hasInstalled) {{ mgmt.updateIndex(idx, SchemaAction.REGISTER_INDEX).get(); mgmt.commit(); org.janusgraph.graphdb.database.management.ManagementSystem.awaitGraphIndexStatus(graph, '{name}').status(SchemaStatus.REGISTERED).call(); mgmt = graph.openManagement(); }}";
                 content += $"{Environment.NewLine}";
-                // REGISTERED → REINDEX (will fail if still INSTALLED, Ivet retry handles it)
+                // REGISTERED → REINDEX. No await ENABLED afterwards: for large composite indexes
+                // the default 1m timeout would fail unnecessarily; Ivet's retry resumes cleanly.
                 content += $"mgmt.updateIndex(mgmt.getGraphIndex('{name}'), SchemaAction.REINDEX).get();";
                 content += $"{Environment.NewLine}";
                 content += $"mgmt.commit();";
