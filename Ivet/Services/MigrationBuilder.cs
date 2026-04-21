@@ -77,7 +77,13 @@ namespace Ivet.Services
             foreach (var x in MetaSchema.CompositeIndexes)
             {
                 content += $"if (mgmt.getGraphIndex('{x.Name}') == null) {{";
-                content += BuildIndex(x, MetaSchema.IndexBindings.Where(p => p.IndexName == x.Name), ci => $"vertex = mgmt.getVertexLabel('{ci.IndexedElement}');index = mgmt.buildIndex('{ci.Name}', {ci.Kind}).indexOnly(vertex){(ci.IsUnique ? ".unique()" : "")}");
+                // Empty IndexedElement = global composite (covers every vertex label that has the key).
+                // Used as a safety net for queries that hit the abstract base without a single-label
+                // constraint — see the fan-out + global fallback rule in LibraryToSchemaConverter.
+                if (!string.IsNullOrEmpty(x.IndexedElement))
+                    content += BuildIndex(x, MetaSchema.IndexBindings.Where(p => p.IndexName == x.Name), ci => $"vertex = mgmt.getVertexLabel('{ci.IndexedElement}');index = mgmt.buildIndex('{ci.Name}', {ci.Kind}).indexOnly(vertex){(ci.IsUnique ? ".unique()" : "")}");
+                else
+                    content += BuildIndex(x, MetaSchema.IndexBindings.Where(p => p.IndexName == x.Name), ci => $"index = mgmt.buildIndex('{ci.Name}', {ci.Kind}){(ci.IsUnique ? ".unique()" : "")}");
                 content += $".buildCompositeIndex();";
                 content += $"}}";
                 content += $"{Environment.NewLine}";

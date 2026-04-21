@@ -98,6 +98,29 @@ namespace Ivet.Verbs.Services
                 };
                 database.GremlinqClient.AddV(migration).FirstAsync().AsTask().GetAwaiter().GetResult();
             });
+
+            if (!options.NoVerify)
+                VerifyIndexStatuses(database, logger);
+        }
+
+        internal static void VerifyIndexStatuses(DatabaseService database, ILogger logger)
+        {
+            var rows = new Parser().GetIndexStatusRows(database.GetIndexStatusSchema());
+            VerifyIndexStatuses(rows, logger);
+        }
+
+        public static bool VerifyIndexStatuses(IEnumerable<Ivet.Model.Database.IndexStatusRow> rows, ILogger logger)
+        {
+            var stuck = StatusAction.GetNonEnabledRows(rows);
+            if (stuck.Count == 0)
+            {
+                logger.LogInformation("Post-upgrade verify: all indices ENABLED");
+                return true;
+            }
+            var detail = string.Join(", ", stuck.Select(r => $"{r.IndexName}.{r.PropertyName}={r.Status}"));
+            logger.LogError("Post-upgrade verify failed: {Count} non-ENABLED key(s): {Detail}", stuck.Count, detail);
+            Environment.ExitCode = 1;
+            return false;
         }
 
         // Pushes the candidate names as a server-side filter so JanusGraph picks the

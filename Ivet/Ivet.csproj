@@ -14,9 +14,11 @@
     <PackageProjectUrl>https://github.com/etrange02/Ivet</PackageProjectUrl>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
     <PackageLicenseExpression>CECILL-B</PackageLicenseExpression>
-    <Version>1.8.6</Version>
+    <Version>1.8.7</Version>
     <Authors>david.lecoconnier</Authors>
-    <PackageReleaseNotes>* Fix index registration</PackageReleaseNotes>
+    <PackageReleaseNotes>* Add global index for abstract classes
+* Add specific index for sub classes
+* Add reindex command</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

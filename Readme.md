@@ -28,6 +28,19 @@ Available commands
 	* **port** _8182_
 	* **ssl** Use SSL/TLS for JanusGraph connection (default: false)
 	* **timeout** Default evaluation timeout in milliseconds for Gremlin scripts. Can be overridden per script or per migration file in JSON
+	* **no-verify** Skip post-upgrade index status verification (default: false — verify runs on every upgrade, even with no migrations to apply)
+* **status** Display all JanusGraph indices with per-key status (ENABLED / INSTALLED / REGISTERED)
+	* **ip** _localhost_
+	* **port** _8182_
+	* **ssl** Use SSL/TLS for JanusGraph connection (default: false)
+	* **fail-on-non-enabled** Exit with code 1 if any index key is not ENABLED (useful in CI/CD)
+* **reindex** Force REGISTER + REINDEX on one or all stuck indices
+	* **index** Target index name. If omitted, all non-ENABLED indices are reindexed.
+	* **await-enabled** Wait for ENABLED status after REINDEX (long operation, default: false)
+	* **timeout-seconds** Per-step await timeout in seconds (default: 300)
+	* **ip** _localhost_
+	* **port** _8182_
+	* **ssl** Use SSL/TLS for JanusGraph connection (default: false)
 
 Docker image
 =======
@@ -164,6 +177,28 @@ Ivet upgrade --input ".\Migrations" --timeout 600000
 
 > [!NOTE]
 > If an index script times out, the migration is still marked as applied. JanusGraph registers the index operation and will complete it on restart. Re-running the same script would fail with "index already exists". Scripts without an explicit timeout (e.g., entity creation scripts) are NOT marked as applied on timeout — the error propagates normally.
+
+Index health: status, reindex, verify
+=======
+After an `upgrade`, Ivet automatically verifies that every index key is in the `ENABLED` state. If one is stuck (`INSTALLED` or `REGISTERED`), the command exits with code 1 and logs the offending keys. Pass `--no-verify` to opt out.
+
+Use `status` at any time to inspect the cluster:
+```
+Ivet status --ip localhost --port 8182
+```
+
+In CI/CD, you can also run it as a dedicated gate:
+```
+Ivet upgrade --input ./Migrations
+Ivet status --fail-on-non-enabled
+```
+
+If an index is stuck, use `reindex` to unblock it. Without `--index`, it targets every non-ENABLED index (useful in CI/CD where you don't know the name up front):
+```
+Ivet reindex --index search --await-enabled --timeout-seconds 600
+Ivet reindex                                                    # reindex all stuck indices
+```
+The flow per index is `REGISTER_INDEX → await REGISTERED → REINDEX → (optional) await ENABLED`, with idempotent guards: already-ENABLED indices are skipped.
 
 What's next?
 =======

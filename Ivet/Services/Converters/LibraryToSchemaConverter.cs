@@ -156,9 +156,29 @@ namespace Ivet.Services.Converters
         // A composite index can legitimately span multiple properties (including a [PrimaryKey] one) — do NOT dedup
         // against [PrimaryKey] here. The user is responsible for not declaring two single-property indexes with
         // different names on the same property.
+        //
+        // Fan-out rule : when the <em>same</em> baseName appears on <em>multiple</em> concrete vertices
+        // (the attribute is declared on an abstract base that several descendants share), Ivet emits :
+        //   1. One label-scoped composite per concrete class with <c>{ConcreteClassName}_{IndexName}</c>
+        //      naming — JanusGraph composite indexes only support a single <c>indexOnly(label)</c>, so a
+        //      base-class attribute that must cover every descendant has to fan out into multiple indexes.
+        //      These are the fast path for <c>hasLabel('ConcreteClass').has(prop, v)</c> queries.
+        //   2. One <em>global</em> composite (no <c>indexOnly</c>) with the raw <c>IndexName</c>, acting as
+        //      a fallback for queries that hit the abstract base without a single-label constraint :
+        //      <c>hasLabel('A','B').has(prop, v)</c> (multi-label) or <c>g.V().has(prop, v)</c> (no label).
+        //      Without this fallback those queries would drop down to the mixed index (Solr) post-filter,
+        //      which times out at scale. The global composite doubles the index storage for that property
+        //      but removes the abstract-query footgun — safe by default.
+        //
+        // When the attribute is carried by exactly one concrete vertex (declared on the concrete class
+        // directly, or on an abstract base with a single descendant), the raw IndexName is kept and no
+        // global is emitted — the label-scoped composite already covers every query path.
         private static IEnumerable<MetaCompositeIndex> GetCompositeIndexAttributes(IEnumerable<AbstractMetaItem> items)
         {
-            return items.SelectMany(x =>
+            var fanOut = ComputeFanOutBaseNames(items);
+
+            // Label-scoped entries, one per concrete class that carries the attribute.
+            var perClass = items.SelectMany(x =>
             {
                 var kind = x.Type.GetCustomAttribute<VertexAttribute>() != null ? "Vertex.class" : "Edge.class";
                 var properties = x.Type.GetProperties().Where(y =>
@@ -167,12 +187,50 @@ namespace Ivet.Services.Converters
 
                 return properties.SelectMany(y => y.GetCustomAttributes<CompositeIndexAttribute>().Select(attr => new MetaCompositeIndex
                 {
-                    Name = Validate(attr.IndexName, "composite index name"),
+                    Name = Validate(
+                        fanOut.Contains(attr.IndexName) ? $"{x.Name}_{attr.IndexName}" : attr.IndexName,
+                        "composite index name"),
                     IsUnique = attr.IsUnique,
                     IndexedElement = x.Name,
                     Kind = kind
                 }));
-            });
+            }).ToList();
+
+            // Global fallback for fan-out names. Deduped by baseName; IsUnique/Kind lifted from any
+            // matching per-class entry (they're identical across concrete descendants of the same abstract).
+            // Uniqueness would be unsafe on a global index covering multiple labels, so we explicitly drop
+            // the IsUnique flag — a unique composite on a shared attribute should not fan out in the first
+            // place, and if it does, the per-class entries still enforce their own uniqueness.
+            var global = fanOut
+                .Select(baseName =>
+                {
+                    var sample = perClass.First(p => p.Name == $"{p.IndexedElement}_{baseName}");
+                    return new MetaCompositeIndex
+                    {
+                        Name = Validate(baseName, "composite index name"),
+                        IsUnique = false,
+                        IndexedElement = string.Empty,
+                        Kind = sample.Kind
+                    };
+                });
+
+            return perClass.Concat(global);
+        }
+
+        // Base names carried by more than one concrete vertex — those need the per-class fan-out.
+        // Called by both <see cref="GetCompositeIndexAttributes"/> and <see cref="GetCompositeIndexBindings"/>
+        // so the renaming stays consistent between the index and its binding entries.
+        private static HashSet<string> ComputeFanOutBaseNames(IEnumerable<AbstractMetaItem> items)
+        {
+            return items
+                .SelectMany(x => x.Type.GetProperties()
+                    .Where(y => y.GetCustomAttribute<PropertyKeyAttribute>(true) != null)
+                    .SelectMany(y => y.GetCustomAttributes<CompositeIndexAttribute>()
+                        .Select(a => new { a.IndexName, Element = x.Name })))
+                .GroupBy(p => p.IndexName)
+                .Where(g => g.Select(p => p.Element).Distinct().Count() > 1)
+                .Select(g => g.Key)
+                .ToHashSet();
         }
 
         private static IEnumerable<MetaCompositeIndex> GetPrimaryKeyIndices(IEnumerable<AbstractMetaItem> items)
@@ -249,9 +307,14 @@ namespace Ivet.Services.Converters
         }
 
         // Per-attribute iteration. No PK dedup: a composite index can include a [PrimaryKey] property as one of its keys.
+        // Mirrors the fan-out + global-fallback rule of GetCompositeIndexAttributes so bindings line up with
+        // the emitted index names (per-class prefixed + one global per fanned-out baseName).
         private static IEnumerable<MetaIndexBinding> GetCompositeIndexBindings(IEnumerable<AbstractMetaItem> items)
         {
-            return items.SelectMany(x =>
+            var fanOut = ComputeFanOutBaseNames(items);
+
+            // Per-class bindings — one per (concrete class, attribute).
+            var perClass = items.SelectMany(x =>
             {
                 if (!x.Type.GetCustomAttributes<AbstractGraphItemAttribute>().Any()) return Enumerable.Empty<MetaIndexBinding>();
 
@@ -261,10 +324,31 @@ namespace Ivet.Services.Converters
 
                 return properties.SelectMany(y => y.GetCustomAttributes<CompositeIndexAttribute>().Select(attr => new MetaIndexBinding
                 {
-                    IndexName = Validate(attr.IndexName, "composite index binding name"),
+                    IndexName = Validate(
+                        fanOut.Contains(attr.IndexName) ? $"{x.Name}_{attr.IndexName}" : attr.IndexName,
+                        "composite index binding name"),
                     PropertyName = Validate(y.Name, "property name")
                 }));
+            }).ToList();
+
+            // Global-fallback bindings : one (baseName, propertyName) per fanned-out attribute. The property
+            // name is identical across concrete descendants (attribute lives on the shared base), so we can
+            // read it from any matching per-class entry.
+            var globalProps = items
+                .SelectMany(x => x.Type.GetProperties()
+                    .Where(y => y.GetCustomAttribute<PropertyKeyAttribute>(true) != null)
+                    .SelectMany(y => y.GetCustomAttributes<CompositeIndexAttribute>()
+                        .Where(a => fanOut.Contains(a.IndexName))
+                        .Select(a => new { a.IndexName, PropertyName = y.Name })))
+                .Distinct();
+
+            var global = globalProps.Select(pair => new MetaIndexBinding
+            {
+                IndexName = Validate(pair.IndexName, "composite index binding name"),
+                PropertyName = Validate(pair.PropertyName, "property name")
             });
+
+            return perClass.Concat(global);
         }
 
         private static IEnumerable<MetaIndexBinding> GetPrimaryKeyBindings(IEnumerable<AbstractMetaItem> items)

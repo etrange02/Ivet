@@ -7,7 +7,12 @@ namespace Ivet.Verbs.Services
 {
     public class StatusAction
     {
-        private const string EnabledStatus = "ENABLED";
+        public const string EnabledStatus = "ENABLED";
+
+        public static IReadOnlyList<IndexStatusRow> GetNonEnabledRows(IEnumerable<IndexStatusRow> rows)
+        {
+            return rows.Where(r => !string.Equals(r.Status, EnabledStatus, StringComparison.OrdinalIgnoreCase)).ToList();
+        }
 
         public static void Do(StatusOptions options, ILoggerFactory loggerFactory)
         {
@@ -20,7 +25,7 @@ namespace Ivet.Verbs.Services
 
             Render(rows, Console.Out);
 
-            if (options.FailOnNonEnabled && rows.Any(r => !string.Equals(r.Status, EnabledStatus, StringComparison.OrdinalIgnoreCase)))
+            if (options.FailOnNonEnabled && GetNonEnabledRows(rows).Count > 0)
                 Environment.ExitCode = 1;
         }
 

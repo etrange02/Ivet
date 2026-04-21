@@ -460,6 +460,70 @@ namespace Ivet.Tests.Services.Converters
         }
 
         [Fact]
+        public void ConvertTest_CompositeIndex_OnAbstractWithMultipleDescendants_FansOutPerConcreteVertex()
+        {
+            // Arrange — abstract base declares [CompositeIndex("visibleToOrganizations")] inherited
+            // by two concrete descendants. Ivet must (1) fan out into one label-scoped composite per
+            // descendant with "{ConcreteClassName}_{IndexName}" naming, and (2) emit a global composite
+            // (no indexOnly) with the raw IndexName as a safety net for multi-label / no-label queries
+            // that would otherwise fall back onto the mixed index.
+            var schema = new Schema
+            {
+                Vertices = { typeof(SharedCompositeIndexVertexA), typeof(SharedCompositeIndexVertexB) }
+            };
+
+            // Act
+            var result = LibraryToSchemaConverter.Convert(schema);
+
+            // Assert — 2 label-scoped + 1 global = 3 composites
+            Assert.Equal(3, result.CompositeIndexes.Count);
+
+            var composites = result.CompositeIndexes.OrderBy(i => i.Name).ToList();
+            Assert.Equal("SharedCompositeIndexVertexA_visibleToOrganizations", composites[0].Name);
+            Assert.Equal("SharedCompositeIndexVertexA", composites[0].IndexedElement);
+            Assert.Equal("SharedCompositeIndexVertexB_visibleToOrganizations", composites[1].Name);
+            Assert.Equal("SharedCompositeIndexVertexB", composites[1].IndexedElement);
+            // Global fallback : empty IndexedElement → migration emits it without indexOnly
+            Assert.Equal("visibleToOrganizations", composites[2].Name);
+            Assert.Equal(string.Empty, composites[2].IndexedElement);
+            Assert.False(composites[2].IsUnique);
+
+            // Bindings mirror all three index names
+            Assert.Equal(3, result.IndexBindings.Count);
+            var bindings = result.IndexBindings.OrderBy(b => b.IndexName).ToList();
+            Assert.Equal("SharedCompositeIndexVertexA_visibleToOrganizations", bindings[0].IndexName);
+            Assert.Equal("SharedIndexedProperty", bindings[0].PropertyName);
+            Assert.Equal("SharedCompositeIndexVertexB_visibleToOrganizations", bindings[1].IndexName);
+            Assert.Equal("SharedIndexedProperty", bindings[1].PropertyName);
+            Assert.Equal("visibleToOrganizations", bindings[2].IndexName);
+            Assert.Equal("SharedIndexedProperty", bindings[2].PropertyName);
+        }
+
+        [Fact]
+        public void ConvertTest_CompositeIndex_OnAbstractWithSingleDescendant_KeepsRawName()
+        {
+            // Arrange — if only one concrete vertex carries the attribute (here
+            // SharedCompositeIndexVertexA alone in the schema), the fan-out detection sees a
+            // single entry and keeps the raw name. Same rule covers the case where the attribute
+            // is declared on a concrete class directly (already verified by
+            // ConvertTest_CompositeIndex + CompositeIndexVertex).
+            var schema = new Schema
+            {
+                Vertices = { typeof(SharedCompositeIndexVertexA) }
+            };
+
+            // Act
+            var result = LibraryToSchemaConverter.Convert(schema);
+
+            // Assert — raw name, no prefix
+            Assert.Single(result.CompositeIndexes);
+            Assert.Equal("visibleToOrganizations", result.CompositeIndexes[0].Name);
+            Assert.Equal("SharedCompositeIndexVertexA", result.CompositeIndexes[0].IndexedElement);
+            Assert.Single(result.IndexBindings);
+            Assert.Equal("visibleToOrganizations", result.IndexBindings[0].IndexName);
+        }
+
+        [Fact]
         public void ConvertTest_MixedIndex()
         {
             // Arrange
