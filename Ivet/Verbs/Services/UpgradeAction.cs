@@ -1,4 +1,3 @@
-using ExRam.Gremlinq.Core;
 using Ivet.Model;
 using Ivet.Services;
 using Ivet.Services.Comparers;
@@ -91,12 +90,7 @@ namespace Ivet.Verbs.Services
 
                 ExecuteWithRetry(database, x, timeout, hasExplicitTimeout, logger);
 
-                var migration = new Migration
-                {
-                    MigrationName = x.Name,
-                    MigrationDate = DateTime.Now,
-                };
-                database.GremlinqClient.AddV(migration).FirstAsync().AsTask().GetAwaiter().GetResult();
+                database.AddAppliedMigration(x.Name, DateTime.Now);
             });
 
             if (!options.NoVerify)
@@ -128,27 +122,7 @@ namespace Ivet.Verbs.Services
         // doing a full vertex iteration. Chunked at 200 to stay below the Gremlin
         // parameter limit and the WebSocket frame size.
         internal static HashSet<string> FetchAppliedMigrationNames(DatabaseService database, IEnumerable<string> candidateNames)
-        {
-            const int chunkSize = 200;
-            var applied = new HashSet<string>();
-            var distinctNames = candidateNames.Distinct().ToList();
-            if (distinctNames.Count == 0) return applied;
-
-            foreach (var chunk in distinctNames.Chunk(chunkSize))
-            {
-                var found = database.GremlinqClient.V<Migration>()
-                    .Where(m => chunk.Contains(m.MigrationName!))
-                    .ToArrayAsync()
-                    .AsTask()
-                    .GetAwaiter()
-                    .GetResult();
-                foreach (var m in found)
-                {
-                    if (m.MigrationName != null) applied.Add(m.MigrationName);
-                }
-            }
-            return applied;
-        }
+            => database.GetAppliedMigrations(candidateNames).Select(m => m.Name).ToHashSet();
 
         private static void ExecuteWithRetry(DatabaseService database, MigrationInstance migration, long? timeout, bool hasExplicitTimeout, ILogger logger)
         {

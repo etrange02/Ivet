@@ -1,10 +1,9 @@
-﻿using ExRam.Gremlinq.Core;
-
 namespace Ivet.Services
 {
     public interface IDatabaseService
     {
-        IGremlinQuerySource GremlinqClient { get; }
+        IReadOnlyList<AppliedMigration> GetAppliedMigrations(IEnumerable<string> names);
+        void AddAppliedMigration(string name, DateTime date);
 
         string GetConnectionSchema();
         string GetEdgeSchema();

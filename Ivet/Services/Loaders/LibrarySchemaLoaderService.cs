@@ -33,7 +33,15 @@ namespace Ivet.Services.Loaders
                 {
                     _logger.LogDebug("  Loading: {FileName}", Path.GetFileName(x));
                     var assembly = Assembly.LoadFrom(x);
-                    var graphClasses = assembly.GetTypes().Where(t => t.GetCustomAttributes<AbstractGraphItemAttribute>().Any()).ToList();
+                    // GetTypes() is all-or-nothing: one unloadable type (e.g. a service referencing a
+                    // dependency absent from --dir, or at a diverging version) throws and would drop the
+                    // whole assembly. The [Vertex]/[Edge] model types never reference those dependencies,
+                    // so keep the types that did load and ignore the rest — ivet stays agnostic to the
+                    // consumer's runtime dependencies.
+                    Type[] loadedTypes;
+                    try { loadedTypes = assembly.GetTypes(); }
+                    catch (ReflectionTypeLoadException ex) { loadedTypes = ex.Types.Where(t => t is not null).ToArray()!; }
+                    var graphClasses = loadedTypes.Where(t => t.GetCustomAttributes<AbstractGraphItemAttribute>().Any()).ToList();
                     if (graphClasses.Any())
                     {
                         schema.Vertices.AddRange(graphClasses.Where(t => t.GetCustomAttributes<VertexAttribute>().Any()));

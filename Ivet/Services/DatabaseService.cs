@@ -1,12 +1,6 @@
-﻿using ExRam.Gremlinq.Core;
-using ExRam.Gremlinq.Core.Models;
-using ExRam.Gremlinq.Providers.Core;
-using ExRam.Gremlinq.Providers.JanusGraph;
-using ExRam.Gremlinq.Support.NewtonsoftJson;
-using Gremlin.Net.Driver;
+﻿using Gremlin.Net.Driver;
 using Gremlin.Net.Driver.Messages;
 using Ivet.Model;
-using static ExRam.Gremlinq.Core.GremlinQuerySource;
 
 namespace Ivet.Services
 {
@@ -15,25 +9,63 @@ namespace Ivet.Services
         private GremlinClient? _client;
         private bool disposedValue;
 
-        public IGremlinQuerySource GremlinqClient { get; private set; }
-
         public DatabaseService(string ipAddress, int port, bool useSsl = false)
         {
             _client = new GremlinClient(new GremlinServer(ipAddress, port, enableSsl: useSsl));
-
-            var scheme = useSsl ? "wss" : "ws";
-            var uri = new Uri($"{scheme}://{ipAddress}:{port}");
-
-            GremlinqClient = g.UseJanusGraph<AbstractVertex, AbstractEdge>(configurator => configurator
-                                    .At(uri)
-                                    .UseNewtonsoftJson()
-                                ).ConfigureEnvironment(e => e
-                                    .UseModel(GraphModel.FromBaseTypes<AbstractVertex, AbstractEdge>()
-                                        .AddAssemblies(typeof(Migration).Assembly)
-                                    )
-                                    .UseNewtonsoftJson()
-                                );
         }
+
+        // Migration tracking (read/write the `Migration` vertex) in raw Gremlin — ivet carries no
+        // ExRam.Gremlinq, so it stays agnostic to whatever ExRam version the consumer's model DLLs use.
+        // Raw-script labels/keys are bound via nameof so a model rename breaks the build, not the query.
+        public IReadOnlyList<AppliedMigration> GetAppliedMigrations(IEnumerable<string> names)
+        {
+            const int chunkSize = 200;
+            var distinct = names.Distinct().ToList();
+            var applied = new List<AppliedMigration>();
+            if (distinct.Count == 0) return applied;
+
+            // hasLabel('Migration') lets JanusGraph use the Migration primary-key composite index
+            // (indexOnly(Migration)) instead of a full vertex scan; within() filters server-side.
+            // Chunked at 200 to stay under the Gremlin parameter / WebSocket frame limits. elementMap
+            // returns only the present keys, so a vertex without MigrationDate still parses.
+            const string script = "g.V().hasLabel('" + nameof(Migration) + "')"
+                + ".has('" + nameof(Migration.MigrationName) + "', within(mNames))"
+                + ".elementMap('" + nameof(Migration.MigrationName) + "','" + nameof(Migration.MigrationDate) + "')";
+
+            foreach (var chunk in distinct.Chunk(chunkSize))
+            {
+                var bindings = new Dictionary<string, object> { ["mNames"] = chunk.ToList() };
+                var rows = _client!.SubmitAsync<Dictionary<object, object>>(script, bindings).Result;
+                foreach (var row in rows)
+                {
+                    var name = GetValue(row, nameof(Migration.MigrationName))?.ToString();
+                    if (string.IsNullOrEmpty(name)) continue;
+                    applied.Add(new AppliedMigration(name, ParseDate(GetValue(row, nameof(Migration.MigrationDate)))));
+                }
+            }
+            return applied;
+        }
+
+        public void AddAppliedMigration(string name, DateTime date)
+        {
+            const string script = "g.addV('" + nameof(Migration) + "')"
+                + ".property('" + nameof(Migration.MigrationName) + "', mName)"
+                + ".property('" + nameof(Migration.MigrationDate) + "', mDate)";
+            var bindings = new Dictionary<string, object> { ["mName"] = name, ["mDate"] = date };
+            _client!.SubmitAsync(script, bindings).Wait();
+        }
+
+        private static object? GetValue(Dictionary<object, object> row, string key)
+            => row.FirstOrDefault(kv => kv.Key?.ToString() == key).Value;
+
+        private static DateTime? ParseDate(object? value) => value switch
+        {
+            null => null,
+            DateTime dt => dt,
+            DateTimeOffset dto => dto.LocalDateTime,
+            long epochMs => DateTimeOffset.FromUnixTimeMilliseconds(epochMs).LocalDateTime,
+            _ => DateTime.TryParse(value.ToString(), out var parsed) ? parsed : null,
+        };
 
         protected virtual void Dispose(bool disposing)
         {
