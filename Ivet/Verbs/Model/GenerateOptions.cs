@@ -23,6 +23,9 @@ namespace Ivet.Verbs.Model
         [Option("ssl", HelpText = "Use SSL/TLS for JanusGraph connection", Default = false)]
         public bool UseSsl { get; set; }
 
+        [Option("serializer", HelpText = "Message serializer: janusgraph (default), graphson3, graphson2, graphbinary", Default = "janusgraph")]
+        public string Serializer { get; set; } = "janusgraph";
+
         [Option("dry-run", HelpText = "Preview migration without writing files", Default = false)]
         public bool DryRun { get; set; }
 

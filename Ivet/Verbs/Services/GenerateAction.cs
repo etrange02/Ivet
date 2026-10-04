@@ -17,7 +17,7 @@ namespace Ivet.Verbs.Services
 
             var logger = loggerFactory.CreateLogger<GenerateAction>();
 
-            using var database = new DatabaseService(options.IpAddress, options.Port, options.UseSsl);
+            using var database = new DatabaseService(options.IpAddress, options.Port, options.UseSsl, options.Serializer);
 
             var metaSchema = new TransitiveSchema();
 

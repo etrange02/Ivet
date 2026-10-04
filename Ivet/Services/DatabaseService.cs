@@ -1,18 +1,42 @@
 ﻿using Gremlin.Net.Driver;
 using Gremlin.Net.Driver.Messages;
+using Gremlin.Net.Structure.IO.GraphBinary;
+using Gremlin.Net.Structure.IO.GraphSON;
 using Ivet.Model;
+using JanusGraph.Net.IO.GraphSON;
 
 namespace Ivet.Services
 {
     public class DatabaseService : IDisposable, IDatabaseService
     {
+        public const string DefaultSerializer = "janusgraph";
+
         private GremlinClient? _client;
         private bool disposedValue;
 
-        public DatabaseService(string ipAddress, int port, bool useSsl = false)
+        public DatabaseService(string ipAddress, int port, bool useSsl = false, string? serializer = null)
         {
-            _client = new GremlinClient(new GremlinServer(ipAddress, port, enableSsl: useSsl));
+            _client = new GremlinClient(
+                new GremlinServer(ipAddress, port, enableSsl: useSsl),
+                CreateSerializer(serializer));
         }
+
+        /// <summary>
+        /// Picks the WebSocket message serializer, so ivet adapts to what the target server speaks.
+        /// Default <c>janusgraph</c> = GraphSON 3.0 with the JanusGraph type serializers
+        /// (RelationIdentifier, Geoshape) that management/commit responses carry — the plain Gremlin.Net
+        /// GraphSON3 can't deserialize those, and Gremlin.Net 3.8's default GraphBinary makes some
+        /// JanusGraph builds close the socket. The other modes cover plain TinkerPop servers and
+        /// GraphBinary deployments.
+        /// </summary>
+        public static IMessageSerializer CreateSerializer(string? mode) => (mode?.Trim().ToLowerInvariant()) switch
+        {
+            null or "" or "janusgraph" or "janusgraph-graphson" => new JanusGraphGraphSONMessageSerializer(),
+            "graphson3" or "graphson" => new GraphSON3MessageSerializer(),
+            "graphson2" => new GraphSON2MessageSerializer(),
+            "graphbinary" or "graphbinaryv1" => new GraphBinaryMessageSerializer(),
+            _ => throw new ArgumentException($"Unknown serializer '{mode}'. Valid: janusgraph, graphson3, graphson2, graphbinary."),
+        };
 
         // Migration tracking (read/write the `Migration` vertex) in raw Gremlin — ivet carries no
         // ExRam.Gremlinq, so it stays agnostic to whatever ExRam version the consumer's model DLLs use.
@@ -35,7 +59,18 @@ namespace Ivet.Services
             foreach (var chunk in distinct.Chunk(chunkSize))
             {
                 var bindings = new Dictionary<string, object> { ["mNames"] = chunk.ToList() };
-                var rows = _client!.SubmitAsync<Dictionary<object, object>>(script, bindings).Result;
+                ResultSet<Dictionary<object, object>> rows;
+                try
+                {
+                    rows = _client!.SubmitAsync<Dictionary<object, object>>(script, bindings).Result;
+                }
+                catch (Exception e) when (IsUndefinedType(e))
+                {
+                    // Fresh graph: the Migration tracking schema (label / MigrationName key) doesn't exist
+                    // yet, so has('MigrationName', …) throws "Undefined type used in query". That means
+                    // nothing has been applied — the keys get auto-created on the first AddAppliedMigration.
+                    return applied;
+                }
                 foreach (var row in rows)
                 {
                     var name = GetValue(row, nameof(Migration.MigrationName))?.ToString();
@@ -44,6 +79,16 @@ namespace Ivet.Services
                 }
             }
             return applied;
+        }
+
+        // JanusGraph raises this when a has()/query references a property key or label that has not been
+        // defined — on a pristine graph the Migration tracking schema is simply not there yet.
+        private static bool IsUndefinedType(Exception e)
+        {
+            for (var cur = e; cur is not null; cur = cur.InnerException)
+                if (cur.Message.Contains("Undefined type", StringComparison.OrdinalIgnoreCase))
+                    return true;
+            return false;
         }
 
         public void AddAppliedMigration(string name, DateTime date)
@@ -227,15 +272,23 @@ namespace Ivet.Services
 
         public string Execute(string request, long? evaluationTimeout = null)
         {
+            // Migration scripts end in `graph.tx().commit()` and return nothing — so the result set is
+            // empty. Deserializing as <string> + Single() would throw on that empty set; read as object
+            // and tolerate emptiness. The caller (upgrade) ignores the return anyway.
+            ResultSet<object> results;
             if (evaluationTimeout.HasValue)
             {
                 var msg = RequestMessage.Build(Tokens.OpsEval)
                     .AddArgument(Tokens.ArgsGremlin, request)
                     .AddArgument(Tokens.ArgsEvalTimeout, evaluationTimeout.Value)
                     .Create();
-                return _client.SubmitAsync<string>(msg).Result.Single();
+                results = _client!.SubmitAsync<object>(msg).Result;
             }
-            return _client.SubmitAsync<string>(request).Result.Single();
+            else
+            {
+                results = _client!.SubmitAsync<object>(request).Result;
+            }
+            return results.FirstOrDefault()?.ToString() ?? string.Empty;
         }
     }
 }

@@ -45,7 +45,7 @@ namespace Ivet.Verbs.Services
                 })
                 .ToList();
 
-            using var database = new DatabaseService(options.IpAddress, options.Port, options.UseSsl);
+            using var database = new DatabaseService(options.IpAddress, options.Port, options.UseSsl, options.Serializer);
 
             var appliedMigrations = FetchAppliedMigrations(database, migrationInstances.Select(x => x.Name));
 

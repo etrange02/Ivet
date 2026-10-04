@@ -8,7 +8,7 @@ namespace Ivet.Verbs.Services
     {
         public static void Do(TestOptions options, ILoggerFactory loggerFactory)
         {
-            using var database = new DatabaseService(options.IpAddress, options.Port, options.UseSsl);
+            using var database = new DatabaseService(options.IpAddress, options.Port, options.UseSsl, options.Serializer);
             database.GenerateData();
         }
     }

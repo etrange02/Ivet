@@ -18,7 +18,7 @@ namespace Ivet.Verbs.Services
         {
             CliArgumentValidator.ValidatePort(options.Port);
 
-            using var database = new DatabaseService(options.IpAddress, options.Port, options.UseSsl);
+            using var database = new DatabaseService(options.IpAddress, options.Port, options.UseSsl, options.Serializer);
 
             var csv = database.GetIndexStatusSchema();
             var rows = new Parser().GetIndexStatusRows(csv);

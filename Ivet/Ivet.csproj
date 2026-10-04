@@ -14,11 +14,10 @@
     <PackageProjectUrl>https://github.com/etrange02/Ivet</PackageProjectUrl>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
     <PackageLicenseExpression>CECILL-B</PackageLicenseExpression>
-    <Version>1.9.0</Version>
+    <Version>1.9.1</Version>
     <Authors>david.lecoconnier</Authors>
-    <PackageReleaseNotes>* Make analyzer more flexible on unreadable classes
-* Update dependencies
-* Remove depndency</PackageReleaseNotes>
+    <PackageReleaseNotes>* Pin GraphSON 3.0 serializer (Gremlin.Net 3.8 defaults to GraphBinary, which broke upgrade)
+* Tolerate void-returning migration scripts in Execute</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,7 +31,8 @@
     <PackageReference Include="CommandLineParser" Version="2.9.1" />
     <PackageReference Include="ConsoleTables" Version="2.7.0" />
     <PackageReference Include="CsvHelper" Version="33.1.0" />
-    <PackageReference Include="Gremlin.Net" Version="3.8.2" />
+    <PackageReference Include="Gremlin.Net" Version="3.7.3" />
+    <PackageReference Include="JanusGraph.Net" Version="1.1.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.20" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.20" />
   </ItemGroup>

@@ -20,7 +20,7 @@ namespace Ivet.Verbs.Services
             if (!string.IsNullOrEmpty(options.IndexName))
                 GremlinIdentifierValidator.Validate(options.IndexName, "reindex --index");
 
-            using var database = new DatabaseService(options.IpAddress, options.Port, options.UseSsl);
+            using var database = new DatabaseService(options.IpAddress, options.Port, options.UseSsl, options.Serializer);
 
             var statuses = new Parser().GetIndexStatusRows(database.GetIndexStatusSchema());
             var targets = ResolveTargets(statuses, options.IndexName, logger);
