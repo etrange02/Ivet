@@ -14,10 +14,9 @@
     <PackageProjectUrl>https://github.com/etrange02/Ivet</PackageProjectUrl>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
     <PackageLicenseExpression>CECILL-B</PackageLicenseExpression>
-    <Version>1.9.1</Version>
+    <Version>1.9.2</Version>
     <Authors>david.lecoconnier</Authors>
-    <PackageReleaseNotes>* Pin GraphSON 3.0 serializer (Gremlin.Net 3.8 defaults to GraphBinary, which broke upgrade)
-* Tolerate void-returning migration scripts in Execute</PackageReleaseNotes>
+    <PackageReleaseNotes>* Isolate dll loading</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
